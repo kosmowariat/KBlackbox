@@ -132,12 +132,6 @@ public class IPackageManagerProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
             String packageName = (String) args[0];
             int flags = MethodParameterUtils.toInt(args[1]);
-            
-            
-            if ("com.android.vending".equals(packageName)) {
-                return createFakeGooglePlayServicesPackageInfo();
-            }
-            
             PackageInfo packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(packageName, flags, BlackBoxCore.getUserId());
             if (packageInfo != null) {
                 
@@ -154,6 +148,11 @@ public class IPackageManagerProxy extends BinderInvocationStub {
                     }
                 }
                 return packageInfo;
+            } else {
+                // Provide fake Google Play Services info for MIUI apps
+                if ("com.android.vending".equals(packageName)) {
+                    return createFakeGooglePlayServicesPackageInfo();
+                }
             }
             if (AppSystemEnv.isOpenPackage(packageName)) {
                 return method.invoke(who, args);
