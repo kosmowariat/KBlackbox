@@ -471,6 +471,22 @@ public class IActivityManagerProxy extends ClassInvocationStub {
         }
     }
 
+    @ProxyMethod("updateServiceGroup")
+    public static class UpdateServiceGroup extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            IServiceConnection iServiceConnection = (IServiceConnection) args[0];
+            if (iServiceConnection == null) {
+                return method.invoke(who, args);
+            }
+            ServiceConnectionDelegate delegate = ServiceConnectionDelegate.getDelegate(iServiceConnection.asBinder());
+            if (delegate != null) {
+                args[0] = delegate;
+            }
+            return method.invoke(who, args);
+        }
+    }
+
     @ProxyMethod("getRunningAppProcesses")
     public static class GetRunningAppProcesses extends MethodHook {
 
