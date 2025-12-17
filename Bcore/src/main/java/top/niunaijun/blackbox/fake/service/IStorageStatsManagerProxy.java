@@ -37,6 +37,7 @@ public class IStorageStatsManagerProxy extends BinderInvocationStub {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MethodParameterUtils.replaceFirstAppPkg(args);
+        MethodParameterUtils.replaceLastUid(args);
         return super.invoke(proxy, method, args);
     }
 }
