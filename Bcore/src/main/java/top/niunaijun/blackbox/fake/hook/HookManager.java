@@ -29,6 +29,7 @@ import top.niunaijun.blackbox.fake.service.IXiaomiSettingsProxy;
 import top.niunaijun.blackbox.fake.service.IXiaomiMiuiServicesProxy;
 import top.niunaijun.blackbox.fake.service.IDnsResolverProxy;
 import top.niunaijun.blackbox.fake.service.IContextHubServiceProxy;
+import top.niunaijun.blackbox.fake.service.ICrossProfileAppsProxy;
 import top.niunaijun.blackbox.fake.service.IDeviceIdentifiersPolicyProxy;
 import top.niunaijun.blackbox.fake.service.IDevicePolicyManagerProxy;
 import top.niunaijun.blackbox.fake.service.IDisplayManagerProxy;
@@ -166,6 +167,9 @@ public class HookManager {
         addInjector(new IXiaomiAttributionSourceProxy());
         addInjector(new IXiaomiSettingsProxy());
         addInjector(new IXiaomiMiuiServicesProxy());
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                addInjector(new ICrossProfileAppsProxy());
+            }
             addInjector(new IPhoneSubInfoProxy());
             addInjector(new IMediaRouterServiceProxy());
             addInjector(new IPowerManagerProxy());
