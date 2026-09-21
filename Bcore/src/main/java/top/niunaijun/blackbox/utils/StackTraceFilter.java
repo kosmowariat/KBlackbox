@@ -1,16 +1,21 @@
 package top.niunaijun.blackbox.utils;
 
 public class StackTraceFilter {
-    static {
-        install();
-    }
+    private static boolean sInstalled = false;
 
-    public static void install() {
+    public static synchronized void install() {
+        if (sInstalled) {
+            return;
+        }
         try {
+            final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-                StackTraceElement[] original = e.getStackTrace();
-                e.setStackTrace(filterStackTrace(original));
+                e.setStackTrace(filterStackTrace(e.getStackTrace()));
+                if (previous != null) {
+                    previous.uncaughtException(t, e);
+                }
             });
+            sInstalled = true;
         } catch (Throwable ignored) {}
     }
 

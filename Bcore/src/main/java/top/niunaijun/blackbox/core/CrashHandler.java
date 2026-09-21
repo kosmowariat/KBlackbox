@@ -17,9 +17,14 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        if (BlackBoxCore.get().getExceptionHandler() != null) {
-            BlackBoxCore.get().getExceptionHandler().uncaughtException(t, e);
+        Thread.UncaughtExceptionHandler exceptionHandler = BlackBoxCore.get().getExceptionHandler();
+        if (exceptionHandler != null) {
+            exceptionHandler.uncaughtException(t, e);
         }
-        mDefaultHandler.uncaughtException(t, e);
+        if (mDefaultHandler != null) {
+            mDefaultHandler.uncaughtException(t, e);
+        } else {
+            Runtime.getRuntime().exit(10);
+        }
     }
 }

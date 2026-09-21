@@ -93,10 +93,14 @@ public class NativeCrashPrevention {
             Slog.d(TAG, "Signal handlers prepared (requires native implementation)");
             
             
+            final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread thread, Throwable throwable) {
                     handleNativeCrash(thread, throwable);
+                    if (previous != null) {
+                        previous.uncaughtException(thread, throwable);
+                    }
                 }
             });
             
