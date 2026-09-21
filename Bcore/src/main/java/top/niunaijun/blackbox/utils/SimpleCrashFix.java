@@ -46,46 +46,36 @@ public class SimpleCrashFix {
                 public void uncaughtException(Thread thread, Throwable throwable) {
                     
                     if (isNullContextCrash(throwable)) {
-                        Slog.w(TAG, "Caught null context crash, preventing crash: " + throwable.getMessage());
-                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/NullContext): " + throwable.getMessage(), true);
-                        return; 
+                        reportCrash("NullContext", thread, throwable, true);
+                        return;
                     }
 
                     
                     if (isGooglePlayServicesCrash(throwable)) {
-                        Slog.w(TAG, "Caught Google Play Services crash, preventing crash: " + throwable.getMessage());
-                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/GMS): " + throwable.getMessage(), true);
-                        return; 
+                        reportCrash("GMS", thread, throwable, true);
+                        return;
                     }
 
                     
                     if (isWebViewCrash(throwable)) {
-                        Slog.w(TAG, "Caught WebView crash, preventing crash: " + throwable.getMessage());
-                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/WebView): " + throwable.getMessage(), true);
-                        return; 
+                        reportCrash("WebView", thread, throwable, true);
+                        return;
                     }
 
                     
                     if (isAttributionSourceCrash(throwable)) {
-                        Slog.w(TAG, "Caught AttributionSource crash, preventing crash: " + throwable.getMessage());
-                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/Attribution): " + throwable.getMessage(), true);
-                        return; 
+                        reportCrash("AttributionSource", thread, throwable, true);
+                        return;
                     }
 
                     
                     if (isSocialMediaAppCrash(throwable)) {
-                        Slog.w(TAG, "Caught social media app crash, preventing crash: " + throwable.getMessage());
-                        BlackBoxCore.get().sendLogs("CRASH DETECTED (Caught/SocialMedia): " + throwable.getMessage(), true);
-                        return; 
+                        reportCrash("SocialMedia", thread, throwable, true);
+                        return;
                     }
 
                     
-                    Slog.e(TAG, "Fatal crash detected, attempting to report before death...");
-                    try {
-                         BlackBoxCore.get().sendLogs("FATAL CRASH (Uncaught): " + throwable.getMessage(), false);
-                    } catch (Throwable e) {
-                         Slog.e(TAG, "Failed to report fatal crash: " + e.getMessage());
-                    }
+                    reportCrash("Uncaught", thread, throwable, false);
 
                     
                     if (currentHandler != null) {
@@ -112,38 +102,33 @@ public class SimpleCrashFix {
     }
     
     
+    private static void reportCrash(String rule, Thread thread, Throwable throwable, boolean swallowed) {
+        Slog.w(TAG, "Crash [" + rule + "] on " + thread.getName()
+                + (swallowed ? " swallowed" : " not handled") + ": " + throwable.getMessage(), throwable);
+        try {
+            BlackBoxCore.get().sendLogs("CRASH [" + rule + "]: " + throwable.getMessage(), swallowed);
+        } catch (Throwable e) {
+            Slog.e(TAG, "Failed to report crash: " + e.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Matches only the JVM's own null-receiver wording for a Context lookup, e.g.
+     * "Attempt to invoke interface method 'android.content.res.Resources android.content.Context.getResources()'
+     *  on a null object reference".
+     * Matching the bare word "context", or any stack frame whose class name contains it, made this fire on a
+     * large share of unrelated fatal crashes and left the process alive with its thread already dead.
+     */
     private static boolean isNullContextCrash(Throwable throwable) {
-        if (throwable == null) {
+        if (!(throwable instanceof NullPointerException)) {
             return false;
         }
         
         String message = throwable.getMessage();
-        if (message != null) {
-            return message.contains("Context") || 
-                   message.contains("context") ||
-                   message.contains("getResources") ||
-                   message.contains("getPackageManager") ||
-                   message.contains("getClassLoader");
-        }
-        
-        
-        StackTraceElement[] stackTrace = throwable.getStackTrace();
-        if (stackTrace != null) {
-            for (StackTraceElement element : stackTrace) {
-                String className = element.getClassName();
-                String methodName = element.getMethodName();
-                
-                if (className.contains("Context") || 
-                    className.contains("ContextWrapper") ||
-                    methodName.contains("getResources") ||
-                    methodName.contains("getPackageManager") ||
-                    methodName.contains("getClassLoader")) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
+        return message != null
+                && message.contains("android.content.Context")
+                && message.contains("null object reference");
     }
     
     
