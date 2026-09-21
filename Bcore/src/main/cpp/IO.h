@@ -8,6 +8,7 @@
 #include <jni.h>
 
 #include <list>
+#include <string>
 #include <iostream>
 #include "BoxCore.h"
 
@@ -18,8 +19,8 @@ public:
     static void init(JNIEnv *env);
 
     struct RelocateInfo {
-        const char *targetPath;
-        const char *relocatePath;
+        std::string targetPath;
+        std::string relocatePath;
     };
 
     static void addRule(const char *targetPath, const char *relocatePath);
