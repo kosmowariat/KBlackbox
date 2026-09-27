@@ -76,6 +76,8 @@
     <string name="rename_user">重命名</string>
     <string name="delete_user">删除用户</string>
     <string name="delete_user_hint">删除 %s？此空间中的所有应用和数据都将被移除。</string>
+    <string name="install_gms_option">安装谷歌服务 (GMS)</string>
+    <string name="create_user_failed">无法创建用户</string>
     <string name="user_name">名称</string>
     <string name="all_apps">显示全部应用</string>
     <plurals name="user_app_count">

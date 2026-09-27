@@ -21,8 +21,18 @@ class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
     private val mLaunchResult = MutableLiveData<Boolean?>()
     val launchResult: LiveData<Boolean?> = mLaunchResult
 
-    fun createUser(name: String) {
-        launchOnUI { repo.createUser(name, mCreatedUser) }
+    private val mCreateError = MutableLiveData<String?>()
+    val createError: LiveData<String?> = mCreateError
+
+    val isGmsSupported: Boolean
+        get() = repo.isGmsSupported()
+
+    fun createUser(name: String, installGms: Boolean) {
+        launchOnUI { repo.createUser(name, installGms, mCreatedUser, mCreateError) }
+    }
+
+    fun onCreateErrorShown() {
+        mCreateError.value = null
     }
 
     fun launchApp(packageName: String, userId: Int) {

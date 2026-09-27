@@ -7,6 +7,7 @@ import android.webkit.URLUtil
 import androidx.lifecycle.MutableLiveData
 import java.io.File
 import top.niunaijun.blackbox.BlackBoxCore
+import top.niunaijun.blackbox.core.GmsCore
 import top.niunaijun.blackbox.utils.AbiUtils
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
@@ -460,7 +461,7 @@ class AppsRepository {
             val userIds = blackBoxCore.users.map { it.id }.ifEmpty { listOf(DEFAULT_USER_ID) }.sorted()
             val users =
                     userIds.map { id ->
-                        val apps = sortedInstalledApplications(id)
+                        val apps = sortedInstalledApplications(id).sortedBy { GmsCore.isGoogleAppOrService(it.packageName) }
                         UserBean(
                                 id,
                                 getUserName(id),
@@ -477,7 +478,14 @@ class AppsRepository {
         }
     }
 
-    fun createUser(name: String, createdLiveData: MutableLiveData<UserBean?>) {
+    fun isGmsSupported(): Boolean = BlackBoxCore.get().isSupportGms
+
+    fun createUser(
+            name: String,
+            installGms: Boolean,
+            createdLiveData: MutableLiveData<UserBean?>,
+            errorLiveData: MutableLiveData<String?>
+    ) {
         try {
             val blackBoxCore = BlackBoxCore.get()
             if (blackBoxCore.users.isEmpty()) {
@@ -486,9 +494,16 @@ class AppsRepository {
             val nextId = blackBoxCore.users.maxOf { it.id } + 1
             blackBoxCore.createUser(nextId)
             renameUser(nextId, name)
+            if (installGms) {
+                val result = blackBoxCore.installGms(nextId)
+                if (!result.success) {
+                    errorLiveData.postValue(getString(R.string.install_fail, result.msg))
+                }
+            }
             createdLiveData.postValue(UserBean(nextId, getUserName(nextId), 0, emptyList()))
         } catch (e: Exception) {
             Log.e(TAG, "Error creating user", e)
+            errorLiveData.postValue(getString(R.string.create_user_failed))
         }
     }
 

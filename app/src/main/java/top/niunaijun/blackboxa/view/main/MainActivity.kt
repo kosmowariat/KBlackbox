@@ -273,7 +273,14 @@ class MainActivity : LoadingActivity() {
         viewModel.createdUser.observe(this) { user ->
             user ?: return@observe
             viewModel.onCreatedUserOpened()
+            hideLoading()
             UserAppsActivity.start(this, user.id, user.name)
+        }
+        viewModel.createError.observe(this) { message ->
+            message ?: return@observe
+            viewModel.onCreateErrorShown()
+            hideLoading()
+            toast(message)
         }
         viewModel.launchResult.observe(this) { launched ->
             launched ?: return@observe
@@ -287,7 +294,12 @@ class MainActivity : LoadingActivity() {
 
     private fun initFab() {
         viewBinding.fab.setOnClickListener {
-            showNameDialog(R.string.new_user, "") { viewModel.createUser(it) }
+            showNameDialog(R.string.new_user, "", viewModel.isGmsSupported) { name, installGms ->
+                if (installGms) {
+                    showLoading()
+                }
+                viewModel.createUser(name, installGms)
+            }
         }
     }
 
@@ -306,18 +318,26 @@ class MainActivity : LoadingActivity() {
     }
 
     private fun showRenameDialog(user: UserBean) {
-        showNameDialog(R.string.rename_user, user.name) { viewModel.renameUser(user.id, it) }
+        showNameDialog(R.string.rename_user, user.name) { name, _ -> viewModel.renameUser(user.id, name) }
     }
 
-    private fun showNameDialog(@StringRes title: Int, initialName: String, onConfirm: (String) -> Unit) {
+    private fun showNameDialog(
+            @StringRes title: Int,
+            initialName: String,
+            showGmsOption: Boolean = false,
+            onConfirm: (name: String, installGms: Boolean) -> Unit
+    ) {
         val binding = DialogTextInputBinding.inflate(LayoutInflater.from(this))
         binding.inputLayout.hint = getString(R.string.user_name)
         binding.input.setText(initialName)
         binding.input.setSelection(initialName.length)
+        binding.installGms.visibility = if (showGmsOption) View.VISIBLE else View.GONE
         val dialog = MaterialAlertDialogBuilder(this)
                 .setTitle(title)
                 .setView(binding.root)
-                .setPositiveButton(R.string.done) { _, _ -> onConfirm(binding.input.text.toString().trim()) }
+                .setPositiveButton(R.string.done) { _, _ ->
+                    onConfirm(binding.input.text.toString().trim(), showGmsOption && binding.installGms.isChecked)
+                }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         val doneButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
