@@ -8,6 +8,7 @@ import top.niunaijun.blackboxa.view.apps.AppsFactory
 import top.niunaijun.blackboxa.view.fake.FakeLocationFactory
 import top.niunaijun.blackboxa.view.gms.GmsFactory
 import top.niunaijun.blackboxa.view.list.ListFactory
+import top.niunaijun.blackboxa.view.users.UsersFactory
 
 
 
@@ -27,6 +28,10 @@ object InjectionUtil {
 
     fun getListFactory(): ListFactory {
         return ListFactory(appsRepository)
+    }
+
+    fun getUsersFactory(): UsersFactory {
+        return UsersFactory(appsRepository)
     }
 
 

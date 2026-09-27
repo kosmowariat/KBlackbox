@@ -69,4 +69,15 @@
         <item>淺色</item>
         <item>深色</item>
     </string-array>
+    <string name="new_user">新增使用者</string>
+    <string name="default_user_name">使用者 %s</string>
+    <string name="user_options">使用者選項</string>
+    <string name="rename_user">重新命名</string>
+    <string name="delete_user">刪除使用者</string>
+    <string name="delete_user_hint">刪除 %s？此空間中的所有應用程式和資料都將被移除。</string>
+    <string name="user_name">名稱</string>
+    <string name="all_apps">顯示全部應用程式</string>
+    <plurals name="user_app_count">
+        <item quantity="other">%d 個應用程式</item>
+    </plurals>
 </resources>

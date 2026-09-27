@@ -79,4 +79,17 @@
         <item>light</item>
         <item>dark</item>
     </string-array>
+    <string name="new_user">New user</string>
+    <string name="default_user_name">User %s</string>
+    <string name="user_options">User options</string>
+    <string name="rename_user">Rename</string>
+    <string name="delete_user">Delete user</string>
+    <string name="delete_user_hint">Delete %s? All apps and data in this space will be removed.</string>
+    <string name="user_name">Name</string>
+    <string name="all_apps">Show all apps</string>
+    <string name="more_apps_count" translatable="false">+%d</string>
+    <plurals name="user_app_count">
+        <item quantity="one">%d app</item>
+        <item quantity="other">%d apps</item>
+    </plurals>
 </resources>

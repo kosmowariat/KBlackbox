@@ -12,11 +12,17 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.bean.InstalledAppBean
+import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.getString
 
 
 class AppsRepository {
+    companion object {
+        const val DEFAULT_USER_ID = 0
+        const val USER_PREVIEW_APP_COUNT = 5
+    }
+
     val TAG: String = "AppsRepository"
     private var mInstalledList = mutableListOf<AppInfo>()
 
@@ -408,7 +414,6 @@ class AppsRepository {
             } else {
                 resultLiveData.postValue(getString(R.string.install_fail, installResult.msg))
             }
-            scanUser()
         } catch (e: Exception) {
             Log.e(TAG, "Error installing APK: ${e.message}")
             resultLiveData.postValue("Installation failed: ${e.message}")
@@ -419,7 +424,6 @@ class AppsRepository {
         try {
             BlackBoxCore.get().uninstallPackageAsUser(packageName, userID)
             updateAppSortList(userID, packageName, false)
-            scanUser()
             resultLiveData.postValue(getString(R.string.uninstall_success))
         } catch (e: Exception) {
             Log.e(TAG, "Error uninstalling APK: ${e.message}")
@@ -428,12 +432,15 @@ class AppsRepository {
     }
 
     fun launchApk(packageName: String, userId: Int, launchLiveData: MutableLiveData<Boolean>) {
-        try {
-            val result = BlackBoxCore.get().launchApk(packageName, userId)
-            launchLiveData.postValue(result)
+        launchLiveData.postValue(launchApk(packageName, userId))
+    }
+
+    fun launchApk(packageName: String, userId: Int): Boolean {
+        return try {
+            BlackBoxCore.get().launchApk(packageName, userId)
         } catch (e: Exception) {
             Log.e(TAG, "Error launching APK: ${e.message}")
-            launchLiveData.postValue(false)
+            false
         }
     }
 
@@ -447,30 +454,75 @@ class AppsRepository {
         }
     }
 
-    
-    private fun scanUser() {
+    fun getUserList(usersLiveData: MutableLiveData<List<UserBean>>) {
         try {
             val blackBoxCore = BlackBoxCore.get()
-            val userList = blackBoxCore.users
+            val userIds = blackBoxCore.users.map { it.id }.ifEmpty { listOf(DEFAULT_USER_ID) }.sorted()
+            val users =
+                    userIds.map { id ->
+                        val apps = sortedInstalledApplications(id)
+                        UserBean(
+                                id,
+                                getUserName(id),
+                                apps.size,
+                                apps.take(USER_PREVIEW_APP_COUNT).map {
+                                    AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir, false)
+                                }
+                        )
+                    }
+            usersLiveData.postValue(users)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading user list", e)
+            usersLiveData.postValue(emptyList())
+        }
+    }
 
-            if (userList.isEmpty()) {
-                return
+    fun createUser(name: String, createdLiveData: MutableLiveData<UserBean?>) {
+        try {
+            val blackBoxCore = BlackBoxCore.get()
+            if (blackBoxCore.users.isEmpty()) {
+                blackBoxCore.createUser(DEFAULT_USER_ID)
             }
+            val nextId = blackBoxCore.users.maxOf { it.id } + 1
+            blackBoxCore.createUser(nextId)
+            renameUser(nextId, name)
+            createdLiveData.postValue(UserBean(nextId, getUserName(nextId), 0, emptyList()))
+        } catch (e: Exception) {
+            Log.e(TAG, "Error creating user", e)
+        }
+    }
 
-            val id = userList.last().id
+    fun renameUser(userId: Int, name: String) {
+        AppManager.mRemarkSharedPreferences.edit().apply {
+            if (name.isBlank()) remove("Remark$userId") else putString("Remark$userId", name.trim())
+            apply()
+        }
+    }
 
-            if (blackBoxCore.getInstalledApplications(0, id).isEmpty()) {
-                blackBoxCore.deleteUser(id)
-                AppManager.mRemarkSharedPreferences.edit().apply {
-                    remove("Remark$id")
-                    remove("AppList$id")
-                    apply()
-                }
-                scanUser()
+    fun deleteUser(userId: Int) {
+        try {
+            BlackBoxCore.get().deleteUser(userId)
+            AppManager.mRemarkSharedPreferences.edit().apply {
+                remove("Remark$userId")
+                remove("AppList$userId")
+                apply()
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error in scanUser: ${e.message}")
+            Log.e(TAG, "Error deleting user $userId", e)
         }
+    }
+
+    fun getUserName(userId: Int): String {
+        val remark = AppManager.mRemarkSharedPreferences.getString("Remark$userId", null)
+        return if (remark.isNullOrBlank()) getString(R.string.default_user_name, userId.toString()) else remark
+    }
+
+    private fun sortedInstalledApplications(userId: Int): List<ApplicationInfo> {
+        val applications = BlackBoxCore.get().getInstalledApplications(0, userId)
+        val sortList = AppManager.mRemarkSharedPreferences.getString("AppList$userId", "")
+                ?.split(",")
+                ?.filter { it.isNotEmpty() }
+        return if (sortList.isNullOrEmpty()) applications else applications.sortedWith(AppsSortComparator(sortList))
     }
 
     

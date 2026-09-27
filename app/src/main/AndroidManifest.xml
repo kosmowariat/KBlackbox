@@ -41,6 +41,7 @@
         </activity>
         <activity android:name=".view.list.ListActivity" />
         <activity android:name=".view.fake.FakeManagerActivity" />
+        <activity android:name=".view.apps.UserAppsActivity" />
 
         <activity
             android:name=".view.main.ShortcutActivity"

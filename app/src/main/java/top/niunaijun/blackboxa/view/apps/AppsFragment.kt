@@ -27,7 +27,6 @@ import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
-import top.niunaijun.blackboxa.view.main.MainActivity
 import java.util.*
 import kotlin.math.abs
 
@@ -279,7 +278,7 @@ class AppsFragment : Fragment() {
 
             if (abs(yU) > min) {
                 try {
-                    (requireActivity() as? MainActivity)?.showFloatButton(yU < 0)
+                    (requireActivity() as? UserAppsActivity)?.showFloatButton(yU < 0)
                 } catch (e: Exception) {
                     Log.e(TAG, "Error showing/hiding float button: ${e.message}")
                 }
@@ -402,7 +401,6 @@ class AppsFragment : Fragment() {
                         hideLoading()
                         requireContext().toast(it)
                         viewModel.getInstalledApps(userID)
-                        scanUser()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error observing result data: ${e.message}")
@@ -517,14 +515,6 @@ class AppsFragment : Fragment() {
         } catch (e: Exception) {
             Log.e(TAG, "Error installing APK: ${e.message}")
             hideLoading()
-        }
-    }
-
-    private fun scanUser() {
-        try {
-            (requireActivity() as? MainActivity)?.scanUser()
-        } catch (e: Exception) {
-            Log.e(TAG, "Error scanning user: ${e.message}")
         }
     }
 

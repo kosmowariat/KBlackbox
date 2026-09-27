@@ -88,7 +88,6 @@ dependencies {
 //    implementation 'com.github.nukc.stateview:kotlin:2.2.0'
     
     implementation 'com.github.Ferfalk:SimpleSearchView:0.2.0'
-    implementation 'com.tbuonomo:dotsindicator:4.2'
     
     implementation 'org.osmdroid:osmdroid-android:6.1.11'
     

@@ -69,4 +69,12 @@
         <item name="android:windowBackground">@drawable/splash</item>
     </style>
 
+    <style name="Widget.BlackBox.UserPreviewApp" parent="">
+        <item name="android:layout_width">@dimen/icon_size</item>
+        <item name="android:layout_height">@dimen/icon_size</item>
+        <item name="android:padding">@dimen/preview_icon_padding</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
 </resources>
