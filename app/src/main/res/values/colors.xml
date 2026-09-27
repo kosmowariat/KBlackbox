@@ -38,4 +38,5 @@
     <color name="primary">@color/md_theme_primary</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#757575</color>
+    <color name="ic_launcher_background">#222126</color>
 </resources>
