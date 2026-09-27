@@ -1,5 +1,58 @@
 # Release Notes - NewBlackbox
 
+## Version: GUI Refresh (2026-09-27)
+
+---
+
+### New Features
+
+#### Material 3 Theme and Dark Mode
+The host app UI moves from the grey `MaterialComponents` theme to Material 3 with full light and dark color schemes.
+
+- **Location:** Whole host app (main screen, toolbar, app grid, lists, GMS manager, settings, dialogs, splash)
+- **Default:** Custom blue palette (seed `#3F6FD8`); follows the system light/dark setting
+- On Android 12+ the palette follows the wallpaper (dynamic color); older versions use the custom palette
+- The status bar, toolbar, FAB, page dots, badges, search bar, list rows and GMS switches (now `MaterialSwitch`) use theme colors in both modes
+- Sandboxed (guest) apps are not themed
+
+#### Theme Preference
+Added a setting to choose the app theme.
+
+- **Location:** Settings → Appearance → Theme
+- **Default:** System default
+- Options: System default / Light / Dark
+- Applies immediately, without a restart, and persists across launches
+
+**Files Changed:**
+- `app/src/main/java/top/niunaijun/blackboxa/app/App.kt`
+- `app/src/main/java/top/niunaijun/blackboxa/view/main/BlackBoxLoader.kt`
+- `app/src/main/java/top/niunaijun/blackboxa/view/main/MainActivity.kt`
+- `app/src/main/java/top/niunaijun/blackboxa/view/setting/SettingFragment.kt`
+- `app/src/main/java/top/niunaijun/blackboxa/view/apps/AppsAdapter.kt`
+- `app/src/main/java/top/niunaijun/blackboxa/view/gms/GmsManagerActivity.kt`
+- `app/src/main/res/values/colors.xml`
+- `app/src/main/res/values/themes.xml`
+- `app/src/main/res/values/dimens.xml`
+- `app/src/main/res/values/strings.xml`
+- `app/src/main/res/values-night/colors.xml`
+- `app/src/main/res/values-v23/themes.xml`
+- `app/src/main/res/values-zh-rCN/strings.xml`
+- `app/src/main/res/values-zh-rTW/strings.xml`
+- `app/src/main/res/drawable/splash.xml`
+- `app/src/main/res/drawable-night/ic_empty.xml`
+- `app/src/main/res/drawable-anydpi/ic_add.xml`
+- `app/src/main/res/drawable-anydpi/ic_search.xml`
+- `app/src/main/res/layout/view_toolbar.xml`
+- `app/src/main/res/layout/activity_main.xml`
+- `app/src/main/res/layout/item_app.xml`
+- `app/src/main/res/layout/activity_list.xml`
+- `app/src/main/res/layout/item_package.xml`
+- `app/src/main/res/layout/item_fake.xml`
+- `app/src/main/res/layout/item_gms.xml`
+- `app/src/main/res/xml/setting.xml`
+
+---
+
 ## Version: Latest Build (2026-01-31)
 
 ---

@@ -5,10 +5,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ToolBarColorStyle"
-        android:background="@color/primary"
-        app:title="@string/app_name"
-        app:subtitleTextColor="@color/white"
-        app:titleTextColor="@color/white">
+        style="@style/Widget.Material3.Toolbar.Surface"
+        android:theme="@style/ThemeOverlay.BlackBox.Toolbar"
+        app:title="@string/app_name">
 
 </com.google.android.material.appbar.MaterialToolbar>

@@ -58,7 +58,7 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
   - `bean/`: UI models (`AppInfo`, `InstalledAppBean`, `GmsBean`, `FakeLocationBean`, `XpModuleInfo`)
   - `util/`: `InjectionUtil` (manual DI; singleton repositories + `ViewModelProvider` factories), `ViewBindingEx` (`by inflate()`), `ToastEx`, `ShortcutUtil`, `ResUtil`
   - `widget/`: `EnFloatView`, `RockerView` (floating joystick overlay)
-- **Resources**: `res/layout` (17 layouts), `res/menu` (4 menus), `res/values` (`themes.xml`, `colors.xml`, `strings.xml`), plus `values-zh-rCN` and `values-zh-rTW` translations.
+- **Resources**: `res/layout` (17 layouts), `res/menu` (4 menus), `res/values` (`themes.xml`, `colors.xml`, `dimens.xml`, `strings.xml`), `values-night` (night palette), `values-v23` (status bar), `drawable-night`, plus `values-zh-rCN` and `values-zh-rTW` translations.
 
 ### Bcore — Virtualization engine
 - **Location**: `Bcore/src/main/java/top/niunaijun/blackbox/`
@@ -111,7 +111,8 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 ## UI Development Notes (focus area)
 - Add new screens under `view/<feature>/` with the matching `Activity`/`Fragment`, `ViewModel`, `Adapter`, `Factory` set, and register the factory in `InjectionUtil`.
 - UI code should talk to the engine **only through repositories** in `data/`. Do not call `BlackBoxCore` from views.
-- The theme is defined in `res/values/themes.xml` (`Theme.BlackBox`, `WelcomeTheme`, `ToolBarColorStyle`). The colors in `colors.xml` are currently monochrome grey.
+- The theme is defined in `res/values/themes.xml`: `Base.Theme.BlackBox` (parent `Theme.Material3.DayNight.NoActionBar`) → `Theme.BlackBox`, `WelcomeTheme`, and `ThemeOverlay.BlackBox.Toolbar`, plus typography/shape tokens and `dimens.xml`. The 34 M3 color roles are `md_theme_*` colors in `values/colors.xml` (day) and `values-night/colors.xml` (night), generated from seed `#3F6FD8`; views use `?attr/color*`, never hex.
+- Dark mode follows the Settings → Appearance → Theme preference (`theme_mode`: System default / Light / Dark), stored in `BlackBoxLoader` (`AppSharedPreferenceDelegate`) and applied with `AppCompatDelegate.setDefaultNightMode`. `App.onCreate` applies it and enables `DynamicColors` (API 31+) only in the main process, for host activities only.
 
 ---
 *Based on codebase analysis performed 2026-09-26.*

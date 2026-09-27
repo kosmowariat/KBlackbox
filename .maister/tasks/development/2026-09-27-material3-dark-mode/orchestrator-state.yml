@@ -1,0 +1,143 @@
+orchestrator:
+  started_phase: phase-1
+  completed_phases: [phase-1, phase-2, phase-4, phase-5, phase-6, phase-7, phase-8]
+  failed_phases: []
+  auto_fix_attempts:
+    phase-1: 0
+    phase-2: 0
+  options:
+    html_output: true
+    mockup_format: html
+    spec_audit_enabled: false
+    skip_test_suite: true
+    e2e_enabled: true
+    user_docs_enabled: true
+    code_review_enabled: true
+    pragmatic_review_enabled: true
+    reality_check_enabled: true
+    production_check_enabled: true
+    sequential: null
+  created: 2026-09-27T07:31:13Z
+  updated: 2026-09-27T17:35:11Z
+  task_path: .maister/tasks/development/2026-09-27-material3-dark-mode
+  task_ids: {}
+
+task:
+  title: Migracja motywu na Material 3 + dark mode
+  description: >
+    Migrate the app theme Theme.BlackBox from Theme.MaterialComponents.Light.NoActionBar to Material 3
+    with a real color scheme, typography/shape tokens, a values-night dark theme, and removal of
+    forceDarkAllowed=false. Roadmap High Priority GUI items "Visual refresh / design system" + "Dark mode".
+    Target defined in .maister/docs/standards/frontend/android-resources.md.
+  status: in_progress
+  tags: [ui, theme, material3, dark-mode, app]
+  priority: high
+
+project_context:
+  project_doc_paths:
+    - .maister/docs/project/vision.md
+    - .maister/docs/project/roadmap.md
+    - .maister/docs/project/tech-stack.md
+    - .maister/docs/project/architecture.md
+
+task_context:
+  risk_level: medium
+  clarifications_resolved: true
+  scope_expanded: false
+  tech_clarified: true
+  architecture_decision: "App.onCreate init gated by isMainProcess + host-activity DynamicColors precondition; md_theme_* colors in values/ and values-night/ with single DayNight Theme.BlackBox; no new deps; manual QA"
+  task_characteristics:
+    has_reproducible_defect: false
+    modifies_existing_code: true
+    creates_new_entities: false
+    involves_data_operations: true
+    ui_heavy: true
+  research_reference:
+    path: null
+  design_reference:
+    source: phase-4-mockup-studio
+    mockup_count: 11
+    has_brief: false
+    index_path: analysis/design-context/INDEX.md
+  design_resources:
+    ran: true
+    standards: [{path: .maister/docs/standards/frontend/android-resources.md, topic: theme/resources}, {path: .maister/docs/standards/frontend/android-views.md, topic: views}, {path: .maister/docs/standards/frontend/android-feedback.md, topic: dialogs}, {path: .maister/docs/standards/frontend/accessibility.md, topic: a11y}]
+    design_system: [{kind: theme, path: app/src/main/res/values/themes.xml, note: being replaced}, {kind: token, path: app/src/main/res/values/colors.xml, note: replaced by M3 roles}]
+    skill_hints: []
+    found_any: true
+  phase_summaries:
+    codebase_analysis:
+      summary: "Theme swap to Material3.DayNight is small (MDC 1.12.0 already ships it); real work is ~20 hard-coded light colors (#212121 item text, white-on-grey toolbar, white splash, light ic_empty) and third-party widgets reading colorPrimary. Guest apps unaffected; no tests."
+      primary_language: kotlin
+      key_files: [app/src/main/res/values/themes.xml, app/src/main/res/values/colors.xml, app/src/main/res/layout/view_toolbar.xml, app/src/main/res/layout/item_app.xml, app/src/main/res/layout/item_fake.xml, app/src/main/res/layout/item_package.xml, app/src/main/res/layout/item_gms.xml, app/src/main/res/layout/activity_list.xml, app/src/main/res/drawable/splash.xml, app/src/main/res/layout/activity_main.xml, app/src/main/res/drawable/ic_empty.xml, app/src/main/java/top/niunaijun/blackboxa/view/apps/AppsAdapter.kt, app/src/main/res/xml/setting.xml, app/src/main/java/top/niunaijun/blackboxa/app/App.kt]
+      decisions: []
+      risks: ["Night mode must be gated to main process (App.onCreate runs in every :pN stub process)", "MainActivity.kt:253 toolbar.getChildAt(1) fragile", "No tests - manual light/dark verification"]
+      artifacts: [{path: analysis/codebase-analysis.md, label: Codebase analysis, html: null}]
+    clarifications:
+      summary: "M3 surface toolbar; custom M3 palette + dynamic color (API 31+); System/Light/Dark setting without restart; Bcore LauncherActivity out of scope."
+      decisions:
+        - {decision: "Toolbar: M3 surface style", rationale: "Standard M3, readable in both modes"}
+        - {decision: "Custom M3 palette + dynamic color on Android 12+", rationale: "User choice"}
+        - {decision: "Theme-mode ListPreference System/Light/Dark, default System", rationale: "User choice; no restart via AppCompatDelegate"}
+        - {decision: "Bcore LauncherActivity flash out of scope", rationale: "Separate task; Bcore unchanged"}
+      risks: ["Seed color not chosen yet"]
+      artifacts: [{path: analysis/clarifications.md, label: Clarifications, html: null}]
+    gap_analysis:
+      summary: "Medium risk, modificative UI change. Critical: DynamicColors/night-mode init must be gated to main process + host activities; theme-mode pref needs single source of truth (loader). One critical decision (seed color) + 6 important."
+      integration_points: ["App.kt onCreate (main-process gated)", "SettingFragment.kt theme listener", "BlackBoxLoader.kt new delegate property", "xml/setting.xml + strings en/zh-rCN/zh-rTW"]
+      risks: ["DynamicColors would restyle guest :pN activities and Bcore LauncherActivity unless gated", "Settings stored twice (default prefs + loader) can drift", "Fixed color resources (CornerLabelView, CatLoadingView, AppsAdapter) won't follow Material You"]
+      decisions:
+        - {decision: "Seed color blue ~#3F6FD8 + neutral surfaces", rationale: "Chromatic primary needed for M3 affordances"}
+        - {decision: "material-dialogs styled via md_* attrs; call sites unchanged", rationale: "Focused diff; migration is separate roadmap task"}
+        - {decision: "Tokens: theme-level + touched layouts only", rationale: "No unrelated refactor"}
+        - {decision: "Remove only obsolete theme/color entries; keep dead layouts", rationale: "User choice"}
+        - {decision: "osmdroid tiles stay light", rationale: "Inverted OSM tiles look odd"}
+        - {decision: "Toolbar subtitle click re-implemented robustly", rationale: "User choice; getChildAt(1) fragile"}
+        - {decision: "Dynamic color always on API 31+, no toggle", rationale: "Not requested; easy to add later"}
+      artifacts: [{path: analysis/gap-analysis.md, label: Gap analysis, html: null}, {path: analysis/scope-clarifications.md, label: Scope clarifications, html: null}]
+
+    scope_clarifications:
+      scope_expanded: false
+      summary: "Scope confirmed; no expansion. Dead layouts kept for later."
+    ui_mockups:
+      summary: "11 HTML mockups (light+dark side by side) of M3 re-theme, seed #3F6FD8; structure unchanged. Live gallery http://localhost:3847."
+      format_used: html
+      components_designed: [main-apps-grid, main-empty-state, choose-app-list-with-search, settings-with-theme-preference, theme-picker-dialog, gms-manager-with-materialswitch, dialog-confirm, dialog-input, app-long-press-menu, splash-welcome, fake-location]
+      decisions: []
+      risks: ["Palette values in mockups are approximations; final tonal palette generated in implementation"]
+      artifacts: [{path: analysis/design-context/INDEX.md, label: Design context index, html: null}, {path: analysis/design-context/mockups/main-apps-grid.html, label: Mockup gallery (main), html: analysis/design-context/mockups/main-apps-grid.html}]
+    design:
+      summary: "Design context from Phase 4 mockups; binding for spec/plan/implementation."
+      screen_count: 7
+      component_count: 4
+      index_path: analysis/design-context/INDEX.md
+    specification:
+      summary: "Theme.BlackBox -> Material3.DayNight with 34-role scheme from seed #3F6FD8, DynamicColors API31+ (main process, host activities), surface toolbar, tokens replacing hard-coded colors, Appearance>Theme preference stored in BlackBoxLoader. 20 requirements, 16-row manual QA."
+      decisions:
+        - {decision: "DynamicColors precondition: class name starts with 'top.niunaijun.blackboxa.' (trailing dot)", rationale: "Excludes Bcore top.niunaijun.blackbox.app.LauncherActivity"}
+        - {decision: "@color/primary kept only for CatLoadingView (primary day / primaryContainer night)", rationale: "White label keeps >=4.5:1 contrast"}
+        - {decision: "Status bar surface + dark icons via Base.Theme.BlackBox + values-v23", rationale: "API 21-22 cannot have dark icons"}
+        - {decision: "WelcomeTheme extends Theme.BlackBox", rationale: "DayNight splash without white flash"}
+      risks: ["Third-party XML attrs (CornerLabelView, SimpleSearchView, dotsindicator) may not accept ?attr/ - fallback night-aware @color tokens (no dynamic color)", "ListPreference dialog 28dp corners only on API 28+", "No automated safety net"]
+      artifacts: [{path: implementation/spec.md, label: Specification, html: implementation/spec.html}, {path: analysis/requirements.md, label: Requirements, html: null}, {path: analysis/technical-clarifications.md, label: Technical clarifications, html: null}]
+    planning:
+      summary: "6 task groups, 46 steps, linear 1-6; 11/11 mockups covered; verification = assembleDebug per group + manual QA."
+      decisions:
+        - {decision: "Build verification via local assembleDebug after user installs Android SDK + JDK 21", rationale: "No SDK/JDK21 on machine at planning time; user chose to install"}
+      risks: ["Phase 8 blocked until Android SDK + JDK 21 available"]
+      artifacts: [{path: implementation/implementation-plan.md, label: Implementation plan, html: implementation/implementation-plan.html}, {path: implementation/visual-coverage.md, label: Visual coverage, html: null}]
+  toolchain: "JDK 21 at D:/Android/jdk-21 (via ~/.gradle/gradle.properties org.gradle.java.home), Android SDK at D:/Android/Sdk (local.properties) with platform 35, build-tools 35.0.0, NDK 29.0.13846066. Baseline :app:assembleDebug SUCCESS."
+    implementation:
+      summary: "Groups 1-5 done + 6.1/6.2; full assembleDebug green (all modules); 26 app files changed, Bcore/gradle untouched; manual QA checklist written, 6.3-6.5 deferred to user device QA."
+      decisions:
+        - {decision: "Primary palette chroma 48 (day #395BA9, night #B1C5FF)", rationale: "User chose livelier blue closer to mockups"}
+        - {decision: "Third-party widget colors via ?attr/ (no @color fallback needed)", rationale: "CornerLabelView/dotsindicator/SimpleSearchView read attrs via obtainStyledAttributes"}
+      risks: ["resolved: manual QA confirmed by user on RMX3363 (API 33)", "SimpleSearchView cursor color via reflection may not apply on newer Android", "GMS rows lack mockup summary line (not in spec)"]
+      artifacts: [{path: implementation/work-log.md, label: Work log, html: null}, {path: verification/manual-qa-checklist.md, label: Manual QA checklist, html: null}, {path: implementation/implementation-plan.md, label: Implementation plan (progress), html: implementation/implementation-plan.html}]
+
+verification_context:
+  last_status: null
+  issues_found: []
+  fixes_applied: []
+  decisions_made: []
+  reverify_count: 0

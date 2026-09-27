@@ -5,7 +5,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:paddingTop="16dp">
+        android:paddingTop="@dimen/spacing_medium">
 
     <FrameLayout
             android:layout_width="wrap_content"
@@ -13,8 +13,8 @@
 
         <ImageView
                 android:id="@+id/icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp" />
+                android:layout_width="@dimen/icon_size"
+                android:layout_height="@dimen/icon_size" />
 
         <com.othershe.cornerlabelview.CornerLabelView
                 android:id="@+id/cornerLabel"
@@ -22,11 +22,11 @@
                 android:layout_height="24dp"
                 android:layout_gravity="top|start"
                 android:visibility="invisible"
-                app:bg_color="@color/primary"
+                app:bg_color="?attr/colorTertiaryContainer"
                 app:position="left_top"
                 app:side_length="22dp"
                 app:text="XP"
-                app:text_color="@color/white"
+                app:text_color="?attr/colorOnTertiaryContainer"
                 app:text_size="8sp" />
     </FrameLayout>
 
@@ -35,8 +35,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="@color/primary_text"
-            android:textSize="12sp" />
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnSurface" />
 
 
 </LinearLayout>

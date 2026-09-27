@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="Theme.BlackBox" parent="Base.Theme.BlackBox">
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    </style>
+
+</resources>

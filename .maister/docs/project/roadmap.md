@@ -8,8 +8,8 @@
 ## Planned Enhancements (Next 3–6 Months)
 
 ### High Priority — GUI
-- [ ] **Visual refresh / design system.** Migrate `Theme.BlackBox` from `MaterialComponents` to Material 3, define a real color palette (the primary/dark/light colors are all `#3F3F3F` today), and add typography and shape tokens.
-- [ ] **Dark mode.** Add a `values-night` theme and remove `forceDarkAllowed=false`.
+- [x] **Visual refresh / design system.** Migrate `Theme.BlackBox` from `MaterialComponents` to Material 3, define a real color palette (the primary/dark/light colors are all `#3F3F3F` today), and add typography and shape tokens. *Done 2026-09-27: `Theme.Material3.DayNight.NoActionBar`, custom blue `md_theme_*` palette (seed `#3F6FD8`), dynamic color on Android 12+, typography/shape tokens and `dimens.xml`.*
+- [x] **Dark mode.** Add a `values-night` theme and remove `forceDarkAllowed=false`. *Done 2026-09-27: `values-night` palette plus a Settings → Appearance → Theme preference (System default / Light / Dark).*
 - [ ] **App grid and main screen UX.** Improve `AppsFragment` / `item_app.xml`: clearer install FAB flow, empty and loading states, better long-press actions, and user-space switching in `MainActivity`.
 - [ ] **String externalization.** Move hard-coded dialog texts (e.g. the storage and VPN permission dialogs in `MainActivity`) to `strings.xml`, with `zh-rCN`/`zh-rTW` translations and optionally a Polish one.
 - [ ] **Settings redesign.** Update `SettingFragment` (preference-ktx) to grouped Material 3 preferences.

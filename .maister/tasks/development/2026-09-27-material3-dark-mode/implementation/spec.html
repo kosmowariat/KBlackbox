@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specification — Material 3 theme + dark mode</title>
+<style>
+:root {
+  --bg:#f6f7f9; --surface:#fff; --border:#e2e5ea; --text:#1a1d23; --dim:#6b7280;
+  --accent:#4f46e5; --accent-soft:#eef2ff; --ok:#16a34a; --ok-soft:#ecfdf3;
+  --warn:#d97706; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2;
+  --info:#2563eb; --info-soft:#eff6ff; --radius:10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111418; --surface:#1a1f26; --border:#2e3640; --text:#e6e9ee; --dim:#9aa4b2;
+    --accent:#818cf8; --accent-soft:#26294a; --ok:#4ade80; --ok-soft:#11291a;
+    --warn:#fbbf24; --warn-soft:#2e2410; --crit:#f87171; --crit-soft:#321616;
+    --info:#60a5fa; --info-soft:#15233a; }
+}
+* { box-sizing:border-box; }
+body { margin:0 auto; max-width:1100px; padding:24px 20px 64px; background:var(--bg);
+  color:var(--text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1 { font-size:22px; letter-spacing:-.01em; } h2 { font-size:16px; margin-top:28px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin:14px 0; }
+.badge { display:inline-block; font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent); }
+.sev { display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase;
+  padding:1.5px 7px; border-radius:99px; margin-right:6px; }
+.sev.critical { background:var(--crit-soft); color:var(--crit); }
+.sev.warning  { background:var(--warn-soft); color:var(--warn); }
+.sev.info     { background:var(--info-soft); color:var(--info); }
+.pass { color:var(--ok); font-weight:600; } .fail { color:var(--crit); font-weight:600; }
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
+code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+  background:var(--accent-soft); padding:1px 5px; border-radius:4px; }
+img.shot { max-width:100%; border:1px solid var(--border); border-radius:var(--radius); }
+details > summary { cursor:pointer; font-weight:600; }
+.crumbs { display:flex; gap:14px; font-size:13px; margin-bottom:18px; flex-wrap:wrap; }
+.crumbs a.md { margin-left:auto; color:var(--dim); }
+.crumbs .here { font-weight:650; color:var(--text); }
+.tiles { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0; }
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:10px 16px; text-align:center; min-width:90px; }
+.tile b { display:block; font-size:20px; letter-spacing:-.01em; }
+.tile span { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); }
+/* extensions */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:720px){ .grid2 { grid-template-columns:1fr; } }
+.stories { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+.story { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent);
+  border-radius:var(--radius); padding:12px 14px; }
+.in h3 { color:var(--ok); } .out h3 { color:var(--dim); }
+h3 { font-size:14px; margin:0 0 8px; }
+ul { margin:6px 0; padding-left:20px; }
+.sw { display:inline-block; width:12px; height:12px; border-radius:3px; border:1px solid var(--border); vertical-align:middle; margin-right:4px; }
+.toc { font-size:13px; color:var(--dim); margin:8px 0 4px; }
+</style>
+</head>
+<body>
+<nav class="crumbs">
+  <a href="../dashboard.html">← Dashboard</a>
+  <span class="here">Spec</span>
+  <a href="implementation-plan.html">Plan</a>
+  <a href="../verification/implementation-verification.html">Verification</a>
+  <a href="spec.md" target="_blank" rel="noopener" class="md">md twin ↗</a>
+</nav>
+
+<header>
+  <span class="badge">Specification</span>
+  <h1>Material 3 theme + dark mode (app module)</h1>
+  <div style="color:var(--dim);font-size:13px">Task 2026-09-27-material3-dark-mode · generated 2026-09-27 · source: <a href="spec.md" target="_blank" rel="noopener">spec.md</a></div>
+</header>
+
+<div class="tiles">
+  <div class="tile"><b>20</b><span>core requirements</span></div>
+  <div class="tile"><b>10</b><span>reused components</span></div>
+  <div class="tile"><b>6</b><span>new resources</span></div>
+  <div class="tile"><b>11</b><span>binding mockups</span></div>
+  <div class="tile"><b>16</b><span>QA checks</span></div>
+  <div class="tile"><b style="color:var(--warn)">Medium</b><span>risk</span></div>
+</div>
+
+<section class="tldr card">
+  <h2 style="margin-top:0">TL;DR</h2>
+  <p><code>Theme.BlackBox</code> is re-parented to <code>Theme.Material3.DayNight.NoActionBar</code>. It gets a full M3 tonal scheme from seed <span class="sw" style="background:#3F6FD8"></span><code>#3F6FD8</code>, stored as <code>md_theme_*</code> in <code>values/</code> and <code>values-night/</code>, plus dynamic color on API 31+ (main process, host activities only). Hard-coded light colors move to theme attributes. The toolbar becomes an M3 surface toolbar, <code>forceDarkAllowed=false</code> is removed, and the splash follows the theme. A new <b>Settings › Appearance › Theme</b> ListPreference (System/Light/Dark, default System) is stored only in <code>BlackBoxLoader</code> and applies without a restart. Only the app module changes; there are no new dependencies and no new automated tests (manual QA).</p>
+
+  <h3 style="margin-top:14px">Key Decisions</h3>
+  <ul>
+    <li><b>One DayNight <code>Theme.BlackBox</code></b> with <code>md_theme_*</code> colors (day in values/, night in values-night/). The manifest is unchanged.</li>
+    <li><b>Init in <code>App.onCreate</code></b>, gated by <code>isMainProcess()</code>. The DynamicColors precondition uses the class prefix <code>top.niunaijun.blackboxa.</code>. The trailing dot keeps Bcore's <code>top.niunaijun.blackbox.app.LauncherActivity</code> out.</li>
+    <li><b>Single source of truth:</b> a String delegate in <code>BlackBoxLoader</code>. The ListPreference is <code>persistent=false</code>, and its dedicated listener shows no restart toast.</li>
+    <li><b><code>@color/primary</code> is kept</b> only as the CatLoadingView background: primary in day, primaryContainer in night, so the white label keeps 4.5:1.</li>
+    <li><b>Status bar</b> = colorSurface with light icons on API 23+ through a <code>values-v23</code> override (<code>Base.Theme.BlackBox</code>). API 21–22 keeps the M3 default. The navigation bar stays at the system default.</li>
+    <li><b><code>WelcomeTheme</code> extends <code>Theme.BlackBox</code></b> and overrides only <code>windowBackground</code>.</li>
+    <li><b>material-dialogs</b> is themed via <code>md_*</code> attributes; its 12 call sites are untouched.</li>
+    <li><b><code>ToolBarColorStyle</code> → <code>ThemeOverlay.BlackBox.Toolbar</code></b>. Colors <code>accent</code>, <code>primary_dark</code> and <code>primary_light</code> are removed. <code>primary_text</code> and <code>secondary_text</code> stay because the dead <code>item_xp.xml</code> uses them.</li>
+    <li><b>snake_case color names</b> (<code>md_theme_on_primary_container</code>) per the standard, not the Theme Builder camelCase.</li>
+  </ul>
+
+  <h3 style="margin-top:14px">Open Questions / Risks</h3>
+  <ul style="list-style:none;padding-left:0">
+    <li><span class="sev warning">warning</span>Manual QA is the only safety net: no tests and no lint.</li>
+    <li><span class="sev warning">warning</span>It is unverified whether CornerLabelView, SimpleSearchView and dotsindicator resolve <code>?attr/</code> colors. If not, fall back to night-aware <code>@color/md_theme_*</code>, which does not follow dynamic color. SimpleSearchView attribute names must be confirmed.</li>
+    <li><span class="sev info">info</span>The ListPreference dialog is an AppCompat AlertDialog: the 28dp corner is guaranteed only on API 28+.</li>
+    <li><span class="sev info">info</span>The material-dialogs input field gets the M3 outlined shape on a best-effort basis; readable colors are required.</li>
+    <li><span class="sev info">info</span>Dynamic color makes the look device-dependent on API 31+.</li>
+  </ul>
+</section>
+
+<p class="toc">Contents: <a href="#goal">Goal</a> · <a href="#scope">Scope</a> · <a href="#stories">User Stories</a> · <a href="#requirements">Requirements</a> · <a href="#palette">Palette</a> · <a href="#visual">Visual Design</a> · <a href="#reuse">Reuse vs New</a> · <a href="#tech">Technical Approach</a> · <a href="#qa">Manual QA</a> · <a href="#standards">Standards</a> · <a href="#success">Success Criteria</a></p>
+
+<main>
+<h2 id="goal">Goal</h2>
+<div class="card">Deliver a Material 3 look with a real color scheme and full dark mode across all host screens. Users can follow the system theme or force Light or Dark from Settings without restarting, and Bcore and guest apps stay untouched.</div>
+
+<h2 id="scope">Scope</h2>
+<div class="grid2">
+  <div class="card in"><h3>In scope</h3><ul>
+    <li>Theme re-parent, M3 role set, <code>values-night</code>, <code>values-v23</code> status bar</li>
+    <li>Dynamic color (API 31+, main process, host activities)</li>
+    <li>Surface toolbar + <code>ThemeOverlay.BlackBox.Toolbar</code></li>
+    <li>Tokens in touched layouts: item_app/fake/package/gms, activity_main, activity_list, view_toolbar</li>
+    <li>ic_add / ic_search tints, splash, <code>drawable-night/ic_empty.xml</code></li>
+    <li>AppsAdapter placeholders, MaterialSwitch (GMS), robust subtitle click</li>
+    <li>material-dialogs <code>md_*</code> attributes</li>
+    <li>Theme ListPreference + loader persistence + startup apply; strings in en/zh-rCN/zh-rTW</li>
+    <li>Type/shape tokens, <code>dimens.xml</code>; obsolete theme/color entries removed</li>
+    <li>RELEASE_NOTES, roadmap and project docs updates</li>
+  </ul></div>
+  <div class="card out"><h3>Out of scope</h3><ul>
+    <li>Bcore (LauncherActivity flash, BTheme/LauncherTheme)</li>
+    <li>MaterialAlertDialogBuilder migration; replacing SimpleSearchView/CornerLabelView/RVAdapter</li>
+    <li>preference-ktx upgrade, core-splashscreen</li>
+    <li>osmdroid tile inversion, dynamic-color toggle</li>
+    <li>Deleting dead layouts and shadowed PNGs</li>
+    <li>Full typography sweep of untouched layouts</li>
+    <li>Navigation-bar coloring, edge-to-edge</li>
+    <li>Automated tests, lint</li>
+    <li>Rocker/EnFloatView overlay, <code>ic_location_change</code></li>
+    <li>Other legacy clean-ups in touched files (string literals, findViewById, blanket try/catch)</li>
+  </ul></div>
+</div>
+
+<h2 id="stories">User Stories</h2>
+<div class="stories">
+  <div class="story">As an end user who uses dark mode at night, I want the sandbox UI to <b>follow the system dark theme</b> automatically, so that it does not blind me or flash white on launch.</div>
+  <div class="story">As an end user, I want to <b>force Light or Dark</b> from Settings › Appearance › Theme, so that the app looks the way I prefer. The change applies immediately and persists.</div>
+  <div class="story">As an end user on Android 12+, I want the app to <b>pick up my wallpaper colors</b> (Material You), so that it matches my device.</div>
+  <div class="story">As a user of existing features, I want install, launch, the long-press menu, GMS, fake location and the settings switches to <b>behave exactly as before</b>.</div>
+</div>
+
+<h2 id="requirements">Core Requirements</h2>
+<div class="card" style="padding:4px 8px">
+<table>
+<tr><th>#</th><th>Requirement</th><th>Priority</th></tr>
+<tr><td>1</td><td>Theme parent <code>Theme.Material3.DayNight.NoActionBar</code>; all M3 roles mapped; <code>*Variant</code> roles and <code>forceDarkAllowed</code> removed</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>2</td><td>Day <code>md_theme_*</code> from seed #3F6FD8 in values/colors.xml; night values plus the <code>primary</code> alias in values-night/colors.xml</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>3</td><td>DynamicColors on API 31+, main process only, precondition on the <code>top.niunaijun.blackboxa.</code> prefix, no toggle</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>4</td><td>Surface toolbar: <code>Widget.Material3.Toolbar.Surface</code> + <code>ThemeOverlay.BlackBox.Toolbar</code>; hard-coded colors removed; ic_search tint <code>?attr/colorControlNormal</code>; <code>actionMenuTextColor</code> onSurface</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>5</td><td>Item text onSurface/onSurfaceVariant; CornerLabelView tertiaryContainer pair; SimpleSearchView and WormDotsIndicator tokens</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>6</td><td>AppsAdapter placeholders use <code>colorSurfaceContainerHighest</code> from the theme; hex and <code>Color.GRAY</code> removed</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>7</td><td>M3 default FAB; ic_add tint and alpha removed; contentDescription <code>@string/choose_app</code></td><td><span class="sev warning">should</span></td></tr>
+<tr><td>8</td><td>item_gms MaterialSwitch; GmsManagerActivity type references updated</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>9</td><td>WelcomeTheme extends Theme.BlackBox; splash solid <code>?android:attr/colorBackground</code></td><td><span class="sev critical">must</span></td></tr>
+<tr><td>10</td><td><code>drawable-night/ic_empty.xml</code> with a dimmed palette</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>11</td><td>material-dialogs: <code>md_background_color</code>, <code>md_color_button_text</code>, <code>md_corner_radius</code> 28dp (title/content colors if QA needs them)</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>12</td><td>setting.xml: first "Appearance" category, <code>theme_mode</code> ListPreference, <code>persistent=false</code>, simple summary</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>13</td><td>BlackBoxLoader String delegate (default <code>system</code>) + one shared mapping to MODE_NIGHT_* (unknown → FOLLOW_SYSTEM)</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>14</td><td>SettingFragment sets the value from the loader; dedicated listener: loader write → <code>setDefaultNightMode</code>; no toast</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>15</td><td><code>App.onCreate</code> (main process) applies night mode then DynamicColors, right after <code>super.onCreate()</code></td><td><span class="sev critical">must</span></td></tr>
+<tr><td>16</td><td>Subtitle click: find the TextView whose text equals <code>toolbar.subtitle</code> (no <code>getChildAt(1)</code>)</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>17</td><td>Theme type/shape tokens; TextAppearance.Material3.* + <code>dimens.xml</code> (8/16/24/48dp) in touched layouts</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>18</td><td>New strings in en, zh-rCN and zh-rTW; entry values non-translatable</td><td><span class="sev critical">must</span></td></tr>
+<tr><td>19</td><td>Remove ToolBarColorStyle, accent, primary_dark, primary_light (and white if unreferenced); keep primary_text/secondary_text</td><td><span class="sev warning">should</span></td></tr>
+<tr><td>20</td><td>RELEASE_NOTES entry; roadmap items ticked; tech-stack/architecture theme lines updated</td><td><span class="sev info">could</span></td></tr>
+</table>
+</div>
+
+<h2 id="palette">Palette</h2>
+<div class="card">
+<p style="margin-top:0">Generate day and night schemes from seed <code>#3F6FD8</code> (Material Theme Builder "tonal spot", neutral surfaces). <b>34 M3 roles + 1 alias</b>, each defined in both <code>values/</code> and <code>values-night/</code>.</p>
+<table>
+<tr><th>Group</th><th>Roles (theme attribute → <code>md_theme_*</code>)</th></tr>
+<tr><td>Primary</td><td>colorPrimary, colorOnPrimary, colorPrimaryContainer, colorOnPrimaryContainer, colorPrimaryInverse</td></tr>
+<tr><td>Secondary</td><td>colorSecondary, colorOnSecondary, colorSecondaryContainer, colorOnSecondaryContainer</td></tr>
+<tr><td>Tertiary</td><td>colorTertiary, colorOnTertiary, colorTertiaryContainer, colorOnTertiaryContainer</td></tr>
+<tr><td>Error</td><td>colorError, colorOnError, colorErrorContainer, colorOnErrorContainer</td></tr>
+<tr><td>Background</td><td>android:colorBackground, colorOnBackground</td></tr>
+<tr><td>Surface</td><td>colorSurface, colorOnSurface, colorSurfaceVariant, colorOnSurfaceVariant, colorSurfaceDim, colorSurfaceBright, colorSurfaceContainerLowest / Low / (base) / High / Highest</td></tr>
+<tr><td>Inverse</td><td>colorSurfaceInverse, colorOnSurfaceInverse</td></tr>
+<tr><td>Outline</td><td>colorOutline, colorOutlineVariant</td></tr>
+<tr><td>App alias</td><td><code>primary</code> → md_theme_primary (day) / md_theme_primary_container (night): LoadingActivity only</td></tr>
+</table>
+<details style="margin-top:10px"><summary>Reference values from the mockups (approximate, for sanity checks only)</summary>
+<table style="margin-top:8px">
+<tr><th>Role</th><th>Day</th><th>Night</th></tr>
+<tr><td>primary / onPrimary</td><td><span class="sw" style="background:#2F5BC7"></span>#2F5BC7 / #FFFFFF</td><td><span class="sw" style="background:#B2C5FF"></span>#B2C5FF / #002B73</td></tr>
+<tr><td>primaryContainer / onPrimaryContainer</td><td><span class="sw" style="background:#DAE2FF"></span>#DAE2FF / #001848</td><td><span class="sw" style="background:#1A43A6"></span>#1A43A6 / #DAE2FF</td></tr>
+<tr><td>tertiaryContainer</td><td><span class="sw" style="background:#FCD7FB"></span>#FCD7FB</td><td><span class="sw" style="background:#583E5B"></span>#583E5B</td></tr>
+<tr><td>surface = background</td><td><span class="sw" style="background:#FAF8FF"></span>#FAF8FF</td><td><span class="sw" style="background:#121318"></span>#121318</td></tr>
+<tr><td>surfaceContainer / High / Highest</td><td>#EEEDF4 / #E8E7EF / #E2E2E9</td><td>#1E1F25 / #292A2F / #33343A</td></tr>
+<tr><td>onSurface / onSurfaceVariant</td><td>#1A1B21 / #44464F</td><td>#E3E2E9 / #C5C6D0</td></tr>
+<tr><td>outline / outlineVariant</td><td>#757780 / #C5C6D0</td><td>#8F9099 / #44464F</td></tr>
+<tr><td>error</td><td><span class="sw" style="background:#BA1A1A"></span>#BA1A1A</td><td><span class="sw" style="background:#FFB4AB"></span>#FFB4AB</td></tr>
+</table></details>
+</div>
+
+<h2 id="visual">Visual Design</h2>
+<div class="card" style="padding:4px 8px">
+<p style="margin:10px">Mockups in <code>analysis/design-context/</code> are <b>binding</b>. Fidelity is approximate: structure and role usage are binding, hex values are not. Screen structure is unchanged.</p>
+<table>
+<tr><th>Mockup ID</th><th>Resources / attributes</th></tr>
+<tr><td><a href="../analysis/design-context/mockups/main-apps-grid.html">screen:main-apps-grid</a></td><td>view_toolbar surface + overlay; subtitle lookup; dots <code>?attr/colorPrimary</code>; M3 FAB + contentDescription; ic_add tint removed; item_app badge tertiaryContainer pair, LabelMedium/onSurface; AppsAdapter placeholders</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/main-empty-state.html">screen:main-empty-state</a></td><td><code>drawable-night/ic_empty.xml</code> (dimmed palette); base_empty unchanged</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/choose-app-list-with-search.html">screen:choose-app-list-with-search</a></td><td>activity_list SimpleSearchView: surface container, surfaceContainerHigh card, onSurface text, onSurfaceVariant hint/icons, primary cursor; item_package BodyLarge/BodyMedium; ic_search tint</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/settings-with-theme-preference.html">screen:settings-with-theme-preference</a></td><td>setting.xml Appearance › Theme; SettingFragment + BlackBoxLoader; strings in 3 locales</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/theme-picker-dialog.html">component:theme-picker-dialog</a></td><td>ListPreference AppCompat dialog, theme colors; immediate apply, no toast</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/gms-manager-with-materialswitch.html">screen:gms-manager-with-materialswitch</a></td><td>item_gms MaterialSwitch, BodyLarge/onSurface; GmsManagerActivity types</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/dialog-confirm-material-dialogs.html">component:dialog-confirm</a></td><td><code>md_background_color</code>, <code>md_color_button_text</code>, <code>md_corner_radius</code> in Theme.BlackBox</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/dialog-input-user-remark.html">component:dialog-input</a></td><td>Same md_* attributes; input field best-effort M3</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/app-long-press-menu.html">component:app-long-press-menu</a></td><td>No change: M3 popupMenuStyle from the parent</td></tr>
+<tr><td><a href="../analysis/design-context/mockups/splash-welcome.html">screen:splash-welcome</a></td><td>WelcomeTheme → Theme.BlackBox; splash solid <code>?android:attr/colorBackground</code></td></tr>
+<tr><td><a href="../analysis/design-context/mockups/fake-location.html">screen:fake-location</a></td><td>activity_list + item_fake tokens; osmdroid tiles not inverted</td></tr>
+</table>
+</div>
+
+<h2 id="reuse">Reusable vs New Components</h2>
+<div class="card" style="padding:4px 8px">
+<table>
+<tr><th>Type</th><th>Component</th><th>Use / justification</th></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>AppSharedPreferenceDelegate</code></td><td>Already supports String; stores the theme mode</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>BlackBoxLoader</code> accessor pattern (L18-26)</td><td>Model for <code>themeMode()</code> / <code>invalidThemeMode()</code> + mapping</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>AppManager.mBlackBoxLoader</code></td><td>Access point from App and SettingFragment</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>BlackBoxCore.isMainProcess()</code></td><td>Process type is set in doAttachBaseContext, so it is valid in App.onCreate</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>view_toolbar.xml</code> + <code>initToolbar</code></td><td>One change covers all toolbar screens</td></tr>
+<tr><td><span class="pass">reuse</span></td><td>MDC 1.12.0</td><td>M3 themes, Toolbar.Surface, DynamicColors, MaterialSwitch, MaterialColors, TextAppearance/ShapeAppearance</td></tr>
+<tr><td><span class="pass">reuse</span></td><td>AppCompat <code>setDefaultNightMode</code></td><td>Recreate without custom restart logic</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>ListPreference</code> simple summary</td><td>Current entry shown without code</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>LoadingActivity.kt:19</code></td><td>Unchanged; follows the night-aware <code>primary</code> alias</td></tr>
+<tr><td><span class="pass">reuse</span></td><td><code>@string/choose_app</code>, StateView</td><td>FAB label; loading/retry already themed</td></tr>
+<tr><td><span class="sev info">new</span></td><td><code>values-night/colors.xml</code></td><td>Required for DayNight</td></tr>
+<tr><td><span class="sev info">new</span></td><td><code>values-v23/themes.xml</code></td><td>Light status-bar icons exist only on API 23+</td></tr>
+<tr><td><span class="sev info">new</span></td><td><code>drawable-night/ic_empty.xml</code></td><td>Vector fills are literal hex values</td></tr>
+<tr><td><span class="sev info">new</span></td><td><code>values/dimens.xml</code></td><td>No tokens exist; Req 17</td></tr>
+<tr><td><span class="sev info">new</span></td><td><code>ThemeOverlay.BlackBox.Toolbar</code></td><td>onSurface icons (M3 default is onSurfaceVariant); replaces ToolBarColorStyle</td></tr>
+<tr><td><span class="sev info">new</span></td><td>String keys + entry-values array</td><td>No existing labels</td></tr>
+</table>
+<p style="margin:10px;color:var(--dim)">No new Kotlin classes or files.</p>
+</div>
+
+<h2 id="tech">Technical Approach</h2>
+<details class="card"><summary>Theme resolution</summary>
+<p>Manifest → <code>Theme.BlackBox</code>. In <code>values/themes.xml</code>, <code>Base.Theme.BlackBox</code> holds the roles, type/shape tokens, <code>md_*</code> attributes and actionMenuTextColor; <code>Theme.BlackBox</code> extends it. <code>values-v23</code> adds <code>statusBarColor=?attr/colorSurface</code> and <code>windowLightStatusBar=?attr/isLightTheme</code>. Night selection comes through the <code>values-night/colors.xml</code> qualifier. Style prefixes never collide with Bcore <code>BTheme</code> / <code>LauncherTheme</code>.</p></details>
+<details class="card"><summary>Startup (main process only)</summary>
+<p><code>App.onCreate</code>, after <code>super.onCreate()</code>: if <code>isMainProcess()</code>, call <code>setDefaultNightMode(mapped loader value)</code>, then <code>DynamicColors.applyToActivitiesIfAvailable</code> with the class-prefix precondition. <code>:pN</code> and server processes skip both. Bcore LauncherActivity fails the precondition. This is the allowed lifecycle-hook exception for direct BlackBoxCore access.</p></details>
+<details class="card"><summary>Setting change</summary>
+<p>Listener: loader setter → <code>setDefaultNightMode</code>. Host activities recreate, and SettingFragment re-reads its value from the loader. The default SharedPreferences file is never written for <code>theme_mode</code>.</p></details>
+<details class="card"><summary>Color flow and data</summary>
+<p>Layouts and drawables → <code>?attr/</code> roles → theme → <code>md_theme_*</code> or the dynamic overlay. Only three spots are bound to <code>@color/</code> (the LoadingActivity alias, the splash via colorBackground, and third-party fallbacks); they follow night mode but not dynamic color. Data: one new key in the delegate file; clearing app data resets it to <code>system</code>. There are no Bcore changes.</p></details>
+
+<h2 id="qa">Manual QA Checklist</h2>
+<div class="card" style="padding:4px 8px">
+<p style="margin:10px">No automated tests (K5). Run each row in <b>Light</b>, <b>Dark</b> and <b>Dynamic color</b> (API 31+). Also do one pass on API 23–30, and on API 21–22 if available. Each task group ends with <code>./gradlew :app:assembleDebug</code> and its relevant rows.</p>
+<table>
+<tr><th>#</th><th>Area</th><th>Check</th></tr>
+<tr><td>1</td><td>Splash</td><td>No white flash in dark; background matches the theme</td></tr>
+<tr><td>2</td><td>Main toolbar</td><td>Surface background; onSurface title; subtitle tappable (remark dialog saves); overflow visible; status-bar icons readable</td></tr>
+<tr><td>3</td><td>Main grid</td><td>Names, XP badge, placeholders and dots readable</td></tr>
+<tr><td>4</td><td>FAB</td><td>primaryContainer, readable +, TalkBack "Choose App"</td></tr>
+<tr><td>5</td><td>Long-press menu</td><td>M3 menu surface readable</td></tr>
+<tr><td>6</td><td>Empty state</td><td>Night illustration in dark mode</td></tr>
+<tr><td>7</td><td>Loading</td><td>CatLoadingView readable with white label</td></tr>
+<tr><td>8</td><td>Choose app</td><td>Search icon, card, text, hint, cursor, back icon, rows, badge</td></tr>
+<tr><td>9</td><td>Fake location</td><td>Rows and badge readable; tiles light (expected)</td></tr>
+<tr><td>10</td><td>Settings</td><td>Appearance first; Theme summary; existing switches plus restart toast unchanged</td></tr>
+<tr><td>11</td><td>Theme picker</td><td>Each option applies immediately without a toast; persists after relaunch; System follows the OS live</td></tr>
+<tr><td>12</td><td>GMS</td><td>MaterialSwitch toggles; flows unchanged</td></tr>
+<tr><td>13</td><td>material-dialogs</td><td>Confirm and input variants: surface, primary buttons, rounded, readable</td></tr>
+<tr><td>14</td><td>Guest isolation</td><td>Guest UI and Bcore LauncherActivity unaffected</td></tr>
+<tr><td>15</td><td>Contrast</td><td>4.5:1 spot checks in both modes</td></tr>
+<tr><td>16</td><td>TalkBack</td><td>Theme preference, dialog focus, FAB label</td></tr>
+</table>
+</div>
+
+<h2 id="standards">Standards Compliance</h2>
+<details class="card"><summary>Applicable standards</summary>
+<ul>
+<li><b>android-resources</b>: M3 + values-night, no forceDarkAllowed, ?attr/@color tokens only, snake_case names, dimens and TextAppearance, MaterialSwitch, 3-locale strings, loader persistence (no restart toast: not engine-affecting)</li>
+<li><b>android-views</b>: shared view_toolbar include + initToolbar; GMS <code>findViewById</code> retyped only</li>
+<li><b>android-feedback</b>: material-dialogs call sites untouched; no new usages</li>
+<li><b>android-architecture</b>: loader via AppManager; BlackBoxCore in App is the lifecycle-hook exception</li>
+<li><b>accessibility</b>: 4.5:1 in both modes, FAB "TODO" fixed, TalkBack QA</li>
+<li><b>minimal-implementation</b>: no new classes, only consumed tokens, obsolete entries removed, no toggle</li>
+<li><b>kotlin-style / error-handling</b>: existing accessor pattern, no new blanket try/catch, unknown value → <code>system</code></li>
+<li><b>conventions / gradle</b>: no new dependencies; release notes and docs updated</li>
+</ul></details>
+
+<h2 id="success">Success Criteria</h2>
+<div class="card"><ul>
+<li><code>./gradlew :app:assembleDebug</code> passes; no new dependencies; <code>Bcore/</code> diff is empty</li>
+<li>No hex literals, <code>@color/primary_text</code>, <code>@color/white</code> or <code>@color/primary</code> in the touched layouts, ic_add/ic_search or AppsAdapter</li>
+<li><code>android:forceDarkAllowed</code> appears nowhere in app res</li>
+<li>Every Palette role is defined in both values/ and values-night/</li>
+<li>Theme preference: default System; Light/Dark apply instantly and persist; <code>theme_mode</code> absent from the default prefs</li>
+<li>API 31+ host screens use wallpaper colors; guests and LauncherActivity are unaffected</li>
+<li>All 16 QA rows pass in Light, Dark and Dynamic color with at least 4.5:1 contrast</li>
+<li>All existing flows behave as before</li>
+</ul></div>
+</main>
+</body>
+</html>

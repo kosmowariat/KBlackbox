@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:aapt="http://schemas.android.com/aapt"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -20,11 +21,25 @@
 
         <com.ferfalk.simplesearchview.SimpleSearchView
                 android:id="@+id/searchView"
-                app:type="card"
-
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/primary" />
+                android:background="?attr/colorSurface"
+                android:textColor="?attr/colorOnSurface"
+                app:backIconAlpha="1.0"
+                app:backIconTint="?attr/colorOnSurfaceVariant"
+                app:cursorColor="?attr/colorPrimary"
+                app:hintColor="?attr/colorOnSurfaceVariant"
+                app:iconsAlpha="1.0"
+                app:iconsTint="?attr/colorOnSurfaceVariant"
+                app:type="card">
+
+            <aapt:attr name="app:searchBackground">
+                <shape android:shape="rectangle">
+                    <solid android:color="?attr/colorSurfaceContainerHigh" />
+                    <corners android:radius="28dp" />
+                </shape>
+            </aapt:attr>
+        </com.ferfalk.simplesearchview.SimpleSearchView>
 
     </FrameLayout>
 

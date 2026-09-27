@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
+import androidx.core.view.children
 import androidx.viewpager2.widget.ViewPager2
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
@@ -249,8 +251,12 @@ class MainActivity : LoadingActivity() {
     private fun initToolbarSubTitle() {
         try {
             updateUserRemark(0)
-            
-            viewBinding.toolbarLayout.toolbar.getChildAt(1)?.setOnClickListener {
+
+            val toolbar = viewBinding.toolbarLayout.toolbar
+            val subtitleView = toolbar.children.firstOrNull {
+                it is TextView && it.text == toolbar.subtitle
+            }
+            subtitleView?.setOnClickListener {
                 try {
                     MaterialDialog(this).show {
                         title(res = R.string.userRemark)

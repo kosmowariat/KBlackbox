@@ -1,6 +1,8 @@
 package top.niunaijun.blackboxa.view.setting
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import top.niunaijun.blackbox.BlackBoxCore
@@ -13,6 +15,8 @@ class SettingFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.setting, rootKey)
+
+        initThemeMode()
 
         initGms()
 
@@ -45,6 +49,16 @@ class SettingFragment : PreferenceFragmentCompat() {
         }
 
         initSendLogs()
+    }
+
+    private fun initThemeMode() {
+        val themeModePreference: ListPreference = findPreference("theme_mode")!!
+        themeModePreference.value = AppManager.mBlackBoxLoader.themeMode()
+        themeModePreference.setOnPreferenceChangeListener { _, newValue ->
+            AppManager.mBlackBoxLoader.invalidThemeMode(newValue as String)
+            AppCompatDelegate.setDefaultNightMode(AppManager.mBlackBoxLoader.themeNightMode())
+            true
+        }
     }
 
     private fun initGms() {

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_theme_primary">#B1C5FF</color>
+    <color name="md_theme_on_primary">#002C72</color>
+    <color name="md_theme_primary_container">#1D438F</color>
+    <color name="md_theme_on_primary_container">#DAE2FF</color>
+    <color name="md_theme_inverse_primary">#395BA9</color>
+    <color name="md_theme_secondary">#C0C6DD</color>
+    <color name="md_theme_on_secondary">#2A3042</color>
+    <color name="md_theme_secondary_container">#404659</color>
+    <color name="md_theme_on_secondary_container">#DCE2F9</color>
+    <color name="md_theme_tertiary">#E1BBDD</color>
+    <color name="md_theme_on_tertiary">#412742</color>
+    <color name="md_theme_tertiary_container">#5A3D59</color>
+    <color name="md_theme_on_tertiary_container">#FED7F9</color>
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_on_error">#690004</color>
+    <color name="md_theme_error_container">#93000A</color>
+    <color name="md_theme_on_error_container">#FFDAD6</color>
+    <color name="md_theme_background">#121318</color>
+    <color name="md_theme_on_background">#E2E2E9</color>
+    <color name="md_theme_surface">#121318</color>
+    <color name="md_theme_on_surface">#E2E2E9</color>
+    <color name="md_theme_surface_variant">#44464F</color>
+    <color name="md_theme_on_surface_variant">#C5C6D0</color>
+    <color name="md_theme_surface_dim">#121318</color>
+    <color name="md_theme_surface_bright">#38393F</color>
+    <color name="md_theme_surface_container_lowest">#0D0E13</color>
+    <color name="md_theme_surface_container_low">#1A1B20</color>
+    <color name="md_theme_surface_container">#1E1F25</color>
+    <color name="md_theme_surface_container_high">#282A2F</color>
+    <color name="md_theme_surface_container_highest">#33343A</color>
+    <color name="md_theme_inverse_surface">#E2E2E9</color>
+    <color name="md_theme_inverse_on_surface">#2F3036</color>
+    <color name="md_theme_outline">#8F9099</color>
+    <color name="md_theme_outline_variant">#44464F</color>
+
+    <color name="primary">@color/md_theme_primary_container</color>
+</resources>

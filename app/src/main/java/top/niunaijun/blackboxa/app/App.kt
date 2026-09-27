@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.DynamicColorsOptions
 import top.niunaijun.blackbox.BlackBoxCore
 
 
@@ -65,9 +68,24 @@ class App : Application() {
     override fun onCreate() {
         try {
             super.onCreate()
+            if (BlackBoxCore.get().isMainProcess()) {
+                applyThemeMode()
+            }
             AppManager.doOnCreate(mContext)
         } catch (e: Exception) {
             Log.e("App", "Error in onCreate: ${e.message}")
         }
+    }
+
+    private fun applyThemeMode() {
+        AppCompatDelegate.setDefaultNightMode(AppManager.mBlackBoxLoader.themeNightMode())
+        DynamicColors.applyToActivitiesIfAvailable(
+            this,
+            DynamicColorsOptions.Builder()
+                .setPrecondition { activity, _ ->
+                    activity.javaClass.name.startsWith("top.niunaijun.blackboxa.")
+                }
+                .build()
+        )
     }
 }

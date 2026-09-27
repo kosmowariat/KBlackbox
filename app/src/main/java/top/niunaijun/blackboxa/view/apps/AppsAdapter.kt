@@ -14,7 +14,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
-import android.graphics.Color
+import com.google.android.material.R as MaterialR
+import com.google.android.material.color.MaterialColors
 import android.view.ViewTreeObserver
 import androidx.recyclerview.widget.RecyclerView
 
@@ -25,7 +26,9 @@ class AppsAdapter : RVHolderFactory() {
     companion object {
         private const val TAG = "AppsAdapter"
         private const val MAX_ICON_SIZE = 96 
-        private val DEFAULT_ICON_COLOR = Color.parseColor("#CCCCCC")
+
+        private fun placeholderIcon(view: View): Drawable =
+            ColorDrawable(MaterialColors.getColor(view, MaterialR.attr.colorSurfaceContainerHighest))
     }
 
     override fun createViewHolder(parent: ViewGroup?, viewType: Int, item: Any): RVHolder<out Any> {
@@ -128,14 +131,7 @@ class AppsAdapter : RVHolderFactory() {
             }
         }
 
-        private fun createDefaultIcon(): Drawable {
-            return try {
-                ColorDrawable(DEFAULT_ICON_COLOR)
-            } catch (e: Exception) {
-                Log.w(TAG, "Error creating default icon: ${e.message}")
-                ColorDrawable(Color.GRAY)
-            }
-        }
+        private fun createDefaultIcon(): Drawable = placeholderIcon(itemView)
 
         private fun setSafeDefaults() {
             try {
@@ -155,7 +151,7 @@ class AppsAdapter : RVHolderFactory() {
         override fun setContent(item: AppInfo, isSelected: Boolean, payload: Any?) {
             try {
                 
-                binding.icon.setImageDrawable(ColorDrawable(DEFAULT_ICON_COLOR))
+                binding.icon.setImageDrawable(placeholderIcon(itemView))
                 binding.name.text = item.name ?: "Unknown App"
                 binding.cornerLabel.visibility = View.INVISIBLE
             } catch (e: Exception) {

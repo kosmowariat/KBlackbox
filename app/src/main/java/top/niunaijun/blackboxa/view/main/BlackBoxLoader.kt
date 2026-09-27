@@ -3,6 +3,7 @@ package top.niunaijun.blackboxa.view.main
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import java.io.File
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackbox.app.BActivityThread
@@ -25,6 +26,8 @@ class BlackBoxLoader {
 
     private var mDisableFlagSecure by AppSharedPreferenceDelegate(App.getContext(), false)
 
+    private var mThemeMode by AppSharedPreferenceDelegate(App.getContext(), "system")
+
     fun hideRoot(): Boolean {
         return try {
             mHideRoot
@@ -39,6 +42,31 @@ class BlackBoxLoader {
             this.mHideRoot = hideRoot
         } catch (e: Exception) {
             Log.e(TAG, "Error setting hideRoot: ${e.message}")
+        }
+    }
+
+    fun themeMode(): String {
+        return try {
+            mThemeMode
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting themeMode: ${e.message}")
+            "system"
+        }
+    }
+
+    fun invalidThemeMode(value: String) {
+        try {
+            this.mThemeMode = value
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting themeMode: ${e.message}")
+        }
+    }
+
+    fun themeNightMode(): Int {
+        return when (themeMode()) {
+            "light" -> AppCompatDelegate.MODE_NIGHT_NO
+            "dark" -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
     }
 
