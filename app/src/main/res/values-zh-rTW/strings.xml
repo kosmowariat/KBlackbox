@@ -77,6 +77,12 @@
     <string name="delete_user_hint">刪除 %s？此空間中的所有應用程式和資料都將被移除。</string>
     <string name="install_gms_option">安裝 Google 服務 (GMS)</string>
     <string name="create_user_failed">無法建立使用者</string>
+    <string name="duplicate_user">複製</string>
+    <string name="duplicate_user_title">複製使用者</string>
+    <string name="duplicate_user_default_name">%s（副本）</string>
+    <string name="duplicate_copy_data">複製應用程式資料</string>
+    <string name="duplicate_copy_data_hint">所有應用程式都會安裝到副本中。勾選的應用程式也會複製其資料（登入、設定、檔案）。Google 帳戶不會被複製。</string>
+    <string name="duplicate_failed_apps">無法複製：%s</string>
     <string name="user_name">名稱</string>
     <string name="all_apps">顯示全部應用程式</string>
     <plurals name="user_app_count">

@@ -18,11 +18,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
+import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.databinding.ActivityMainBinding
+import top.niunaijun.blackboxa.databinding.DialogDuplicateUserBinding
 import top.niunaijun.blackboxa.databinding.DialogTextInputBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
@@ -276,6 +279,11 @@ class MainActivity : LoadingActivity() {
             hideLoading()
             UserAppsActivity.start(this, user.id, user.name)
         }
+        viewModel.duplicateRequest.observe(this) { request ->
+            request ?: return@observe
+            viewModel.onDuplicateRequestShown()
+            showDuplicateDialog(request)
+        }
         viewModel.createError.observe(this) { message ->
             message ?: return@observe
             viewModel.onCreateErrorShown()
@@ -309,6 +317,7 @@ class MainActivity : LoadingActivity() {
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.user_rename -> showRenameDialog(user)
+                    R.id.user_duplicate -> viewModel.requestDuplicate(user)
                     R.id.user_delete -> showDeleteDialog(user)
                 }
                 true
@@ -345,6 +354,42 @@ class MainActivity : LoadingActivity() {
         binding.input.doAfterTextChanged { doneButton.isEnabled = !it.isNullOrBlank() }
         binding.input.requestFocus()
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+    }
+
+    private fun showDuplicateDialog(request: DuplicateUserBean) {
+        val binding = DialogDuplicateUserBinding.inflate(LayoutInflater.from(this))
+        val defaultName = getString(R.string.duplicate_user_default_name, request.source.name)
+        binding.input.setText(defaultName)
+        binding.input.setSelection(defaultName.length)
+        val iconSize = resources.getDimensionPixelSize(R.dimen.preview_app_icon_size)
+        val checkBoxes = request.apps.map { app ->
+            MaterialCheckBox(this).apply {
+                text = app.name
+                isChecked = app.packageName !in request.googlePackages
+                compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.spacing_small)
+                app.icon?.mutate()?.let { icon ->
+                    icon.setBounds(0, 0, iconSize, iconSize)
+                    setCompoundDrawablesRelative(null, null, icon, null)
+                }
+                binding.appsContainer.addView(this)
+            } to app.packageName
+        }
+        val hasApps = request.apps.isNotEmpty()
+        binding.copyDataHeader.visibility = if (hasApps) View.VISIBLE else View.GONE
+        binding.copyDataHint.visibility = if (hasApps) View.VISIBLE else View.GONE
+
+        val dialog = MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.duplicate_user_title)
+                .setView(binding.root)
+                .setPositiveButton(R.string.duplicate_user) { _, _ ->
+                    val copyDataFor = checkBoxes.filter { it.first.isChecked }.map { it.second }.toSet()
+                    showLoading()
+                    viewModel.duplicateUser(request.source.id, binding.input.text.toString().trim(), copyDataFor)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        val duplicateButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        binding.input.doAfterTextChanged { duplicateButton.isEnabled = !it.isNullOrBlank() }
     }
 
     private fun showDeleteDialog(user: UserBean) {

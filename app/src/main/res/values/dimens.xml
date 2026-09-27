@@ -6,4 +6,5 @@
     <dimen name="icon_size">48dp</dimen>
     <dimen name="preview_icon_padding">4dp</dimen>
     <dimen name="fab_clearance">88dp</dimen>
+    <dimen name="preview_app_icon_size">32dp</dimen>
 </resources>

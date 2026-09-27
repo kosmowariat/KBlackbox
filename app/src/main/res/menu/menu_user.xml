@@ -6,6 +6,10 @@
             android:title="@string/rename_user" />
 
     <item
+            android:id="@+id/user_duplicate"
+            android:title="@string/duplicate_user" />
+
+    <item
             android:id="@+id/user_delete"
             android:title="@string/delete_user" />
 </menu>

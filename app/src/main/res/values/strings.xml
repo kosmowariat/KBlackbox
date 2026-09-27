@@ -87,6 +87,12 @@
     <string name="delete_user_hint">Delete %s? All apps and data in this space will be removed.</string>
     <string name="install_gms_option">Install Google services (GMS)</string>
     <string name="create_user_failed">Could not create user</string>
+    <string name="duplicate_user">Duplicate</string>
+    <string name="duplicate_user_title">Duplicate user</string>
+    <string name="duplicate_user_default_name">%s (copy)</string>
+    <string name="duplicate_copy_data">Copy app data</string>
+    <string name="duplicate_copy_data_hint">All apps are installed in the copy. Checked apps also get their data (logins, settings, files). Google accounts are not copied.</string>
+    <string name="duplicate_failed_apps">Could not copy: %s</string>
     <string name="user_name">Name</string>
     <string name="all_apps">Show all apps</string>
     <string name="more_apps_count" translatable="false">+%d</string>

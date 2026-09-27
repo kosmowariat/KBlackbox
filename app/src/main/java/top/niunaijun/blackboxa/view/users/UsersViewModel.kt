@@ -2,6 +2,7 @@ package top.niunaijun.blackboxa.view.users
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
@@ -29,6 +30,21 @@ class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
     fun createUser(name: String, installGms: Boolean) {
         launchOnUI { repo.createUser(name, installGms, mCreatedUser, mCreateError) }
+    }
+
+    private val mDuplicateRequest = MutableLiveData<DuplicateUserBean?>()
+    val duplicateRequest: LiveData<DuplicateUserBean?> = mDuplicateRequest
+
+    fun requestDuplicate(user: UserBean) {
+        launchOnUI { mDuplicateRequest.postValue(repo.getDuplicateRequest(user)) }
+    }
+
+    fun onDuplicateRequestShown() {
+        mDuplicateRequest.value = null
+    }
+
+    fun duplicateUser(sourceUserId: Int, name: String, copyDataFor: Set<String>) {
+        launchOnUI { repo.duplicateUser(sourceUserId, name, copyDataFor, mCreatedUser, mCreateError) }
     }
 
     fun onCreateErrorShown() {

@@ -78,6 +78,12 @@
     <string name="delete_user_hint">删除 %s？此空间中的所有应用和数据都将被移除。</string>
     <string name="install_gms_option">安装谷歌服务 (GMS)</string>
     <string name="create_user_failed">无法创建用户</string>
+    <string name="duplicate_user">复制</string>
+    <string name="duplicate_user_title">复制用户</string>
+    <string name="duplicate_user_default_name">%s（副本）</string>
+    <string name="duplicate_copy_data">复制应用数据</string>
+    <string name="duplicate_copy_data_hint">所有应用都会安装到副本中。勾选的应用还会复制其数据（登录、设置、文件）。谷歌账号不会被复制。</string>
+    <string name="duplicate_failed_apps">无法复制：%s</string>
     <string name="user_name">名称</string>
     <string name="all_apps">显示全部应用</string>
     <plurals name="user_app_count">

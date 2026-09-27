@@ -8,10 +8,13 @@ import androidx.lifecycle.MutableLiveData
 import java.io.File
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackbox.core.GmsCore
+import top.niunaijun.blackbox.core.env.BEnvironment
+import top.niunaijun.blackbox.entity.pm.InstallResult
 import top.niunaijun.blackbox.utils.AbiUtils
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.bean.AppInfo
+import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.util.MemoryManager
@@ -22,6 +25,7 @@ class AppsRepository {
     companion object {
         const val DEFAULT_USER_ID = 0
         const val USER_PREVIEW_APP_COUNT = 5
+        private val NON_COPIED_DATA_DIRS = setOf("lib", "cache", "code_cache")
     }
 
     val TAG: String = "AppsRepository"
@@ -488,12 +492,7 @@ class AppsRepository {
     ) {
         try {
             val blackBoxCore = BlackBoxCore.get()
-            if (blackBoxCore.users.isEmpty()) {
-                blackBoxCore.createUser(DEFAULT_USER_ID)
-            }
-            val nextId = blackBoxCore.users.maxOf { it.id } + 1
-            blackBoxCore.createUser(nextId)
-            renameUser(nextId, name)
+            val nextId = createNamedUser(name)
             if (installGms) {
                 val result = blackBoxCore.installGms(nextId)
                 if (!result.success) {
@@ -505,6 +504,101 @@ class AppsRepository {
             Log.e(TAG, "Error creating user", e)
             errorLiveData.postValue(getString(R.string.create_user_failed))
         }
+    }
+
+    fun getDuplicateRequest(user: UserBean): DuplicateUserBean {
+        val apps = getUserApps(user.id)
+        val googlePackages = apps.map { it.packageName }.filter { GmsCore.isGoogleAppOrService(it) }.toSet()
+        return DuplicateUserBean(user, apps, googlePackages)
+    }
+
+    fun getUserApps(userId: Int): List<AppInfo> {
+        return sortedInstalledApplications(userId)
+                .sortedBy { GmsCore.isGoogleAppOrService(it.packageName) }
+                .map { AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir, false) }
+    }
+
+    fun duplicateUser(
+            sourceUserId: Int,
+            name: String,
+            copyDataFor: Set<String>,
+            createdLiveData: MutableLiveData<UserBean?>,
+            errorLiveData: MutableLiveData<String?>
+    ) {
+        try {
+            val targetUserId = createNamedUser(name)
+            val failedApps = mutableListOf<String>()
+            sortedInstalledApplications(sourceUserId).forEach { app ->
+                val result = installCopyForUser(app, targetUserId)
+                if (!result.success) {
+                    Log.w(TAG, "Duplicate: install of ${app.packageName} failed: ${result.msg}")
+                    failedApps += safeLoadAppLabel(app)
+                } else if (app.packageName in copyDataFor) {
+                    copyAppData(app.packageName, sourceUserId, targetUserId)
+                }
+            }
+            AppManager.mRemarkSharedPreferences.getString("AppList$sourceUserId", null)?.let {
+                AppManager.mRemarkSharedPreferences.edit().putString("AppList$targetUserId", it).apply()
+            }
+            if (failedApps.isNotEmpty()) {
+                errorLiveData.postValue(getString(R.string.duplicate_failed_apps, failedApps.joinToString()))
+            }
+            createdLiveData.postValue(UserBean(targetUserId, getUserName(targetUserId), 0, emptyList()))
+        } catch (e: Exception) {
+            Log.e(TAG, "Error duplicating user $sourceUserId", e)
+            errorLiveData.postValue(getString(R.string.create_user_failed))
+        }
+    }
+
+    private fun createNamedUser(name: String): Int {
+        val blackBoxCore = BlackBoxCore.get()
+        if (blackBoxCore.users.isEmpty()) {
+            blackBoxCore.createUser(DEFAULT_USER_ID)
+        }
+        val nextId = blackBoxCore.users.maxOf { it.id } + 1
+        blackBoxCore.createUser(nextId)
+        renameUser(nextId, name)
+        return nextId
+    }
+
+    private fun installCopyForUser(app: ApplicationInfo, userId: Int): InstallResult {
+        val blackBoxCore = BlackBoxCore.get()
+        val installedApk = File(app.sourceDir)
+        if (!installedApk.absolutePath.startsWith(BEnvironment.getAppRootDir().absolutePath)) {
+            return blackBoxCore.installPackageAsUser(app.packageName, userId)
+        }
+        blackBoxCore.users.forEach { blackBoxCore.stopPackage(app.packageName, it.id) }
+        val tempApk = File(BEnvironment.getCacheDir(), "duplicate-${app.packageName}.apk")
+        return try {
+            installedApk.copyTo(tempApk, overwrite = true)
+            installedApk.setWritable(true)
+            blackBoxCore.installPackageAsUser(tempApk, userId)
+        } finally {
+            tempApk.delete()
+        }
+    }
+
+    private fun copyAppData(packageName: String, sourceUserId: Int, targetUserId: Int) {
+        BlackBoxCore.get().stopPackage(packageName, sourceUserId)
+        listOf(
+                BEnvironment.getDataDir(packageName, sourceUserId) to BEnvironment.getDataDir(packageName, targetUserId),
+                BEnvironment.getDeDataDir(packageName, sourceUserId) to BEnvironment.getDeDataDir(packageName, targetUserId),
+                BEnvironment.getExternalDataDir(packageName, sourceUserId) to BEnvironment.getExternalDataDir(packageName, targetUserId)
+        ).forEach { (source, target) ->
+            try {
+                copyDataDir(source, target)
+            } catch (e: Exception) {
+                Log.e(TAG, "Duplicate: copying ${source.path} failed", e)
+            }
+        }
+    }
+
+    private fun copyDataDir(source: File, target: File) {
+        val entries = source.listFiles() ?: return
+        val canonicalSource = source.canonicalFile
+        target.mkdirs()
+        entries.filter { it.name !in NON_COPIED_DATA_DIRS && it.canonicalFile == File(canonicalSource, it.name) }
+                .forEach { it.copyRecursively(File(target, it.name), overwrite = true) }
     }
 
     fun renameUser(userId: Int, name: String) {
