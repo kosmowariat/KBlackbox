@@ -139,6 +139,9 @@ class AppsRepository {
         try {
             loadingLiveData.postValue(true)
             synchronized(mInstalledList) {
+                if (mInstalledList.isEmpty()) {
+                    previewInstallList()
+                }
                 val blackBoxCore = BlackBoxCore.get()
                 Log.d(TAG, mInstalledList.joinToString(","))
                 val newInstalledList =
