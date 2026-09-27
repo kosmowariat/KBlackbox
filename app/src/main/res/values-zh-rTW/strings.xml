@@ -69,6 +69,8 @@
         <item>淺色</item>
         <item>深色</item>
     </string-array>
+    <string name="grid_view">網格檢視</string>
+    <string name="list_view">清單檢視</string>
     <string name="new_user">新增使用者</string>
     <string name="default_user_name">使用者 %s</string>
     <string name="rename_user">重新命名</string>

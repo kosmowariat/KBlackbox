@@ -3,14 +3,17 @@ package top.niunaijun.blackboxa.view.users
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.bean.UserBean
-import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.databinding.ItemUserBinding
+import top.niunaijun.blackboxa.databinding.ItemUserGridBinding
 
 class UsersAdapter(
         private val onClick: (UserBean) -> Unit,
@@ -20,28 +23,60 @@ class UsersAdapter(
         private val onDelete: (UserBean) -> Unit
 ) : ListAdapter<UserBean, UsersAdapter.UserVH>(DIFF) {
 
+    var gridMode = false
+        set(value) {
+            if (field != value) {
+                field = value
+                notifyDataSetChanged()
+            }
+        }
+
+    override fun getItemViewType(position: Int) = if (gridMode) VIEW_TYPE_GRID else VIEW_TYPE_LIST
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserVH {
-        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return UserVH(binding)
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == VIEW_TYPE_GRID) {
+            val binding = ItemUserGridBinding.inflate(inflater, parent, false)
+            UserVH(
+                    binding.root, null, binding.name, null, binding.previews,
+                    listOf(binding.preview1, binding.preview2, binding.preview3), binding.moreApps,
+                    null, null, null
+            )
+        } else {
+            val binding = ItemUserBinding.inflate(inflater, parent, false)
+            UserVH(
+                    binding.root, binding.avatar, binding.name, binding.appCount, binding.previews,
+                    listOf(binding.preview1, binding.preview2, binding.preview3, binding.preview4, binding.preview5),
+                    binding.moreApps, binding.rename, binding.duplicate, binding.delete
+            )
+        }
     }
 
     override fun onBindViewHolder(holder: UserVH, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class UserVH(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
-
-        private val previewViews =
-                listOf(binding.preview1, binding.preview2, binding.preview3, binding.preview4, binding.preview5)
+    inner class UserVH(
+            root: View,
+            private val avatar: TextView?,
+            private val name: TextView,
+            private val appCount: TextView?,
+            private val previews: View,
+            private val previewViews: List<ImageButton>,
+            private val moreApps: TextView,
+            private val rename: View?,
+            private val duplicate: View?,
+            private val delete: View?
+    ) : RecyclerView.ViewHolder(root) {
 
         fun bind(user: UserBean) {
-            val resources = binding.root.resources
-            binding.avatar.text = user.name.firstOrNull()?.uppercase() ?: user.id.toString()
-            binding.name.text = user.name
-            binding.appCount.text = resources.getQuantityString(R.plurals.user_app_count, user.appCount, user.appCount)
+            val resources = itemView.resources
+            avatar?.text = user.name.firstOrNull()?.uppercase() ?: user.id.toString()
+            name.text = user.name
+            appCount?.text = resources.getQuantityString(R.plurals.user_app_count, user.appCount, user.appCount)
 
-            val hasMore = user.appCount > AppsRepository.USER_PREVIEW_APP_COUNT
-            val shownApps = if (hasMore) user.previewApps.dropLast(1) else user.previewApps
+            val hasMore = user.appCount > previewViews.size
+            val shownApps = user.previewApps.take(if (hasMore) previewViews.size - 1 else previewViews.size)
             previewViews.forEachIndexed { index, view ->
                 val app = shownApps.getOrNull(index)
                 view.visibility = if (app != null) View.VISIBLE else View.GONE
@@ -49,19 +84,39 @@ class UsersAdapter(
                 view.contentDescription = app?.name
                 view.setOnClickListener { app?.let { onAppClick(user, it) } }
             }
-            binding.moreApps.visibility = if (hasMore) View.VISIBLE else View.GONE
-            binding.moreApps.text = resources.getString(R.string.more_apps_count, user.appCount - shownApps.size)
-            binding.moreApps.setOnClickListener { onClick(user) }
-            binding.previews.visibility = if (user.previewApps.isEmpty()) View.GONE else View.VISIBLE
+            moreApps.visibility = if (hasMore) View.VISIBLE else View.GONE
+            moreApps.text = resources.getString(R.string.more_apps_count, user.appCount - shownApps.size)
+            moreApps.setOnClickListener { onClick(user) }
+            previews.visibility = if (user.previewApps.isEmpty()) View.GONE else View.VISIBLE
 
-            binding.root.setOnClickListener { onClick(user) }
-            binding.rename.setOnClickListener { onRename(user) }
-            binding.duplicate.setOnClickListener { onDuplicate(user) }
-            binding.delete.setOnClickListener { onDelete(user) }
+            itemView.setOnClickListener { onClick(user) }
+            rename?.setOnClickListener { onRename(user) }
+            duplicate?.setOnClickListener { onDuplicate(user) }
+            delete?.setOnClickListener { onDelete(user) }
+            itemView.setOnLongClickListener(if (rename == null) View.OnLongClickListener { showMenu(user) } else null)
+        }
+
+        private fun showMenu(user: UserBean): Boolean {
+            PopupMenu(itemView.context, itemView).apply {
+                menuInflater.inflate(R.menu.menu_user, menu)
+                setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.user_rename -> onRename(user)
+                        R.id.user_duplicate -> onDuplicate(user)
+                        R.id.user_delete -> onDelete(user)
+                    }
+                    true
+                }
+                show()
+            }
+            return true
         }
     }
 
     companion object {
+        private const val VIEW_TYPE_LIST = 0
+        private const val VIEW_TYPE_GRID = 1
+
         private val DIFF = object : DiffUtil.ItemCallback<UserBean>() {
             override fun areItemsTheSame(oldItem: UserBean, newItem: UserBean) = oldItem.id == newItem.id
 

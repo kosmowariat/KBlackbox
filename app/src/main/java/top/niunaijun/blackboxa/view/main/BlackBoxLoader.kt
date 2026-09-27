@@ -28,6 +28,8 @@ class BlackBoxLoader {
 
     private var mThemeMode by AppSharedPreferenceDelegate(App.getContext(), "system")
 
+    private var mUserGridView by AppSharedPreferenceDelegate(App.getContext(), true)
+
     fun hideRoot(): Boolean {
         return try {
             mHideRoot
@@ -59,6 +61,23 @@ class BlackBoxLoader {
             this.mThemeMode = value
         } catch (e: Exception) {
             Log.e(TAG, "Error setting themeMode: ${e.message}")
+        }
+    }
+
+    fun userGridView(): Boolean {
+        return try {
+            mUserGridView
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting userGridView: ${e.message}")
+            true
+        }
+    }
+
+    fun invalidUserGridView(value: Boolean) {
+        try {
+            this.mUserGridView = value
+        } catch (e: Exception) {
+            Log.e(TAG, "Error setting userGridView: ${e.message}")
         }
     }
 

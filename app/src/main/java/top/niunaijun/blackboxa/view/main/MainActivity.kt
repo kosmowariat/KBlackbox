@@ -6,26 +6,18 @@ import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doAfterTextChanged
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.afollestad.materialdialogs.MaterialDialog
-import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
-import top.niunaijun.blackboxa.bean.DuplicateUserBean
-import top.niunaijun.blackboxa.bean.UserBean
+import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.databinding.ActivityMainBinding
-import top.niunaijun.blackboxa.databinding.DialogDuplicateUserBinding
-import top.niunaijun.blackboxa.databinding.DialogTextInputBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
@@ -33,6 +25,7 @@ import top.niunaijun.blackboxa.view.apps.UserAppsActivity
 import top.niunaijun.blackboxa.view.base.LoadingActivity
 import top.niunaijun.blackboxa.view.fake.FakeManagerActivity
 import top.niunaijun.blackboxa.view.setting.SettingActivity
+import top.niunaijun.blackboxa.view.users.UserDialogs
 import top.niunaijun.blackboxa.view.users.UsersAdapter
 import top.niunaijun.blackboxa.view.users.UsersViewModel
 
@@ -43,6 +36,8 @@ class MainActivity : LoadingActivity() {
     private lateinit var viewModel: UsersViewModel
 
     private lateinit var mAdapter: UsersAdapter
+
+    private lateinit var userDialogs: UserDialogs
 
     companion object {
         private const val TAG = "MainActivity"
@@ -262,17 +257,19 @@ class MainActivity : LoadingActivity() {
 
     private fun initUserList() {
         viewModel = ViewModelProvider(this, InjectionUtil.getUsersFactory())[UsersViewModel::class.java]
+        userDialogs = UserDialogs(this, viewModel)
         mAdapter = UsersAdapter(
                 onClick = { UserAppsActivity.start(this, it.id, it.name) },
                 onAppClick = { user, app ->
                     showLoading()
                     viewModel.launchApp(app.packageName, user.id)
                 },
-                onRename = { showRenameDialog(it) },
+                onRename = { userDialogs.showRenameDialog(it) },
                 onDuplicate = { viewModel.requestDuplicate(it) },
-                onDelete = { showDeleteDialog(it) }
+                onDelete = { userDialogs.showDeleteDialog(it) }
         )
         viewBinding.recyclerView.adapter = mAdapter
+        applyUserLayout(AppManager.mBlackBoxLoader.userGridView())
         viewModel.users.observe(this) { mAdapter.submitList(it) }
         viewModel.createdUser.observe(this) { user ->
             user ?: return@observe
@@ -283,7 +280,7 @@ class MainActivity : LoadingActivity() {
         viewModel.duplicateRequest.observe(this) { request ->
             request ?: return@observe
             viewModel.onDuplicateRequestShown()
-            showDuplicateDialog(request)
+            userDialogs.showDuplicateDialog(request)
         }
         viewModel.createError.observe(this) { message ->
             message ?: return@observe
@@ -301,94 +298,29 @@ class MainActivity : LoadingActivity() {
         }
     }
 
+    private fun applyUserLayout(grid: Boolean) {
+        mAdapter.gridMode = grid
+        viewBinding.recyclerView.layoutManager = if (grid) {
+            GridLayoutManager(this, resources.getInteger(R.integer.user_grid_columns))
+        } else {
+            LinearLayoutManager(this)
+        }
+    }
+
     private fun initFab() {
         viewBinding.fab.setOnClickListener {
-            showNameDialog(R.string.new_user, "", viewModel.isGmsSupported) { name, installGms ->
-                if (installGms) {
-                    showLoading()
-                }
-                viewModel.createUser(name, installGms)
-            }
+            userDialogs.showCreateDialog()
         }
-    }
-
-    private fun showRenameDialog(user: UserBean) {
-        showNameDialog(R.string.rename_user, user.name) { name, _ -> viewModel.renameUser(user.id, name) }
-    }
-
-    private fun showNameDialog(
-            @StringRes title: Int,
-            initialName: String,
-            showGmsOption: Boolean = false,
-            onConfirm: (name: String, installGms: Boolean) -> Unit
-    ) {
-        val binding = DialogTextInputBinding.inflate(LayoutInflater.from(this))
-        binding.inputLayout.hint = getString(R.string.user_name)
-        binding.input.setText(initialName)
-        binding.input.setSelection(initialName.length)
-        binding.installGms.visibility = if (showGmsOption) View.VISIBLE else View.GONE
-        val dialog = MaterialAlertDialogBuilder(this)
-                .setTitle(title)
-                .setView(binding.root)
-                .setPositiveButton(R.string.done) { _, _ ->
-                    onConfirm(binding.input.text.toString().trim(), showGmsOption && binding.installGms.isChecked)
-                }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        val doneButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        doneButton.isEnabled = initialName.isNotBlank()
-        binding.input.doAfterTextChanged { doneButton.isEnabled = !it.isNullOrBlank() }
-        binding.input.requestFocus()
-        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-    }
-
-    private fun showDuplicateDialog(request: DuplicateUserBean) {
-        val binding = DialogDuplicateUserBinding.inflate(LayoutInflater.from(this))
-        val defaultName = getString(R.string.duplicate_user_default_name, request.source.name)
-        binding.input.setText(defaultName)
-        binding.input.setSelection(defaultName.length)
-        val iconSize = resources.getDimensionPixelSize(R.dimen.preview_app_icon_size)
-        val checkBoxes = request.apps.map { app ->
-            MaterialCheckBox(this).apply {
-                text = app.name
-                compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.spacing_small)
-                app.icon?.mutate()?.let { icon ->
-                    icon.setBounds(0, 0, iconSize, iconSize)
-                    setCompoundDrawablesRelative(null, null, icon, null)
-                }
-                binding.appsContainer.addView(this)
-            } to app.packageName
-        }
-        val hasApps = request.apps.isNotEmpty()
-        binding.copyDataHeader.visibility = if (hasApps) View.VISIBLE else View.GONE
-        binding.copyDataHint.visibility = if (hasApps) View.VISIBLE else View.GONE
-
-        val dialog = MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.duplicate_user_title)
-                .setView(binding.root)
-                .setPositiveButton(R.string.duplicate_user) { _, _ ->
-                    val copyDataFor = checkBoxes.filter { it.first.isChecked }.map { it.second }.toSet()
-                    showLoading()
-                    viewModel.duplicateUser(request.source.id, binding.input.text.toString().trim(), copyDataFor)
-                }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        val duplicateButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        binding.input.doAfterTextChanged { duplicateButton.isEnabled = !it.isNullOrBlank() }
-    }
-
-    private fun showDeleteDialog(user: UserBean) {
-        MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.delete_user)
-                .setMessage(getString(R.string.delete_user_hint, user.name))
-                .setPositiveButton(R.string.delete_user) { _, _ -> viewModel.deleteUser(user.id) }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         try {
             menuInflater.inflate(R.menu.menu_main, menu)
+            menu?.findItem(R.id.main_layout)?.let { item ->
+                val grid = AppManager.mBlackBoxLoader.userGridView()
+                item.setIcon(if (grid) R.drawable.ic_view_list else R.drawable.ic_view_grid)
+                item.setTitle(if (grid) R.string.list_view else R.string.grid_view)
+            }
             return true
         } catch (e: Exception) {
             Log.e(TAG, "Error creating options menu: ${e.message}")
@@ -399,6 +331,12 @@ class MainActivity : LoadingActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         try {
             when (item.itemId) {
+                R.id.main_layout -> {
+                    val grid = !AppManager.mBlackBoxLoader.userGridView()
+                    AppManager.mBlackBoxLoader.invalidUserGridView(grid)
+                    applyUserLayout(grid)
+                    invalidateOptionsMenu()
+                }
                 R.id.main_git -> {
                     val intent =
                             Intent(

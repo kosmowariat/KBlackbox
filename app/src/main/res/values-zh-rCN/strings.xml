@@ -70,6 +70,8 @@
         <item>浅色</item>
         <item>深色</item>
     </string-array>
+    <string name="grid_view">网格视图</string>
+    <string name="list_view">列表视图</string>
     <string name="new_user">新建用户</string>
     <string name="default_user_name">用户 %s</string>
     <string name="rename_user">重命名</string>

@@ -79,6 +79,8 @@
         <item>light</item>
         <item>dark</item>
     </string-array>
+    <string name="grid_view">Grid view</string>
+    <string name="list_view">List view</string>
     <string name="new_user">New user</string>
     <string name="default_user_name">User %s</string>
     <string name="rename_user">Rename</string>

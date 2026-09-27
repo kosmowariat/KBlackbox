@@ -70,10 +70,18 @@ class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
         }
     }
 
+    private val mDeletedUser = MutableLiveData<Int?>()
+    val deletedUser: LiveData<Int?> = mDeletedUser
+
     fun deleteUser(userId: Int) {
         launchOnUI {
             repo.deleteUser(userId)
+            mDeletedUser.postValue(userId)
             repo.getUserList(mUsers)
         }
+    }
+
+    fun onDeletedUserHandled() {
+        mDeletedUser.value = null
     }
 }
