@@ -507,9 +507,7 @@ class AppsRepository {
     }
 
     fun getDuplicateRequest(user: UserBean): DuplicateUserBean {
-        val apps = getUserApps(user.id)
-        val googlePackages = apps.map { it.packageName }.filter { GmsCore.isGoogleAppOrService(it) }.toSet()
-        return DuplicateUserBean(user, apps, googlePackages)
+        return DuplicateUserBean(user, getUserApps(user.id))
     }
 
     fun getUserApps(userId: Int): List<AppInfo> {

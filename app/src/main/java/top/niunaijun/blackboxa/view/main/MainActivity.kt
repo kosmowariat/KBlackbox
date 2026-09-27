@@ -365,7 +365,6 @@ class MainActivity : LoadingActivity() {
         val checkBoxes = request.apps.map { app ->
             MaterialCheckBox(this).apply {
                 text = app.name
-                isChecked = app.packageName !in request.googlePackages
                 compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.spacing_small)
                 app.icon?.mutate()?.let { icon ->
                     icon.setBounds(0, 0, iconSize, iconSize)
