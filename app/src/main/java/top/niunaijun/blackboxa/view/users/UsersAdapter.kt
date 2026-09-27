@@ -15,7 +15,9 @@ import top.niunaijun.blackboxa.databinding.ItemUserBinding
 class UsersAdapter(
         private val onClick: (UserBean) -> Unit,
         private val onAppClick: (UserBean, AppInfo) -> Unit,
-        private val onMenu: (UserBean, View) -> Unit
+        private val onRename: (UserBean) -> Unit,
+        private val onDuplicate: (UserBean) -> Unit,
+        private val onDelete: (UserBean) -> Unit
 ) : ListAdapter<UserBean, UsersAdapter.UserVH>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserVH {
@@ -53,11 +55,9 @@ class UsersAdapter(
             binding.previews.visibility = if (user.previewApps.isEmpty()) View.GONE else View.VISIBLE
 
             binding.root.setOnClickListener { onClick(user) }
-            binding.root.setOnLongClickListener {
-                onMenu(user, binding.more)
-                true
-            }
-            binding.more.setOnClickListener { onMenu(user, it) }
+            binding.rename.setOnClickListener { onRename(user) }
+            binding.duplicate.setOnClickListener { onDuplicate(user) }
+            binding.delete.setOnClickListener { onDelete(user) }
         }
     }
 

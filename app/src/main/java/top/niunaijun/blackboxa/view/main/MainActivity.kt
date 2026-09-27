@@ -15,7 +15,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -269,7 +268,9 @@ class MainActivity : LoadingActivity() {
                     showLoading()
                     viewModel.launchApp(app.packageName, user.id)
                 },
-                onMenu = { user, anchor -> showUserMenu(user, anchor) }
+                onRename = { showRenameDialog(it) },
+                onDuplicate = { viewModel.requestDuplicate(it) },
+                onDelete = { showDeleteDialog(it) }
         )
         viewBinding.recyclerView.adapter = mAdapter
         viewModel.users.observe(this) { mAdapter.submitList(it) }
@@ -308,21 +309,6 @@ class MainActivity : LoadingActivity() {
                 }
                 viewModel.createUser(name, installGms)
             }
-        }
-    }
-
-    private fun showUserMenu(user: UserBean, anchor: View) {
-        PopupMenu(this, anchor).apply {
-            menuInflater.inflate(R.menu.menu_user, menu)
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.user_rename -> showRenameDialog(user)
-                    R.id.user_duplicate -> viewModel.requestDuplicate(user)
-                    R.id.user_delete -> showDeleteDialog(user)
-                }
-                true
-            }
-            show()
         }
     }
 

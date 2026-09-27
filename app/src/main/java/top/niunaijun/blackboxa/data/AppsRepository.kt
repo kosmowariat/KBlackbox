@@ -465,7 +465,7 @@ class AppsRepository {
             val userIds = blackBoxCore.users.map { it.id }.ifEmpty { listOf(DEFAULT_USER_ID) }.sorted()
             val users =
                     userIds.map { id ->
-                        val apps = sortedInstalledApplications(id).sortedBy { GmsCore.isGoogleAppOrService(it.packageName) }
+                        val apps = sortedInstalledApplications(id).filterNot { GmsCore.isGoogleAppOrService(it.packageName) }
                         UserBean(
                                 id,
                                 getUserName(id),

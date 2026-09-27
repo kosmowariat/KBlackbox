@@ -77,4 +77,10 @@
         <item name="android:scaleType">fitCenter</item>
     </style>
 
+    <style name="Widget.BlackBox.UserAction" parent="">
+        <item name="android:layout_width">@dimen/icon_size</item>
+        <item name="android:layout_height">@dimen/icon_size</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+    </style>
+
 </resources>

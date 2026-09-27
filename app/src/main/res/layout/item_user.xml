@@ -35,7 +35,7 @@
                 android:maxLines="1"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:textColor="?attr/colorOnSurface"
-                app:layout_constraintEnd_toStartOf="@id/more"
+                app:layout_constraintEnd_toStartOf="@id/actions"
                 app:layout_constraintStart_toEndOf="@id/avatar"
                 app:layout_constraintTop_toTopOf="@id/avatar" />
 
@@ -46,19 +46,36 @@
                 android:layout_marginStart="@dimen/spacing_medium"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintEnd_toStartOf="@id/more"
+                app:layout_constraintEnd_toStartOf="@id/actions"
                 app:layout_constraintStart_toEndOf="@id/avatar"
                 app:layout_constraintTop_toBottomOf="@id/name" />
 
-        <ImageButton
-                android:id="@+id/more"
-                android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/user_options"
-                android:src="@drawable/ic_more_vert"
+        <LinearLayout
+                android:id="@+id/actions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                    android:id="@+id/rename"
+                    style="@style/Widget.BlackBox.UserAction"
+                    android:contentDescription="@string/rename_user"
+                    android:src="@drawable/ic_edit" />
+
+            <ImageButton
+                    android:id="@+id/duplicate"
+                    style="@style/Widget.BlackBox.UserAction"
+                    android:contentDescription="@string/duplicate_user"
+                    android:src="@drawable/ic_content_copy" />
+
+            <ImageButton
+                    android:id="@+id/delete"
+                    style="@style/Widget.BlackBox.UserAction"
+                    android:contentDescription="@string/delete_user"
+                    android:src="@drawable/ic_delete" />
+        </LinearLayout>
 
         <LinearLayout
                 android:id="@+id/previews"
