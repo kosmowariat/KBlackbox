@@ -96,7 +96,6 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 - **Google Mobile Services**: optional GMS install and support (`GmsCore`, `GmsManagerActivity`)
 - **OpenStreetMap tiles**: osmdroid for the fake-location map
 - **VpnService**: `ProxyVpnService`, toggled from the UI
-- **Telegram Bot API**: CI artifact distribution only
 
 ## Configuration
 - Build: the root `build.gradle` `ext` (SDK levels, version), `gradle.properties` (JVM args, AndroidX), `gradle/libs.versions.toml`
@@ -104,7 +103,7 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 - Runtime (engine): `JarConfig` / TOML config, per-user virtual file system
 
 ## Deployment Architecture
-- An APK per ABI (armeabi-v7a, arm64-v8a) plus a universal APK, built by GitHub Actions and posted to Telegram
+- An APK per ABI (armeabi-v7a, arm64-v8a) plus a universal APK, built by GitHub Actions and uploaded as GitHub Actions artifacts
 - `Bcore`, `black-reflection` and `compiler` also ship as AAR/JAR artifacts for embedding in other host apps
 - No backend or server component
 

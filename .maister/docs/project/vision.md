@@ -23,7 +23,7 @@ The main focus of this fork is **improving the GUI** of the `app` module:
 - Keep the engine (`Bcore`) stable while the UI evolves. Change engine code only when a UI feature needs it.
 
 ## Evolution
-Upstream grew from the original BlackBox engine into NewBlackbox, adding Android 14/15 compatibility, anti-detection, a VPN toggle, device-info logging and CI distribution through Telegram. This fork keeps that engine as its foundation and moves the product toward a polished, modern user-facing app.
+Upstream grew from the original BlackBox engine into NewBlackbox, adding Android 14/15 compatibility, anti-detection, a VPN toggle, device-info logging and CI builds. This fork keeps that engine as its foundation and moves the product toward a polished, modern user-facing app.
 
 ---
 *Generated during Maister init on 2026-09-26 from codebase analysis and user input.*

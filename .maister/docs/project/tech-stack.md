@@ -70,9 +70,9 @@ There is no SQL database. State lives in:
 ## Infrastructure
 
 ### CI/CD
-- GitHub Actions: `.github/workflows/build_and_telegram.yml`. It runs on push to `main` and on manual dispatch.
+- GitHub Actions: `.github/workflows/build.yml`. It runs on push to `main` and on manual dispatch.
 - JDK 21 (Temurin) and the Android SDK are set up, and Gradle caching is on.
-- It builds `assembleDebug assembleRelease` for all modules, then uploads the APKs, AARs and JARs to a Telegram chat and pins them.
+- It builds `assembleDebug assembleRelease` for all modules, then uploads the APKs, AARs and JARs as GitHub Actions workflow artifacts.
 - It runs no tests and no lint.
 
 ### Signing

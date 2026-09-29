@@ -3,7 +3,7 @@
 ## Current State
 - **Version**: 4.0.0 (versionCode 400), forked from ALEX5402/NewBlackbox at commit `89b5983`
 - **Key Features**: Virtual app install/launch/uninstall/clear-data, multi-user spaces (ViewPager pages), fake location (osmdroid map), GMS install/management, Xposed-style module list, VPN toggle, device spoofing and anti-detection, home-screen shortcuts, floating joystick ("rocker") for location.
-- **Recent Updates (upstream)**: Build and Telegram distribution for all modules, removal of the aliyun Maven mirror, the VPN toggle, device-info logging, Android 14/15 fixes.
+- **Recent Updates (upstream)**: CI builds for all modules, removal of the aliyun Maven mirror, the VPN toggle, device-info logging, Android 14/15 fixes.
 
 ## Planned Enhancements (Next 3–6 Months)
 
@@ -23,7 +23,7 @@
 
 ### Technical Debt
 - [ ] **Testing.** There is effectively no test suite: one file, `JarManagerTest.java`, sits in `src/main`. Add ViewModel unit tests and a few Espresso smoke tests for the main flows.
-- [ ] **CI quality gates.** CI only builds and uploads to Telegram. Add `lint` and unit tests to the workflow.
+- [ ] **CI quality gates.** CI only builds and uploads artifacts. Add `lint` and unit tests to the workflow.
 - [ ] **Lint.** `Bcore` sets `checkReleaseBuilds false`. Re-enable lint for `app` at least.
 - [ ] **Error handling in UI.** `MainActivity` wraps almost everything in `try/catch` + `Log.e`. Surface errors to users through a single consistent pattern.
 - [ ] **Package/app ID.** The app still uses the upstream `top.niunaijun.blackbox` applicationId and debug signing for release. Decide on your own ID and signing config.

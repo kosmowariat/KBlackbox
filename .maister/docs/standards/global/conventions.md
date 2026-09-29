@@ -8,7 +8,7 @@ Keep README files current with setup steps, architecture overview, and contribut
 
 ### Clean Version Control
 Write clear commit messages, use feature branches, and add meaningful descriptions to pull requests.
-In this project the CI posts the last commit subject as the Telegram artifact caption — write meaningful subjects.
+In this project write meaningful commit subjects.
 
 ### Environment Variables
 Store configuration in environment variables; never commit secrets or API keys.
