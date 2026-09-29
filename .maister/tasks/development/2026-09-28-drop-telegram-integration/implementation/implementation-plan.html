@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementation Plan — Drop Telegram Integration</title>
+<style>
+:root {
+  --bg:#f6f7f9; --surface:#fff; --border:#e2e5ea; --text:#1a1d23; --dim:#6b7280;
+  --accent:#4f46e5; --accent-soft:#eef2ff; --ok:#16a34a; --ok-soft:#ecfdf3;
+  --warn:#d97706; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2;
+  --info:#2563eb; --info-soft:#eff6ff; --radius:10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111418; --surface:#1a1f26; --border:#2e3640; --text:#e6e9ee; --dim:#9aa4b2;
+    --accent:#818cf8; --accent-soft:#26294a; --ok:#4ade80; --ok-soft:#11291a;
+    --warn:#fbbf24; --warn-soft:#2e2410; --crit:#f87171; --crit-soft:#321616;
+    --info:#60a5fa; --info-soft:#15233a; }
+}
+* { box-sizing:border-box; }
+body { margin:0 auto; max-width:1100px; padding:24px 20px 64px; background:var(--bg);
+  color:var(--text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1 { font-size:22px; letter-spacing:-.01em; } h2 { font-size:16px; margin-top:28px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin:14px 0; }
+.badge { display:inline-block; font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent); }
+.sev { display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase;
+  padding:1.5px 7px; border-radius:99px; margin-right:6px; }
+.sev.critical { background:var(--crit-soft); color:var(--crit); }
+.sev.warning  { background:var(--warn-soft); color:var(--warn); }
+.sev.info     { background:var(--info-soft); color:var(--info); }
+.pass { color:var(--ok); font-weight:600; } .fail { color:var(--crit); font-weight:600; }
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
+code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+  background:var(--accent-soft); padding:1px 5px; border-radius:4px; }
+img.shot { max-width:100%; border:1px solid var(--border); border-radius:var(--radius); }
+details > summary { cursor:pointer; font-weight:600; }
+.crumbs { display:flex; gap:14px; font-size:13px; margin-bottom:18px; flex-wrap:wrap; }
+.crumbs a.md { margin-left:auto; color:var(--dim); }
+.crumbs .here { font-weight:650; color:var(--text); }
+.tiles { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0; }
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:10px 16px; text-align:center; min-width:90px; }
+.tile b { display:block; font-size:20px; letter-spacing:-.01em; }
+.tile span { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); }
+.step.todo::before  { content:"☐ "; color:var(--dim); }
+.step.done::before  { content:"☑ "; color:var(--ok); }
+.step.done          { color:var(--dim); }
+.group.todo .g-badge::after { content:"pending"; }
+.group.done .g-badge::after { content:"✓ completed"; color:var(--ok); }
+/* plan extensions */
+.g-badge { font-size:11px; font-weight:600; text-transform:uppercase; color:var(--dim); float:right; }
+.group { border-left:4px solid var(--accent); }
+.group h3 { margin:0 0 6px; font-size:15px; }
+.meta { font-size:12.5px; color:var(--dim); margin:4px 0; }
+.chips code { display:inline-block; margin:2px 4px 2px 0; }
+ul.steps { list-style:none; padding-left:4px; margin:8px 0; }
+ul.steps li { margin:5px 0; }
+ul.steps li ul { color:var(--dim); font-size:13px; margin:2px 0 0 18px; padding:0; list-style:disc; }
+.flow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.wave { display:flex; flex-direction:column; gap:6px; }
+.node { background:var(--accent-soft); color:var(--accent); border-radius:8px; padding:6px 12px; font-weight:600; font-size:13px; }
+.arrow { font-size:22px; color:var(--dim); }
+.accept { font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<nav class="crumbs">
+  <a href="../dashboard.html">← Dashboard</a>
+  <a href="spec.html">Spec</a> <span class="here">Plan</span>
+  <a href="../verification/implementation-verification.html">Verification</a>
+  <a href="implementation-plan.md" target="_blank" rel="noopener" class="md">md twin ↗</a>
+</nav>
+
+<header>
+  <span class="badge">Implementation Plan</span>
+  <h1>Drop Telegram Integration</h1>
+  <div class="meta">Generated 2026-09-28 · Risk: low · Source: <a href="spec.md" target="_blank" rel="noopener">spec.md</a></div>
+</header>
+
+<div class="tiles">
+  <div class="tile"><b>4</b><span>task groups</span></div>
+  <div class="tile"><b>21</b><span>total steps</span></div>
+  <div class="tile"><b>~16</b><span>scripted checks</span></div>
+  <div class="tile"><b>3 → 1</b><span>parallel → final</span></div>
+  <div class="tile"><b>14</b><span>files touched</span></div>
+</div>
+
+<section class="tldr card">
+  <h2 style="margin-top:0">TL;DR</h2>
+  <p>4 task groups, 21 steps. Groups 1 (CI workflow), 2 (app menu, handler and strings) and 3 (docs) touch disjoint files and can run in parallel. Group 4 (final sweep and verification) runs last. No unit tests are added (K5). Each group's "tests" are its own checks: a YAML parse and content greps for CI, <code>./gradlew :app:assembleDebug</code> for the app, and targeted greps for the docs. The R12 repo-wide grep is the final gate.</p>
+  <h2>Key Decisions</h2>
+  <table>
+    <tr><th>Decision</th><th>Rationale</th></tr>
+    <tr><td>3 parallel groups plus a final verification group</td><td>CI, app and docs share no files. Only the R12 sweep needs all three done.</td></tr>
+    <tr><td>All of R2–R4 go in one group (Group 2)</td><td>A dangling <code>R.id.main_tg</code> or <code>@string/tg_group</code> breaks the build, so everything is removed together and built once.</td></tr>
+    <tr><td>The checks replace unit tests</td><td>The project has no tests, and the spec says not to add any. Each group writes its checks first and runs them at the end.</td></tr>
+    <tr><td>The YAML check uses <code>python yaml.safe_load</code></td><td>Python 3.13 with PyYAML is available locally.</td></tr>
+    <tr><td>Edit the docs in place</td><td>Only the named lines and sentences are reworded. No sections are rewritten.</td></tr>
+  </table>
+  <h2>Open Questions / Risks</h2>
+  <ul>
+    <li><span class="sev warning">warning</span><strong><code>build.yml</code> can only be proven on GitHub.</strong> Locally there is only the YAML parse and a content review. The first push or <code>workflow_dispatch</code> run must show 4 artifacts.</li>
+    <li><span class="sev info">info</span><strong>Manual follow-up:</strong> the user must delete the <code>TELEGRAM_BOT_TOKEN</code> and <code>TELEGRAM_CHAT_ID</code> repository secrets.</li>
+    <li><span class="sev critical">critical</span><strong>Blanket-replace hazard:</strong> <code>SimpleCrashFix.java</code> and <code>SocialMediaAppCrashPrevention.java</code> contain <code>telegram</code> and must stay untouched. Never run a repo-wide search-and-replace.</li>
+    <li><span class="sev warning">warning</span><strong>Grep exclusion hazard:</strong> R12 must not exclude directories named <code>build</code>, or <code>standards/build/ci.md</code> is hidden. Exclude only by path.</li>
+    <li><span class="sev info">info</span><strong>Line endings:</strong> all target files are LF (<code>* text=auto</code>). Keep them LF.</li>
+  </ul>
+</section>
+
+<h2>Dependency overview</h2>
+<div class="card flow">
+  <div class="wave">
+    <div class="node">G1 · CI Workflow</div>
+    <div class="node">G2 · App Overflow Menu</div>
+    <div class="node">G3 · Docs &amp; Standards</div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="wave"><div class="node">G4 · Final Sweep &amp; Verification</div></div>
+  <div class="meta" style="flex-basis:100%">Wave 1 runs in parallel because the files are disjoint. Wave 2 depends on 1, 2 and 3.</div>
+</div>
+
+<main>
+<h2>Task groups</h2>
+
+<section data-group="1" class="group done card">
+  <span class="g-badge"></span>
+  <h3>Group 1: CI Workflow</h3>
+  <div class="meta">Dependencies: None · 4 steps · R1</div>
+  <div class="chips">Files: <code>.github/workflows/build_and_telegram.yml</code> (delete) <code>.github/workflows/build.yml</code> (create)</div>
+  <ul class="steps">
+    <li data-step="1.1" class="step done">1.1 Define the CI checks (2-6, run in 1.4)
+      <ul><li><code>yaml.safe_load</code> parses the file and prints <code>Build ['build']</code></li><li>no <code>telegram</code> or <code>secrets.</code> matches</li><li>4× upload-artifact@v4, 4× <code>retention-days: 30</code>, 4× <code>if-no-files-found: error</code></li><li>the old file is absent</li></ul></li>
+    <li data-step="1.2" class="step done">1.2 Create <code>build.yml</code>: <code>name: Build</code>, push to <code>main</code> + <code>workflow_dispatch</code>, job <code>build</code> on ubuntu-latest, no <code>env</code>
+      <ul><li>Steps unchanged: checkout@v4, setup-java@v4 (temurin 21, gradle cache), setup-android@v3, license-accept, <code>chmod +x ./gradlew</code>, and the full assemble command</li><li>Do not carry over the <code>aar_paths</code>/<code>additional_artifacts</code> find steps or the Telegram steps</li><li>Reuse: <code>build_and_telegram.yml</code> lines 1-37</li></ul></li>
+    <li data-step="1.3" class="step done">1.3 Add 4 upload-artifact@v4 steps (30-day retention, <code>if-no-files-found: error</code>)
+      <ul><li><code>app-debug-apks</code>: <code>app/build/outputs/apk/debug/*.apk</code></li><li><code>app-release-apks</code>: <code>app/build/outputs/apk/release/*.apk</code></li><li><code>bcore-aars</code>: <code>Bcore/build/outputs/aar/*.aar</code></li><li><code>libs</code>: multi-line path, <code>black-reflection/build/libs/*.jar</code> + <code>compiler/build/libs/*.jar</code></li></ul></li>
+    <li data-step="1.4" class="step done">1.4 <code>git rm</code> the old workflow, then run only the checks from 1.1</li>
+  </ul>
+  <div class="accept"><strong>Acceptance:</strong> all 1.1 checks pass, <code>build.yml</code> matches R1 exactly, and the old workflow is gone.</div>
+</section>
+
+<section data-group="2" class="group done card">
+  <span class="g-badge"></span>
+  <h3>Group 2: App Overflow Menu</h3>
+  <div class="meta">Dependencies: None · 5 steps · R2–R4 (atomic)</div>
+  <div class="chips">Files: <code>app/src/main/res/menu/menu_main.xml</code> <code>app/src/main/java/top/niunaijun/blackboxa/view/main/MainActivity.kt</code> <code>app/src/main/res/values/strings.xml</code> <code>app/src/main/res/values-zh-rCN/strings.xml</code> <code>app/src/main/res/values-zh-rTW/strings.xml</code></div>
+  <ul class="steps">
+    <li data-step="2.1" class="step done">2.1 Define the app checks
+      <ul><li><code>grep -rnE 'main_tg|tg_group|t\.me/|newblackboxa' app/src</code> returns nothing</li><li><code>menu_main.xml</code> has 4 <code>&lt;item</code> entries</li><li><code>./gradlew :app:assembleDebug</code> succeeds</li></ul></li>
+    <li data-step="2.2" class="step done">2.2 Delete the <code>main_tg</code> <code>&lt;item&gt;</code> from <code>menu_main.xml</code> (about lines 26-29)</li>
+    <li data-step="2.3" class="step done">2.3 Delete the <code>R.id.main_tg -&gt; { ... }</code> branch in <code>onOptionsItemSelected</code> (about lines 351-354)
+      <ul><li>Keep the <code>Intent</code>/<code>Uri</code> imports because <code>main_git</code> uses them</li></ul></li>
+    <li data-step="2.4" class="step done">2.4 Delete <code>tg_group</code> from <code>values</code> :12, <code>values-zh-rCN</code> :12 and <code>values-zh-rTW</code> :11</li>
+    <li data-step="2.5" class="step done">2.5 Run only the checks from 2.1, including <code>:app:assembleDebug</code></li>
+  </ul>
+  <div class="accept"><strong>Acceptance:</strong> the build passes, the menu has 4 entries (layout, setting, fake location, upstream repo), nothing else changes, and the files stay LF.</div>
+</section>
+
+<section data-group="3" class="group done card">
+  <span class="g-badge"></span>
+  <h3>Group 3: Project Docs &amp; Standards</h3>
+  <div class="meta">Dependencies: None · 8 steps · R5–R11</div>
+  <div class="chips">Files: <code>.maister/docs/standards/build/ci.md</code> <code>.maister/docs/standards/global/conventions.md</code> <code>.maister/docs/project/tech-stack.md</code> <code>.maister/docs/project/architecture.md</code> <code>.maister/docs/project/roadmap.md</code> <code>.maister/docs/project/vision.md</code> <code>.maister/docs/INDEX.md</code></div>
+  <ul class="steps">
+    <li data-step="3.1" class="step done">3.1 Define the docs checks
+      <ul><li><code>grep -rniE 'telegram|t\.me/' .maister/docs</code> returns nothing</li><li><code>build.yml</code> is mentioned in ci.md, tech-stack.md and INDEX.md</li><li>"No tests or lint run in CI" is kept in ci.md</li></ul></li>
+    <li data-step="3.2" class="step done">3.2 <code>ci.md</code> (R5): the pipeline section describes <code>build.yml</code> and the 4 artifacts with 30-day retention. The secrets section says no secrets are needed and secrets are never committed.</li>
+    <li data-step="3.3" class="step done">3.3 <code>conventions.md:11</code> (R6): keep the meaningful-commit-subjects rule and drop the Telegram-caption reason</li>
+    <li data-step="3.4" class="step done">3.4 <code>tech-stack.md</code> (R7): :73 names <code>build.yml</code>, and :75 says the outputs are GitHub Actions workflow artifacts</li>
+    <li data-step="3.5" class="step done">3.5 <code>architecture.md</code> (R8): remove the Telegram Bot API line (about :99), and :107 says "uploaded as GitHub Actions artifacts"</li>
+    <li data-step="3.6" class="step done">3.6 <code>roadmap.md</code> :6 and :26 (R9) and <code>vision.md</code> :26 (R10) are reworded</li>
+    <li data-step="3.7" class="step done">3.7 <code>INDEX.md</code> (R11): :35, :63 and :149 are aligned with the reworded ci.md and conventions.md</li>
+    <li data-step="3.8" class="step done">3.8 Run only the checks from 3.1, then eyeball INDEX.md against the standards for consistency</li>
+  </ul>
+  <div class="accept"><strong>Acceptance:</strong> the checks pass, the edits are local rewordings only, and INDEX.md is consistent with the standards.</div>
+</section>
+
+<section data-group="4" class="group done card">
+  <span class="g-badge"></span>
+  <h3>Group 4: Final Sweep &amp; Verification</h3>
+  <div class="meta">Dependencies: 1, 2, 3 · 4 steps · R12</div>
+  <div class="chips">Files: None</div>
+  <ul class="steps">
+    <li data-step="4.1" class="step done">4.1 Review the checks from groups 1-3 and re-run any that were not recorded</li>
+    <li data-step="4.2" class="step done">4.2 Run the R12 sweep: <code>git grep --untracked -niE 'telegram|t\.me/|tg_group|main_tg|newblackboxa' -- . ':!.maister/tasks'</code>
+      <ul><li>Ignored build outputs are skipped, while <code>standards/build/ci.md</code> is still searched</li><li>Expected: only the 2 Bcore compat files</li></ul></li>
+    <li data-step="4.3" class="step done">4.3 Check that <code>git status --short</code> lists only the 14 planned paths, and that Bcore and <code>.maister/tasks</code> are untouched</li>
+    <li data-step="4.4" class="step done">4.4 Record the manual follow-ups
+      <ul><li>Run the workflow once with <code>workflow_dispatch</code> and confirm 4 artifacts</li><li>Delete the Telegram repo secrets</li><li>Suggested commit: <code>chore: drop Telegram integration, build-only CI with artifact upload</code></li></ul></li>
+  </ul>
+  <div class="accept"><strong>Acceptance:</strong> R12 shows only the 2 Bcore compat files, 14 paths changed, and no tests or dependencies were added.</div>
+</section>
+
+<h2>Execution order</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>Group</th><th>Steps</th><th>Depends on</th></tr>
+    <tr><td>1</td><td>CI Workflow</td><td>4</td><td>—</td></tr>
+    <tr><td>2</td><td>App Overflow Menu</td><td>5</td><td>—</td></tr>
+    <tr><td>3</td><td>Project Docs &amp; Standards</td><td>8</td><td>—</td></tr>
+    <tr><td>4</td><td>Final Sweep &amp; Verification</td><td>4</td><td>1, 2, 3</td></tr>
+  </table>
+</div>
+
+<details class="card">
+  <summary>Standards compliance &amp; notes</summary>
+  <ul>
+    <li><code>global/minimal-implementation.md</code>: only the replacement workflow is added, and the Telegram-only find steps are removed</li>
+    <li><code>global/conventions.md</code>: meaningful commit subject, no committed secrets, LF, no new dependencies (K2)</li>
+    <li><code>build/ci.md</code>: rewritten by this change. <code>build/gradle.md</code>: the build command is unchanged.</li>
+    <li><code>frontend/android-resources.md</code>: all 3 locales are updated together</li>
+    <li><code>docs/release-notes.md</code>: no entry, by user decision</li>
+    <li>Don't touch: <code>Bcore/**</code>, <code>.maister/tasks/**</code>, RELEASE_NOTES.md, README.md, Docs.md</li>
+  </ul>
+</details>
+</main>
+</body>
+</html>

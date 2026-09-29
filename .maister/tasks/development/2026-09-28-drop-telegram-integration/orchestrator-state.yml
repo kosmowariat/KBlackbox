@@ -1,0 +1,63 @@
+orchestrator:
+  started_phase: phase-1
+  completed_phases: [phase-1, phase-2, phase-5, phase-7, phase-8, phase-14]
+  skipped_phases: {phase-3: no reproducible defect, phase-4: not ui_heavy, phase-6: spec audit skipped by user, phase-10: verification skipped by user, phase-11: verification skipped by user, phase-12: e2e disabled (not ui_heavy), phase-13: user docs disabled}
+  failed_phases: []
+  auto_fix_attempts: {}
+  options:
+    html_output: true
+    mockup_format: html
+    spec_audit_enabled: false
+    skip_test_suite: true
+    e2e_enabled: false
+    user_docs_enabled: false
+    code_review_enabled: true
+    pragmatic_review_enabled: true
+    reality_check_enabled: true
+    production_check_enabled: true
+  created: 2026-09-28T06:49:51Z
+  updated: 2026-09-29T14:56:19Z
+  task_path: .maister/tasks/development/2026-09-28-drop-telegram-integration
+task:
+  title: Drop Telegram integration and references
+  description: >-
+    Drop the Telegram integrations and references to it ("zdropuj integracje telegramowe i odnośniki do niego").
+    Touch points: CI .github/workflows/build_and_telegram.yml, app menu item main_tg + MainActivity handler
+    (https://t.me/newblackboxa), tg_group string in 3 locales, maister docs (INDEX.md, standards/build/ci.md,
+    standards/global/conventions.md, project/architecture.md, roadmap.md, tech-stack.md, vision.md).
+    Out of scope: Bcore guest-app compat code for org.telegram.messenger, historical task artifacts.
+  status: completed
+  tags: [cleanup, ci, docs]
+task_context:
+  risk_level: low
+  clarifications_resolved: true
+  scope_expanded: false
+  architecture_decision: null
+  task_characteristics:
+    has_reproducible_defect: false
+    modifies_existing_code: true
+    creates_new_entities: false
+    involves_data_operations: false
+    ui_heavy: false
+  research_reference: {path: null}
+  design_reference: {source: null}
+  project_context:
+    project_doc_paths:
+      - .maister/docs/project/vision.md
+      - .maister/docs/project/roadmap.md
+      - .maister/docs/project/tech-stack.md
+      - .maister/docs/project/architecture.md
+  phase_summaries:
+    codebase_analysis:
+      summary: Telegram lives in the only CI workflow, one overflow-menu link (menu + MainActivity branch + tg_group in 3 locales) and 7 .maister/docs files; simple removal, low risk.
+      key_files: [.github/workflows/build_and_telegram.yml, app/src/main/res/menu/menu_main.xml, app/src/main/java/top/niunaijun/blackboxa/view/main/MainActivity.kt]
+    clarifications:
+      - CI keeps build-only workflow renamed build.yml with upload-artifact instead of Telegram
+      - Remove historical upstream Telegram mentions in vision.md and roadmap.md too
+    specification:
+      summary: 12 requirements; build.yml with 4 upload-artifact groups replaces Telegram workflow; menu item, handler, tg_group x3 removed; 7 docs reworded; final grep only Bcore compat.
+    gap_analysis:
+      decisions:
+        - release notes entry skipped (user)
+        - build.yml artifact defaults accepted (30 days, if-no-files-found error, include release APKs)
+      summary: Removal-only change across ~12 files; build.yml replaces the Telegram workflow with upload-artifact (4 artifact groups); app menu item, handler and 3 strings removed; 7 docs reworded.

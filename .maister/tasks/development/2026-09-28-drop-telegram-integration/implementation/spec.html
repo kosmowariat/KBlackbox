@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Specification — Drop Telegram Integration</title>
+<style>
+:root {
+  --bg:#f6f7f9; --surface:#fff; --border:#e2e5ea; --text:#1a1d23; --dim:#6b7280;
+  --accent:#4f46e5; --accent-soft:#eef2ff; --ok:#16a34a; --ok-soft:#ecfdf3;
+  --warn:#d97706; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2;
+  --info:#2563eb; --info-soft:#eff6ff; --radius:10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111418; --surface:#1a1f26; --border:#2e3640; --text:#e6e9ee; --dim:#9aa4b2;
+    --accent:#818cf8; --accent-soft:#26294a; --ok:#4ade80; --ok-soft:#11291a;
+    --warn:#fbbf24; --warn-soft:#2e2410; --crit:#f87171; --crit-soft:#321616;
+    --info:#60a5fa; --info-soft:#15233a; }
+}
+* { box-sizing:border-box; }
+body { margin:0 auto; max-width:1100px; padding:24px 20px 64px; background:var(--bg);
+  color:var(--text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1 { font-size:22px; letter-spacing:-.01em; } h2 { font-size:16px; margin-top:28px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin:14px 0; }
+.badge { display:inline-block; font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent); }
+.sev { display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase;
+  padding:1.5px 7px; border-radius:99px; margin-right:6px; }
+.sev.critical { background:var(--crit-soft); color:var(--crit); }
+.sev.warning  { background:var(--warn-soft); color:var(--warn); }
+.sev.info     { background:var(--info-soft); color:var(--info); }
+.pass { color:var(--ok); font-weight:600; } .fail { color:var(--crit); font-weight:600; }
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
+code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+  background:var(--accent-soft); padding:1px 5px; border-radius:4px; }
+details > summary { cursor:pointer; font-weight:600; }
+.crumbs { display:flex; gap:14px; font-size:13px; margin-bottom:18px; flex-wrap:wrap; }
+.crumbs a.md { margin-left:auto; color:var(--dim); }
+.crumbs .here { font-weight:650; color:var(--text); }
+.tiles { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0; }
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:10px 16px; text-align:center; min-width:90px; }
+.tile b { display:block; font-size:20px; letter-spacing:-.01em; }
+.tile span { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:720px) { .grid2 { grid-template-columns:1fr; } }
+h3 { font-size:13px; text-transform:uppercase; letter-spacing:.04em; margin:0 0 8px; }
+.in h3 { color:var(--ok); } .out h3 { color:var(--dim); }
+ul { margin:6px 0; padding-left:20px; }
+.table-wrap { overflow-x:auto; }
+</style>
+</head>
+<body>
+<nav class="crumbs">
+  <a href="../dashboard.html">← Dashboard</a>
+  <span class="here">Spec</span>
+  <a href="implementation-plan.html">Plan</a>
+  <a href="../verification/implementation-verification.html">Verification</a>
+  <a href="spec.md" target="_blank" rel="noopener" class="md">md twin ↗</a>
+</nav>
+
+<header>
+  <span class="badge">Specification</span>
+  <h1>Drop Telegram Integration</h1>
+  <div style="color:var(--dim);font-size:12.5px">Generated 2026-09-28 · <a href="spec.md" target="_blank" rel="noopener">spec.md</a></div>
+</header>
+
+<div class="tiles">
+  <div class="tile"><b>12</b><span>requirements</span></div>
+  <div class="tile"><b>3</b><span>reused</span></div>
+  <div class="tile"><b>1</b><span>new file</span></div>
+  <div class="tile"><b>Low</b><span>risk</span></div>
+</div>
+
+<section class="tldr card">
+  <h2 style="margin-top:0">TL;DR</h2>
+  <p>Remove every Telegram integration and reference from KBlackbox, in three parts:</p>
+  <ul>
+    <li><b>CI:</b> <code>build_and_telegram.yml</code> is replaced by a build-only <code>build.yml</code> that publishes 4 GitHub Actions artifact groups.</li>
+    <li><b>App:</b> the "Telegram Group" item leaves the main-screen overflow menu (menu item, Kotlin branch, and the <code>tg_group</code> string in all 3 locales).</li>
+    <li><b>Docs:</b> 7 <code>.maister/docs</code> files are reworded so no Telegram mention is left.</li>
+  </ul>
+  <p>This is a removal-only change. The Bcore guest-app compat code, the <code>.maister/tasks/**</code> history and RELEASE_NOTES.md are not touched.</p>
+  <h3>Key Decisions</h3>
+  <ul>
+    <li><b>Replace the workflow instead of deleting it.</b> It is the repo's only CI, so the build steps are kept exactly as they are, and <code>actions/upload-artifact@v4</code> replaces the Telegram send/pin steps.</li>
+    <li><b>4 artifact groups, 30-day retention, <code>if-no-files-found: error</code>.</b> Each group can be downloaded on its own, and a broken build output fails loudly (the old workflow silently echoed "not found").</li>
+    <li><b>Delete the <code>aar_paths</code> and <code>additional_artifacts</code> find steps.</b> They only fed the Telegram steps, and the upload-artifact path globs replace them.</li>
+    <li><b>Remove the historical upstream mentions too</b> (roadmap.md:6, vision.md:26), because the user wants zero Telegram references.</li>
+    <li><b>No RELEASE_NOTES.md entry.</b> The user treats this as maintenance.</li>
+    <li><b>Keep the <code>Intent</code> and <code>Uri</code> imports in MainActivity.kt.</b> They are still used by <code>main_git</code> and elsewhere.</li>
+  </ul>
+  <h3>Open Questions / Risks</h3>
+  <ul>
+    <li><span class="sev warning">warning</span><b>Manual follow-up for the user:</b> delete the <code>TELEGRAM_BOT_TOKEN</code> and <code>TELEGRAM_CHAT_ID</code> repository secrets in GitHub (Settings → Secrets and variables → Actions). No code change can do this.</li>
+    <li><span class="sev info">info</span><b><code>build.yml</code> can only be checked on GitHub</b> (on push to <code>main</code> or by manual dispatch). Locally there is only YAML review plus <code>./gradlew :app:assembleDebug</code>.</li>
+    <li><span class="sev warning">warning</span><b>Don't use a blanket search-and-replace.</b> <code>SimpleCrashFix.java:257,273</code> and <code>SocialMediaAppCrashPrevention.java:31</code> must stay untouched.</li>
+    <li><span class="sev info">info</span><b>The final grep must not exclude directories named <code>build</code>.</b> Doing so hides <code>.maister/docs/standards/build/ci.md</code>. Exclude only by path (the <code>.git</code>, <code>.maister/tasks</code>, and module <code>*/build/</code> output dirs).</li>
+  </ul>
+</section>
+
+<section class="card" style="border-left:3px solid var(--accent)">
+  <h3>Goal</h3>
+  <p style="margin:0">KBlackbox, a solo independent fork, has no Telegram integration and no Telegram references left, except the Bcore compat code that keeps guest Telegram apps from crashing. CI keeps building every module and makes the outputs downloadable from GitHub.</p>
+</section>
+
+<div class="grid2">
+  <div class="card in"><h3>In scope</h3><ul>
+    <li>Replace the CI workflow (<code>build_and_telegram.yml</code> → <code>build.yml</code>)</li>
+    <li>Overflow-menu item <code>main_tg</code>, its <code>MainActivity</code> branch, and the <code>tg_group</code> string in 3 locales</li>
+    <li>7 <code>.maister/docs</code> files, including the historical upstream mentions</li>
+  </ul></div>
+  <div class="card out"><h3>Out of scope</h3><ul>
+    <li>The Bcore <code>SocialMediaAppCrashPrevention.java</code> and <code>SimpleCrashFix.java</code> <code>org.telegram.messenger</code> compat logic</li>
+    <li><code>.maister/tasks/**</code> historical artifacts</li>
+    <li>RELEASE_NOTES.md, and README.md and Docs.md (neither has any hits)</li>
+    <li>Deleting the GitHub repository secrets (manual, done by the user)</li>
+    <li>Adding lint or tests to CI (a separate roadmap item), and changing the upstream GitHub link</li>
+  </ul></div>
+</div>
+
+<h2 id="requirements">Requirements</h2>
+<div class="card table-wrap">
+<table>
+<tr><th>ID</th><th>Requirement</th><th>Area</th><th>Priority</th></tr>
+<tr><td>R1</td><td><b>Replace the CI workflow.</b> Delete <code>build_and_telegram.yml</code> and create <code>build.yml</code>: name <code>Build</code>, job <code>build</code> on <code>ubuntu-latest</code>, triggers <code>push</code> to <code>main</code> and <code>workflow_dispatch</code>. There is no <code>env</code> block and there are no <code>TELEGRAM_*</code> references. The build steps are identical to the current ones, followed by 4 <code>actions/upload-artifact@v4</code> steps (see below).</td><td>CI</td><td>must</td></tr>
+<tr><td>R2</td><td><b>Remove the menu item.</b> Delete the <code>main_tg</code> <code>&lt;item&gt;</code> from <code>menu_main.xml</code> (lines 26-29). The layout, setting, fake_location and main_git items stay.</td><td>App</td><td>must</td></tr>
+<tr><td>R3</td><td><b>Remove the handler.</b> Delete the <code>R.id.main_tg</code> branch (the <code>https://t.me/newblackboxa</code> intent) from <code>onOptionsItemSelected</code> in <code>MainActivity.kt</code> (lines 351-354).</td><td>App</td><td>must</td></tr>
+<tr><td>R4</td><td><b>Remove the string in all 3 locales.</b> Delete the <code>tg_group</code> entry from <code>values/strings.xml:12</code>, <code>values-zh-rCN/strings.xml:12</code> and <code>values-zh-rTW/strings.xml:11</code>.</td><td>App</td><td>must</td></tr>
+<tr><td>R5</td><td><b>Update <code>standards/build/ci.md</code>.</b> Pipeline section: describe <code>build.yml</code>, which builds all APKs/AARs/JARs and uploads them as GitHub Actions artifacts (the 4 groups, 30-day retention), downloadable from the run page. Keep "No tests or lint run in CI today." Secrets section: the workflow needs no secrets, and secrets are never committed. Delete the section only if nothing meaningful is left.</td><td>Docs</td><td>must</td></tr>
+<tr><td>R6</td><td><b>Update <code>standards/global/conventions.md:11</code>.</b> Keep the "write meaningful commit subjects" rule and drop the Telegram-caption reason.</td><td>Docs</td><td>must</td></tr>
+<tr><td>R7</td><td><b>Update <code>project/tech-stack.md</code>.</b> At :73, change the workflow to <code>.github/workflows/build.yml</code>. At :75, say the outputs are uploaded as GitHub Actions workflow artifacts.</td><td>Docs</td><td>must</td></tr>
+<tr><td>R8</td><td><b>Update <code>project/architecture.md</code>.</b> Remove the :99 "Telegram Bot API" integration line. At :107, change "posted to Telegram" to "uploaded as GitHub Actions artifacts".</td><td>Docs</td><td>must</td></tr>
+<tr><td>R9</td><td><b>Update <code>project/roadmap.md</code>.</b> At :6, reword the upstream update to mention only CI builds for all modules. At :26, change the text to "CI only builds and uploads artifacts".</td><td>Docs</td><td>must</td></tr>
+<tr><td>R10</td><td><b>Update <code>project/vision.md:26</code>.</b> Change "CI distribution through Telegram" to "CI builds", or drop the clause.</td><td>Docs</td><td>must</td></tr>
+<tr><td>R11</td><td><b>Update <code>.maister/docs/INDEX.md</code>.</b> At :35, "GitHub Actions to Telegram CI" becomes GitHub Actions build CI with artifact upload. At :63, drop the Telegram-caption reason. At :149, the CI &amp; Distribution summary describes <code>build.yml</code> with upload-artifact and mentions no Telegram credentials. The INDEX summaries must match the reworded standards.</td><td>Docs</td><td>must</td></tr>
+<tr><td>R12</td><td><b>Final sweep.</b> A case-insensitive grep for <code>telegram|t\.me/|tg_group|main_tg|newblackboxa</code> across the repo matches only the 2 Bcore compat files. The grep excludes <code>.git</code>, <code>.maister/tasks/**</code> and module build-output directories.</td><td>All</td><td>must</td></tr>
+</table>
+</div>
+
+<h3 style="margin-top:18px">R1 artifact groups</h3>
+<p style="margin:0 0 4px;color:var(--dim)">Each upload step sets <code>retention-days: 30</code> and <code>if-no-files-found: error</code>.</p>
+<div class="card table-wrap">
+<table>
+<tr><th>Artifact name</th><th>Path(s)</th></tr>
+<tr><td><code>app-debug-apks</code></td><td><code>app/build/outputs/apk/debug/*.apk</code></td></tr>
+<tr><td><code>app-release-apks</code></td><td><code>app/build/outputs/apk/release/*.apk</code></td></tr>
+<tr><td><code>bcore-aars</code></td><td><code>Bcore/build/outputs/aar/*.aar</code></td></tr>
+<tr><td><code>libs</code></td><td><code>black-reflection/build/libs/*.jar</code> and <code>compiler/build/libs/*.jar</code> (multi-line <code>path</code>)</td></tr>
+</table>
+</div>
+
+<h2 id="stories">User Stories</h2>
+<div class="grid2">
+  <div class="card"><span class="badge">End user</span><p>As an end user, I don't want to see an overflow-menu link to the upstream Telegram chat, which is unrelated to this fork.</p></div>
+  <div class="card"><span class="badge">Maintainer</span><p>As the maintainer, I want CI to keep building every module and give me downloadable artifacts, without needing Telegram credentials.</p></div>
+  <div class="card"><span class="badge">Contributor</span><p>As a contributor, I want the project docs and standards to describe the real CI pipeline.</p></div>
+</div>
+
+<h2 id="components">Reusable vs New Components</h2>
+<div class="card table-wrap">
+<table>
+<tr><th>Component</th><th>Type</th><th>Notes</th></tr>
+<tr><td><code>.github/workflows/build_and_telegram.yml</code> lines 1-37</td><td><span class="pass">reuse</span></td><td>Triggers and build steps, copied unchanged into <code>build.yml</code>.</td></tr>
+<tr><td>Existing menu, handler and strings structure</td><td><span class="pass">reuse</span></td><td>Only items are removed and nothing is restructured.</td></tr>
+<tr><td>The current wording in the 7 docs files</td><td><span class="pass">reuse</span></td><td>Edit it in place, and don't rewrite whole sections.</td></tr>
+<tr><td><code>.github/workflows/build.yml</code></td><td><span class="badge">new</span></td><td>It replaces the deleted workflow, which is the only CI. The 4 upload-artifact steps are the only new logic, and they replace the Telegram distribution the user asked to drop. <code>actions/upload-artifact</code> is the standard first-party action, so no Gradle or library dependency is added.</td></tr>
+</table>
+</div>
+
+<h2 id="technical">Technical Detail</h2>
+<details class="card"><summary>Technical approach</summary>
+<ul>
+  <li>Do it as one atomic change so <code>main</code> always has CI and the app always compiles. The menu item, Kotlin branch and 3 strings must go together, or dangling <code>R.id.main_tg</code> or <code>@string/tg_group</code> references break the build.</li>
+  <li>The APK globs cover the <code>BlackBox_&lt;version&gt;_&lt;baseName&gt;.apk</code> naming from <code>app/build.gradle</code>. <code>black-reflection</code> and <code>compiler</code> are <code>java-library</code> modules, so their JARs land in <code>build/libs</code>.</li>
+  <li>Suggested commit subject: <code>chore: drop Telegram integration, build-only CI with artifact upload</code>.</li>
+  <li>After the merge, run the workflow once with <code>workflow_dispatch</code> to confirm the 4 artifacts appear, then delete the secrets (a manual step for the user).</li>
+</ul>
+</details>
+<details class="card"><summary>Testing approach</summary>
+<p>2-8 focused checks per step group. No automated tests exist, and K5 says tests are encouraged but not required. Verification runs only the checks below and not a full suite.</p>
+<ul>
+  <li><b>App group:</b> <code>./gradlew :app:assembleDebug</code> succeeds, and the overflow menu shows no "Telegram Group" item in any locale.</li>
+  <li><b>CI group:</b>
+    <ul>
+      <li><code>build.yml</code> is valid YAML.</li>
+      <li>It has no <code>TELEGRAM</code> or <code>secrets.</code> references.</li>
+      <li>The 4 artifact names and paths, retention and <code>if-no-files-found</code> match R1.</li>
+      <li>After the push, the run on GitHub is green and shows 4 artifacts.</li>
+    </ul>
+  </li>
+  <li><b>Docs group:</b> the R12 grep is clean, and the INDEX.md summaries are consistent with ci.md and conventions.md.</li>
+</ul>
+</details>
+<details class="card"><summary>Standards compliance</summary>
+<ul>
+  <li><code>standards/build/ci.md</code>: this change rewrites that standard to match the new pipeline. Secrets stay out of the repo.</li>
+  <li><code>standards/build/gradle.md</code>: the build command is unchanged, and no dependencies are added (K2 is not affected).</li>
+  <li><code>standards/global/conventions.md</code>: meaningful commit subjects and secrets never committed.</li>
+  <li><code>standards/global/minimal-implementation.md</code>: nothing is added beyond the replacement workflow. The Telegram-only find steps are removed.</li>
+  <li><code>standards/frontend/android-resources.md</code>: the string is removed from all 3 mirrored locales together.</li>
+  <li><code>standards/docs/release-notes.md</code>: no entry, by user decision.</li>
+</ul>
+</details>
+
+<h2 id="success">Success Criteria</h2>
+<div class="card"><ul>
+  <li><code>build_and_telegram.yml</code> is gone, and <code>build.yml</code> matches R1 exactly.</li>
+  <li><code>./gradlew :app:assembleDebug</code> passes, and the overflow menu has 4 entries: layout, setting, fake location and the upstream repo link.</li>
+  <li>The R12 grep returns only the 2 Bcore compat files.</li>
+  <li>The first <code>build.yml</code> run on GitHub succeeds and publishes the 4 artifact groups.</li>
+</ul></div>
+</body>
+</html>
