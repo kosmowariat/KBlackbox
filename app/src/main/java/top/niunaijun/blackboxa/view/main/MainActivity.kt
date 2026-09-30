@@ -28,6 +28,7 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.databinding.ActivityMainBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.ShortcutUtil
 import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
@@ -206,6 +207,7 @@ class MainActivity : LoadingActivity() {
         mAdapter = UsersAdapter(
                 onClick = { UserAppsActivity.start(this, it.id, it.name) },
                 onAppClick = { user, app ->
+                    ShortcutUtil.pushRecentApp(this, user.id, app)
                     showLoading()
                     viewModel.launchApp(app.packageName, user.id)
                 },

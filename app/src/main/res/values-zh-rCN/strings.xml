@@ -103,4 +103,6 @@
         <item>简体中文</item>
         <item>繁體中文</item>
     </string-array>
+    <string name="shortcut_fake_location">虚拟定位</string>
+    <string name="shortcut_removed">应用已移除</string>
 </resources>

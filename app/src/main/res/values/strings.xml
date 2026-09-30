@@ -117,4 +117,6 @@
         <item>zh-CN</item>
         <item>zh-TW</item>
     </string-array>
+    <string name="shortcut_fake_location">Fake location</string>
+    <string name="shortcut_removed">App removed</string>
 </resources>

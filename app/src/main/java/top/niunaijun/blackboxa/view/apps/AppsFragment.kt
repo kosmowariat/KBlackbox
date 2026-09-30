@@ -100,6 +100,7 @@ class AppsFragment : Fragment() {
         ItemTouchHelper(touchCallBack).attachToRecyclerView(viewBinding.recyclerView)
 
         mAdapter.onItemClick = { _, data, _ ->
+            ShortcutUtil.pushRecentApp(requireContext(), userID, data)
             showLoading()
             viewModel.launchApk(data.packageName, userID)
         }
@@ -238,6 +239,7 @@ class AppsFragment : Fragment() {
                 R.string.uninstall_app,
                 getString(R.string.uninstall_app_hint, info.name)
         ) {
+            ShortcutUtil.removeShortcuts(requireContext(), userID, info)
             showLoading()
             viewModel.unInstall(info.packageName, userID)
         }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+            android:enabled="true"
+            android:icon="@mipmap/ic_launcher"
+            android:shortcutId="fake_location"
+            android:shortcutLongLabel="@string/fake_location"
+            android:shortcutShortLabel="@string/shortcut_fake_location">
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="top.niunaijun.blackboxa.view.fake.FakeManagerActivity"
+                android:targetPackage="com.kosmowariat.appenclave" />
+    </shortcut>
+</shortcuts>
