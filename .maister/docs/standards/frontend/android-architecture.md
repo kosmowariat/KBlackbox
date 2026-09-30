@@ -17,8 +17,7 @@ Current: `ViewModelProvider(this, InjectionUtil.get<Feature>Factory())[XViewMode
 New screens follow this until a DI decision is made; prefer the `[ ]` indexer over `.get(...)`.
 
 ### ViewModel state exposure (target)
-Target: expose read-only state (`StateFlow`/`LiveData`) backed by a private mutable field; repositories are `suspend` functions that return results instead of receiving `MutableLiveData`; one-off events (toasts, navigation) use a single-event mechanism, not nulling LiveData from the view. Run blocking work with `withContext(Dispatchers.IO)`.
-Legacy (migrate when touching): public `MutableLiveData` passed into repository methods which `postValue()`; `BaseViewModel.launchOnUI` (actually runs on IO and swallows Throwables); views writing to ViewModel LiveData.
+State is exposed as read-only `StateFlow` backed by a private `MutableStateFlow` (a nullable value means "not loaded yet"). Repositories are `suspend` functions that return results and switch to `Dispatchers.IO` themselves. One-off events (messages, navigation, dialogs to open) are a `sealed interface` sent through a `Channel(BUFFERED)` and exposed as `receiveAsFlow()`, so they are delivered once and never replayed. ViewModels start work with `BaseViewModel.launch { }`, which logs uncaught errors. Screens collect with `LifecycleOwner.collectStarted(flow) { }` (`util/FlowEx.kt`, `repeatOnLifecycle(STARTED)`); a Fragment uses `viewLifecycleOwner`. Views never write to ViewModel state.
 
 ### Observing state
 Observe with the lifecycle-owner lambda: `observe(this) { }` in Activities, `observe(viewLifecycleOwner) { }` in Fragments (or `repeatOnLifecycle` for flows). List screens update the adapter, then switch StateView to content/empty.

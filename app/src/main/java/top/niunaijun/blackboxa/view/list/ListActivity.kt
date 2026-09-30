@@ -17,6 +17,7 @@ import top.niunaijun.blackboxa.databinding.ActivityListBinding
 import top.niunaijun.blackboxa.databinding.ItemPackageBinding
 import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.view.base.BaseActivity
 
@@ -54,21 +55,18 @@ class ListActivity : BaseActivity() {
         viewModel.getInstallAppList(userID)
         viewBinding.toolbarLayout.toolbar.setTitle(R.string.installed_app)
 
-        viewModel.loadingLiveData.observe(this) {
-            if (it) {
+        collectStarted(viewModel.loading) { loading ->
+            if (loading) {
                 viewBinding.stateView.showLoading()
-            } else {
-                viewBinding.stateView.showContent()
             }
         }
 
-        viewModel.appsLiveData.observe(this) {
-            if (it != null) {
-                this.appList = it
+        collectStarted(viewModel.apps) { apps ->
+            if (apps != null) {
+                appList = apps
                 filterApp(query)
-                if (it.isNotEmpty()) {
+                if (apps.isNotEmpty()) {
                     viewBinding.stateView.showContent()
-                    viewModel.previewInstalledList()
                 } else {
                     viewBinding.stateView.showEmpty()
                 }
@@ -120,14 +118,6 @@ class ListActivity : BaseActivity() {
                 }
         )
         return true
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewModel.loadingLiveData.postValue(true)
-        viewModel.loadingLiveData.removeObservers(this)
-        viewModel.appsLiveData.postValue(null)
-        viewModel.appsLiveData.removeObservers(this)
     }
 
     companion object {

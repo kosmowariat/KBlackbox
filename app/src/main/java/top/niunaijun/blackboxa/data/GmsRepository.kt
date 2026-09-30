@@ -1,6 +1,7 @@
 package top.niunaijun.blackboxa.data
 
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
@@ -8,58 +9,35 @@ import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.bean.GmsInstallBean
 import top.niunaijun.blackboxa.util.getString
 
-
 class GmsRepository {
 
-
-    fun getGmsInstalledList(mInstalledLiveData: MutableLiveData<List<GmsBean>>) {
-        val userList = arrayListOf<GmsBean>()
-
-        BlackBoxCore.get().users.forEach {
-            val userId = it.id
+    suspend fun getGmsInstalledList(): List<GmsBean> = withContext(Dispatchers.IO) {
+        val core = BlackBoxCore.get()
+        core.users.map {
             val userName =
-                AppManager.mRemarkSharedPreferences.getString("Remark$userId", getString(R.string.default_user_name, userId.toString())) ?: ""
-            val isInstalled = BlackBoxCore.get().isInstallGms(userId)
-            val bean = GmsBean(userId, userName, isInstalled)
-            userList.add(bean)
+                    AppManager.mRemarkSharedPreferences.getString(
+                            "Remark${it.id}",
+                            getString(R.string.default_user_name, it.id.toString())
+                    ) ?: ""
+            GmsBean(it.id, userName, core.isInstallGms(it.id))
         }
-
-        mInstalledLiveData.postValue(userList)
     }
 
-    fun installGms(
-        userID: Int,
-        mUpdateInstalledLiveData: MutableLiveData<GmsInstallBean>
-    ) {
+    suspend fun installGms(userID: Int): GmsInstallBean = withContext(Dispatchers.IO) {
         val installResult = BlackBoxCore.get().installGms(userID)
-
-        val result = if (installResult.success) {
-            getString(R.string.install_success)
-        } else {
-            getString(R.string.install_fail, installResult.msg)
-        }
-
-        val bean = GmsInstallBean(userID,installResult.success,result)
-        mUpdateInstalledLiveData.postValue(bean)
+        val message =
+                if (installResult.success) {
+                    getString(R.string.install_success)
+                } else {
+                    getString(R.string.install_fail, installResult.msg)
+                }
+        GmsInstallBean(userID, installResult.success, message)
     }
 
-    fun uninstallGms(
-        userID: Int,
-        mUpdateInstalledLiveData: MutableLiveData<GmsInstallBean>
-    ) {
-        var isSuccess = false
-        if (BlackBoxCore.get().isInstallGms(userID)) {
-            isSuccess = BlackBoxCore.get().uninstallGms(userID)
-        }
-
-        val result = if (isSuccess) {
-            getString(R.string.uninstall_success)
-        } else {
-            getString(R.string.uninstall_fail)
-        }
-
-        val bean = GmsInstallBean(userID,isSuccess,result)
-
-        mUpdateInstalledLiveData.postValue(bean)
+    suspend fun uninstallGms(userID: Int): GmsInstallBean = withContext(Dispatchers.IO) {
+        val core = BlackBoxCore.get()
+        val success = core.isInstallGms(userID) && core.uninstallGms(userID)
+        val message = if (success) getString(R.string.uninstall_success) else getString(R.string.uninstall_fail)
+        GmsInstallBean(userID, success, message)
     }
 }

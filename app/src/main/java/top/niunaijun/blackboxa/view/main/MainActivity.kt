@@ -28,6 +28,7 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.databinding.ActivityMainBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.apps.UserAppsActivity
@@ -36,6 +37,7 @@ import top.niunaijun.blackboxa.view.fake.FakeManagerActivity
 import top.niunaijun.blackboxa.view.setting.SettingActivity
 import top.niunaijun.blackboxa.view.users.UserDialogs
 import top.niunaijun.blackboxa.view.users.UsersAdapter
+import top.niunaijun.blackboxa.view.users.UsersEvent
 import top.niunaijun.blackboxa.view.users.UsersViewModel
 
 class MainActivity : LoadingActivity() {
@@ -213,30 +215,25 @@ class MainActivity : LoadingActivity() {
         )
         viewBinding.recyclerView.adapter = mAdapter
         applyUserLayout(AppManager.mBlackBoxLoader.userGridView())
-        viewModel.users.observe(this) { mAdapter.submitList(it) }
-        viewModel.createdUser.observe(this) { user ->
-            user ?: return@observe
-            viewModel.onCreatedUserOpened()
-            hideLoading()
-            UserAppsActivity.start(this, user.id, user.name)
-        }
-        viewModel.duplicateRequest.observe(this) { request ->
-            request ?: return@observe
-            viewModel.onDuplicateRequestShown()
-            userDialogs.showDuplicateDialog(request)
-        }
-        viewModel.createError.observe(this) { message ->
-            message ?: return@observe
-            viewModel.onCreateErrorShown()
-            hideLoading()
-            toast(message)
-        }
-        viewModel.launchResult.observe(this) { launched ->
-            launched ?: return@observe
-            viewModel.onLaunchResultHandled()
-            hideLoading()
-            if (!launched) {
-                toast(R.string.start_fail)
+        collectStarted(viewModel.users) { mAdapter.submitList(it) }
+        collectStarted(viewModel.events) { event ->
+            when (event) {
+                is UsersEvent.UserReady -> {
+                    hideLoading()
+                    UserAppsActivity.start(this, event.user.id, event.user.name)
+                }
+                is UsersEvent.Message -> {
+                    hideLoading()
+                    toast(event.text)
+                }
+                is UsersEvent.DuplicateRequested -> userDialogs.showDuplicateDialog(event.request)
+                is UsersEvent.LaunchResult -> {
+                    hideLoading()
+                    if (!event.launched) {
+                        toast(R.string.start_fail)
+                    }
+                }
+                is UsersEvent.UserDeleted -> Unit
             }
         }
     }

@@ -1,87 +1,74 @@
 package top.niunaijun.blackboxa.view.users
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.UserBean
+import top.niunaijun.blackboxa.bean.UserCreationResult
 import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 
+/** One-shot results the screen reacts to once, such as opening a screen or showing a message. */
+sealed interface UsersEvent {
+    data class UserReady(val user: UserBean) : UsersEvent
+    data class Message(val text: String) : UsersEvent
+    data class DuplicateRequested(val request: DuplicateUserBean) : UsersEvent
+    data class LaunchResult(val launched: Boolean) : UsersEvent
+    data class UserDeleted(val userId: Int) : UsersEvent
+}
+
 class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
-    private val mUsers = MutableLiveData<List<UserBean>>()
-    val users: LiveData<List<UserBean>> = mUsers
+    private val _users = MutableStateFlow<List<UserBean>>(emptyList())
+    val users: StateFlow<List<UserBean>> = _users.asStateFlow()
 
-    private val mCreatedUser = MutableLiveData<UserBean?>()
-    val createdUser: LiveData<UserBean?> = mCreatedUser
-
-    fun loadUsers() {
-        launchOnUI { repo.getUserList(mUsers) }
-    }
-
-    private val mLaunchResult = MutableLiveData<Boolean?>()
-    val launchResult: LiveData<Boolean?> = mLaunchResult
-
-    private val mCreateError = MutableLiveData<String?>()
-    val createError: LiveData<String?> = mCreateError
+    private val _events = Channel<UsersEvent>(Channel.BUFFERED)
+    val events: Flow<UsersEvent> = _events.receiveAsFlow()
 
     val isGmsSupported: Boolean
         get() = repo.isGmsSupported()
 
-    fun createUser(name: String, installGms: Boolean) {
-        launchOnUI { repo.createUser(name, installGms, mCreatedUser, mCreateError) }
+    fun loadUsers() {
+        launch { _users.value = repo.getUserList() }
     }
 
-    private val mDuplicateRequest = MutableLiveData<DuplicateUserBean?>()
-    val duplicateRequest: LiveData<DuplicateUserBean?> = mDuplicateRequest
+    fun createUser(name: String, installGms: Boolean) {
+        launch { publish(repo.createUser(name, installGms)) }
+    }
 
     fun requestDuplicate(user: UserBean) {
-        launchOnUI { mDuplicateRequest.postValue(repo.getDuplicateRequest(user)) }
-    }
-
-    fun onDuplicateRequestShown() {
-        mDuplicateRequest.value = null
+        launch { _events.send(UsersEvent.DuplicateRequested(repo.getDuplicateRequest(user))) }
     }
 
     fun duplicateUser(sourceUserId: Int, name: String, copyDataFor: Set<String>) {
-        launchOnUI { repo.duplicateUser(sourceUserId, name, copyDataFor, mCreatedUser, mCreateError) }
-    }
-
-    fun onCreateErrorShown() {
-        mCreateError.value = null
+        launch { publish(repo.duplicateUser(sourceUserId, name, copyDataFor)) }
     }
 
     fun launchApp(packageName: String, userId: Int) {
-        launchOnUI { mLaunchResult.postValue(repo.launchApk(packageName, userId)) }
-    }
-
-    fun onLaunchResultHandled() {
-        mLaunchResult.value = null
-    }
-
-    fun onCreatedUserOpened() {
-        mCreatedUser.value = null
+        launch { _events.send(UsersEvent.LaunchResult(repo.launchApk(packageName, userId))) }
     }
 
     fun renameUser(userId: Int, name: String) {
-        launchOnUI {
+        launch {
             repo.renameUser(userId, name)
-            repo.getUserList(mUsers)
+            _users.value = repo.getUserList()
         }
     }
-
-    private val mDeletedUser = MutableLiveData<Int?>()
-    val deletedUser: LiveData<Int?> = mDeletedUser
 
     fun deleteUser(userId: Int) {
-        launchOnUI {
+        launch {
             repo.deleteUser(userId)
-            mDeletedUser.postValue(userId)
-            repo.getUserList(mUsers)
+            _events.send(UsersEvent.UserDeleted(userId))
+            _users.value = repo.getUserList()
         }
     }
 
-    fun onDeletedUserHandled() {
-        mDeletedUser.value = null
+    private suspend fun publish(result: UserCreationResult) {
+        result.error?.let { _events.send(UsersEvent.Message(it)) }
+        result.user?.let { _events.send(UsersEvent.UserReady(it)) }
     }
 }

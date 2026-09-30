@@ -1,33 +1,34 @@
 package top.niunaijun.blackboxa.view.gms
 
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.bean.GmsInstallBean
 import top.niunaijun.blackboxa.data.GmsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 
-
 class GmsViewModel(private val mRepo: GmsRepository) : BaseViewModel() {
 
-    val mInstalledLiveData = MutableLiveData<List<GmsBean>>()
+    /** The users with their GMS state; null until the first load finishes. */
+    private val _users = MutableStateFlow<List<GmsBean>?>(null)
+    val users: StateFlow<List<GmsBean>?> = _users.asStateFlow()
 
-    val mUpdateInstalledLiveData = MutableLiveData<GmsInstallBean>()
+    private val _installResults = Channel<GmsInstallBean>(Channel.BUFFERED)
+    val installResults: Flow<GmsInstallBean> = _installResults.receiveAsFlow()
 
     fun getInstalledUser() {
-        launchOnUI {
-            mRepo.getGmsInstalledList(mInstalledLiveData)
-        }
+        launch { _users.value = mRepo.getGmsInstalledList() }
     }
 
     fun installGms(userID: Int) {
-        launchOnUI {
-            mRepo.installGms(userID,mUpdateInstalledLiveData)
-        }
+        launch { _installResults.send(mRepo.installGms(userID)) }
     }
 
     fun uninstallGms(userID: Int) {
-        launchOnUI {
-            mRepo.uninstallGms(userID,mUpdateInstalledLiveData)
-        }
+        launch { _installResults.send(mRepo.uninstallGms(userID)) }
     }
 }

@@ -11,12 +11,14 @@ import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.databinding.ActivityUserAppsBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.Resolution
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
 import top.niunaijun.blackboxa.view.list.ListActivity
 import top.niunaijun.blackboxa.view.users.UserDialogs
+import top.niunaijun.blackboxa.view.users.UsersEvent
 import top.niunaijun.blackboxa.view.users.UsersViewModel
 
 class UserAppsActivity : LoadingActivity() {
@@ -73,28 +75,21 @@ class UserAppsActivity : LoadingActivity() {
     private fun initViewModel() {
         viewModel = ViewModelProvider(this, InjectionUtil.getUsersFactory())[UsersViewModel::class.java]
         userDialogs = UserDialogs(this, viewModel)
-        viewModel.duplicateRequest.observe(this) { request ->
-            request ?: return@observe
-            viewModel.onDuplicateRequestShown()
-            userDialogs.showDuplicateDialog(request)
-        }
-        viewModel.createdUser.observe(this) { created ->
-            created ?: return@observe
-            viewModel.onCreatedUserOpened()
-            hideLoading()
-            start(this, created.id, created.name)
-            finish()
-        }
-        viewModel.createError.observe(this) { message ->
-            message ?: return@observe
-            viewModel.onCreateErrorShown()
-            hideLoading()
-            toast(message)
-        }
-        viewModel.deletedUser.observe(this) { deleted ->
-            deleted ?: return@observe
-            viewModel.onDeletedUserHandled()
-            finish()
+        collectStarted(viewModel.events) { event ->
+            when (event) {
+                is UsersEvent.DuplicateRequested -> userDialogs.showDuplicateDialog(event.request)
+                is UsersEvent.UserReady -> {
+                    hideLoading()
+                    start(this, event.user.id, event.user.name)
+                    finish()
+                }
+                is UsersEvent.Message -> {
+                    hideLoading()
+                    toast(event.text)
+                }
+                is UsersEvent.UserDeleted -> finish()
+                is UsersEvent.LaunchResult -> Unit
+            }
         }
     }
 

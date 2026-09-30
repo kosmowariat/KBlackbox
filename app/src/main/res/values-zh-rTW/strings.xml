@@ -106,4 +106,5 @@
     <string name="disable_flag_secure">停用 Flag Secure</string>
     <string name="disable_flag_secure_summary">允許在應用程式內截圖與螢幕錄製</string>
     <string name="installed_label">已安裝</string>
+    <string name="install_self_blocked">這是應用程式本身，無法安裝到自身內部。</string>
 </resources>

@@ -1,22 +1,34 @@
 package top.niunaijun.blackboxa.view.list
 
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 
-
 class ListViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
-    val appsLiveData = MutableLiveData<List<InstalledAppBean>>()
+    private val _loading = MutableStateFlow(true)
+    val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    val loadingLiveData = MutableLiveData<Boolean>()
+    /** The apps installed on the phone; null until the first load finishes. */
+    private val _apps = MutableStateFlow<List<InstalledAppBean>?>(null)
+    val apps: StateFlow<List<InstalledAppBean>?> = _apps.asStateFlow()
 
     fun previewInstalledList() {
-        launchOnUI { repo.previewInstallList() }
+        launch { repo.previewInstallList() }
     }
 
     fun getInstallAppList(userID: Int) {
-        launchOnUI { repo.getInstalledAppList(userID, loadingLiveData, appsLiveData) }
+        launch {
+            _loading.value = true
+            val apps = repo.getInstalledAppList(userID)
+            _apps.value = apps
+            _loading.value = false
+            if (apps.isNotEmpty()) {
+                repo.previewInstallList()
+            }
+        }
     }
 }

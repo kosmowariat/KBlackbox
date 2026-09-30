@@ -18,6 +18,7 @@ import top.niunaijun.blackboxa.databinding.ActivityListBinding
 import top.niunaijun.blackboxa.databinding.ItemFakeBinding
 import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
 import top.niunaijun.blackboxa.util.toast
@@ -78,11 +79,11 @@ class FakeManagerActivity : BaseActivity() {
         loadAppList()
         viewBinding.toolbarLayout.toolbar.setTitle(R.string.fake_location)
 
-        viewModel.appsLiveData.observe(this) {
-            if (it != null) {
-                this.appList = it
+        collectStarted(viewModel.apps) { apps ->
+            if (apps != null) {
+                appList = apps
                 filterApp(query)
-                if (it.isNotEmpty()) {
+                if (apps.isNotEmpty()) {
                     viewBinding.stateView.showContent()
                 } else {
                     viewBinding.stateView.showEmpty()

@@ -1,33 +1,28 @@
 package top.niunaijun.blackboxa.view.fake
 
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import top.niunaijun.blackbox.entity.location.BLocation
 import top.niunaijun.blackboxa.bean.FakeLocationBean
 import top.niunaijun.blackboxa.data.FakeLocationRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 
-
 class FakeLocationViewModel(private val mRepo: FakeLocationRepository) : BaseViewModel() {
 
-    val appsLiveData = MutableLiveData<List<FakeLocationBean>>()
-
+    /** The apps with their fake location; null until the first load finishes. */
+    private val _apps = MutableStateFlow<List<FakeLocationBean>?>(null)
+    val apps: StateFlow<List<FakeLocationBean>?> = _apps.asStateFlow()
 
     fun getInstallAppList(userID: Int) {
-        launchOnUI {
-            mRepo.getInstalledAppList(userID, appsLiveData)
-        }
+        launch { _apps.value = mRepo.getInstalledAppList(userID) }
     }
 
     fun setPattern(userId: Int, pkg: String, pattern: Int) {
-        launchOnUI {
-            mRepo.setPattern(userId, pkg, pattern)
-        }
+        launch { mRepo.setPattern(userId, pkg, pattern) }
     }
 
     fun setLocation(userId: Int, pkg: String, location: BLocation) {
-        launchOnUI {
-            mRepo.setLocation(userId, pkg, location)
-        }
+        launch { mRepo.setLocation(userId, pkg, location) }
     }
-
 }

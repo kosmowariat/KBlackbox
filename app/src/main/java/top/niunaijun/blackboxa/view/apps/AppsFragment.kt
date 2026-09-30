@@ -2,7 +2,6 @@ package top.niunaijun.blackboxa.view.apps
 
 import android.graphics.Point
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -24,6 +23,7 @@ import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.ShortcutUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
 import top.niunaijun.blackboxa.util.toast
@@ -95,7 +95,7 @@ class AppsFragment : Fragment() {
 
         val touchCallBack = AppsTouchCallBack { from, to ->
             onItemMove(from, to)
-            viewModel.updateSortLiveData.postValue(true)
+            viewModel.updateApkOrder(userID, mAdapter.getItems())
         }
         ItemTouchHelper(touchCallBack).attachToRecyclerView(viewBinding.recyclerView)
 
@@ -210,10 +210,10 @@ class AppsFragment : Fragment() {
         viewBinding.stateView.showLoading()
         viewModel.getInstalledApps(userID)
 
-        viewModel.appsLiveData.observe(viewLifecycleOwner) {
-            if (it != null) {
-                mAdapter.setItems(it)
-                if (it.isEmpty()) {
+        viewLifecycleOwner.collectStarted(viewModel.apps) { apps ->
+            if (apps != null) {
+                mAdapter.setItems(apps)
+                if (apps.isEmpty()) {
                     viewBinding.stateView.showEmpty()
                 } else {
                     viewBinding.stateView.showContent()
@@ -221,32 +221,16 @@ class AppsFragment : Fragment() {
             }
         }
 
-        viewModel.resultLiveData.observe(viewLifecycleOwner) {
-            if (!TextUtils.isEmpty(it)) {
-                hideLoading()
-                requireContext().toast(it)
-                viewModel.getInstalledApps(userID)
-            }
-        }
-
-        viewModel.launchLiveData.observe(viewLifecycleOwner) {
-            it?.let { launched ->
-                hideLoading()
-                if (!launched) {
-                    toast(R.string.start_fail)
+        viewLifecycleOwner.collectStarted(viewModel.events) { event ->
+            hideLoading()
+            when (event) {
+                is AppsEvent.Message -> {
+                    requireContext().toast(event.text)
+                    viewModel.getInstalledApps(userID)
                 }
+                is AppsEvent.LaunchResult -> if (!event.launched) toast(R.string.start_fail)
             }
         }
-
-        viewModel.updateSortLiveData.observe(viewLifecycleOwner) {
-            viewModel.updateApkOrder(userID, mAdapter.getItems())
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        viewModel.resultLiveData.value = null
-        viewModel.launchLiveData.value = null
     }
 
     private fun unInstallApk(info: AppInfo) {

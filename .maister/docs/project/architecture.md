@@ -10,7 +10,7 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 ```
 ┌──────────────────────────── app (Kotlin, host UI) ────────────────────────────┐
 │ View (Activities/Fragments, XML + ViewBinding)                                │
-│   └─ ViewModel (LiveData, BaseViewModel.launchOnUI)                           │
+│   └─ ViewModel (StateFlow + event Channel, BaseViewModel.launch)              │
 │        └─ Repository (AppsRepository, GmsRepository, FakeLocationRepository)  │
 │             └─ BlackBoxCore API ─────────────────────────────┐                │
 └──────────────────────────────────────────────────────────────┼────────────────┘
@@ -86,9 +86,9 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 ## Data Flow
 **Example: installing and launching a virtual app from the UI**
 1. The user picks an app or APK in `ListActivity`. The result goes back to `AppsFragment`, which calls `AppsViewModel.install(source, userId)`.
-2. `AppsViewModel` runs `AppsRepository.installApk()` in a coroutine (`launchOnUI`). The repository calls `BlackBoxCore.installPackageAsUser()`.
+2. `AppsViewModel` runs `AppsRepository.installApk()` in a coroutine (`BaseViewModel.launch`, the repository switches to IO). The repository calls `BlackBoxCore.installPackageAsUser()`.
 3. `BPackageManagerService` in the engine parses the APK, copies it into the virtual file system and records the package settings.
-4. The result is posted to `resultLiveData`, and the fragment refreshes `appsLiveData`.
+4. The result message is sent as an `AppsEvent.Message`, and the fragment reloads `AppsViewModel.apps`.
 5. On launch, `BlackBoxCore.launchApk()` asks `BActivityManagerService` to start a stub `ProxyActivity` in a stub process. The guest process initializes, the hooks are installed (Java proxies + native), and the guest's real Activity is instantiated inside the stub.
 
 ## External Integrations

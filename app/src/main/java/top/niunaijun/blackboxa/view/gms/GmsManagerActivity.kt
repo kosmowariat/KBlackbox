@@ -12,6 +12,7 @@ import top.niunaijun.blackboxa.databinding.ActivityGmsBinding
 import top.niunaijun.blackboxa.databinding.ItemGmsBinding
 import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
 import top.niunaijun.blackboxa.util.showInfoDialog
@@ -40,26 +41,22 @@ class GmsManagerActivity : LoadingActivity() {
         viewModel = ViewModelProvider(this, InjectionUtil.getGmsFactory())[GmsViewModel::class.java]
         showLoading()
 
-        viewModel.mInstalledLiveData.observe(this) {
-            hideLoading()
-            mAdapter.setItems(it)
+        collectStarted(viewModel.users) { users ->
+            if (users != null) {
+                hideLoading()
+                mAdapter.setItems(users)
+            }
         }
 
-        viewModel.mUpdateInstalledLiveData.observe(this) { result ->
-            if (result == null) {
-                return@observe
-            }
-
+        collectStarted(viewModel.installResults) { result ->
             val items = mAdapter.getItems()
-            for (index in items.indices) {
+            val index = items.indexOfFirst { it.userID == result.userID }
+            if (index >= 0) {
                 val bean = items[index]
-                if (bean.userID == result.userID) {
-                    if (result.success) {
-                        bean.isInstalledGms = !bean.isInstalledGms
-                    }
-                    mAdapter.replaceAt( index,bean)
-                    break
+                if (result.success) {
+                    bean.isInstalledGms = !bean.isInstalledGms
                 }
+                mAdapter.replaceAt(index, bean)
             }
 
             hideLoading()

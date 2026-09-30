@@ -4,8 +4,9 @@ import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.util.Log
 import android.webkit.URLUtil
-import androidx.lifecycle.MutableLiveData
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackbox.core.GmsCore
 import top.niunaijun.blackbox.core.env.BEnvironment
@@ -17,6 +18,7 @@ import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.bean.UserBean
+import top.niunaijun.blackboxa.bean.UserCreationResult
 import top.niunaijun.blackboxa.util.DataDirCopier
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.getString
@@ -26,6 +28,8 @@ class AppsRepository {
     companion object {
         const val DEFAULT_USER_ID = 0
         const val USER_PREVIEW_APP_COUNT = 5
+        private const val MAX_LOAD_ATTEMPTS = 3
+        private const val RETRY_DELAY_MS = 150L
     }
 
     val TAG: String = "AppsRepository"
@@ -89,7 +93,9 @@ class AppsRepository {
         }
     }
 
-    fun previewInstallList() {
+    suspend fun previewInstallList() = withContext(Dispatchers.IO) { refreshInstalledList() }
+
+    private fun refreshInstalledList() {
         try {
             synchronized(mInstalledList) {
                 val installedApplications: List<ApplicationInfo> =
@@ -139,386 +145,218 @@ class AppsRepository {
         }
     }
 
-    fun getInstalledAppList(
-            userID: Int,
-            loadingLiveData: MutableLiveData<Boolean>,
-            appsLiveData: MutableLiveData<List<InstalledAppBean>>
-    ) {
+    suspend fun getInstalledAppList(userID: Int): List<InstalledAppBean> = withContext(Dispatchers.IO) {
         try {
-            loadingLiveData.postValue(true)
             synchronized(mInstalledList) {
                 if (mInstalledList.isEmpty()) {
-                    previewInstallList()
+                    refreshInstalledList()
                 }
                 val blackBoxCore = BlackBoxCore.get()
-                Log.d(TAG, mInstalledList.joinToString(","))
-                val newInstalledList =
-                        mInstalledList.map {
-                            InstalledAppBean(
-                                    it.name,
-                                    it.icon, 
-                                    it.packageName,
-                                    it.sourceDir,
-                                    blackBoxCore.isInstalled(it.packageName, userID)
-                            )
-                        }
-                appsLiveData.postValue(newInstalledList)
-                loadingLiveData.postValue(false)
+                mInstalledList.map {
+                    InstalledAppBean(
+                            it.name,
+                            it.icon,
+                            it.packageName,
+                            it.sourceDir,
+                            blackBoxCore.isInstalled(it.packageName, userID)
+                    )
+                }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error in getInstalledAppList: ${e.message}")
-            loadingLiveData.postValue(false)
-            appsLiveData.postValue(emptyList())
+            Log.e(TAG, "Error in getInstalledAppList", e)
+            emptyList()
         }
     }
 
-    fun getVmInstallList(userId: Int, appsLiveData: MutableLiveData<List<AppInfo>>) {
+    suspend fun getVmInstallList(userId: Int): List<AppInfo> = withContext(Dispatchers.IO) {
         try {
-            
-            if (MemoryManager.isMemoryCritical()) {
-                Log.w(
-                        TAG,
-                        "Memory critical (${MemoryManager.getMemoryUsagePercentage()}%), forcing garbage collection"
-                )
+            loadVmInstallList(userId)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in getVmInstallList", e)
+            emptyList()
+        }
+    }
+
+    private fun loadVmInstallList(userId: Int): List<AppInfo> {
+        MemoryManager.forceGarbageCollectionIfNeeded()
+
+        val sortList = AppManager.mRemarkSharedPreferences.getString("AppList$userId", "")?.split(",")
+        val applications = loadApplicationsWithRetry(userId)
+        if (applications == null) {
+            Log.e(TAG, "getVmInstallList: no application list for userId=$userId after $MAX_LOAD_ATTEMPTS attempts")
+            return emptyList()
+        }
+
+        val sorted =
+                if (sortList.isNullOrEmpty()) {
+                    applications
+                } else {
+                    runCatching { applications.sortedWith(AppsSortComparator(sortList)) }.getOrDefault(applications)
+                }
+
+        val result = mutableListOf<AppInfo>()
+        sorted.forEachIndexed { index, applicationInfo ->
+            if (index > 0 && index % 25 == 0) {
                 MemoryManager.forceGarbageCollectionIfNeeded()
             }
-
-            val blackBoxCore = BlackBoxCore.get()
-
-            
-            val users = blackBoxCore.users
-            Log.d(TAG, "getVmInstallList: userId=$userId, total users=${users.size}")
-            users.forEach { user -> Log.d(TAG, "User: id=${user.id}, name=${user.name}") }
-
-            val sortListData = AppManager.mRemarkSharedPreferences.getString("AppList$userId", "")
-            val sortList = sortListData?.split(",")
-
-            
-            var applicationList: List<ApplicationInfo>? = null
-            var retryCount = 0
-            val maxRetries = 3
-
-            while (applicationList == null && retryCount < maxRetries) {
-                try {
-                    applicationList = blackBoxCore.getInstalledApplications(0, userId)
-                    if (applicationList == null) {
-                        Log.w(
-                                TAG,
-                                "getVmInstallList: Attempt ${retryCount + 1} returned null, retrying..."
-                        )
-                        retryCount++
-                        Thread.sleep(100) 
-                    }
-                } catch (e: Exception) {
-                    Log.e(
-                            TAG,
-                            "getVmInstallList: Error getting applications on attempt ${retryCount + 1}: ${e.message}"
-                    )
-                    retryCount++
-                    if (retryCount < maxRetries) {
-                        Thread.sleep(200) 
-                    }
-                }
+            if (applicationInfo == null || applicationInfo.packageName.isNullOrBlank()) {
+                Log.w(TAG, "getVmInstallList: skipping invalid application entry at index $index")
+                return@forEachIndexed
             }
-
-            
-            if (applicationList == null) {
-                Log.e(
-                        TAG,
-                        "getVmInstallList: applicationList is null for userId=$userId after $maxRetries attempts"
-                )
-                appsLiveData.postValue(emptyList())
-                return
-            }
-
-            
-            Log.d(
-                    TAG,
-                    "getVmInstallList: userId=$userId, applicationList.size=${applicationList.size}"
-            )
-            if (applicationList.isNotEmpty()) {
-                Log.d(TAG, "First app: ${applicationList.first().packageName}")
-            } else {
-                Log.w(TAG, "getVmInstallList: No applications found for userId=$userId")
-            }
-
-            val appInfoList = mutableListOf<AppInfo>()
-
-            
-            val sortedApplicationList =
-                    if (!sortList.isNullOrEmpty()) {
-                        try {
-                            applicationList.sortedWith(AppsSortComparator(sortList))
-                        } catch (e: Exception) {
-                            Log.e(TAG, "getVmInstallList: Error sorting applications: ${e.message}")
-                            applicationList 
-                        }
-                    } else {
-                        applicationList
-                    }
-
-            
-            sortedApplicationList.forEachIndexed { index, applicationInfo ->
-                try {
-                    
-                    if (index > 0 && index % 25 == 0) {
-                        if (MemoryManager.isMemoryCritical()) {
-                            Log.w(TAG, "Memory critical during processing, forcing GC")
-                            MemoryManager.forceGarbageCollectionIfNeeded()
-                        }
-                    }
-
-                    
-                    if (applicationInfo == null) {
-                        Log.w(
-                                TAG,
-                                "getVmInstallList: Skipping null applicationInfo at index $index"
-                        )
-                        return@forEachIndexed
-                    }
-
-                    
-                    if (applicationInfo.packageName.isNullOrBlank()) {
-                        Log.w(
-                                TAG,
-                                "getVmInstallList: Skipping app with null/blank package name at index $index"
-                        )
-                        return@forEachIndexed
-                    }
-
-                    val info =
-                            AppInfo(
-                                    safeLoadAppLabel(applicationInfo),
-                                    safeLoadAppIcon(
-                                            applicationInfo
-                                    ), 
-                                    applicationInfo.packageName,
-                                    applicationInfo.sourceDir ?: ""
-                            )
-
-                    appInfoList.add(info)
-
-                    
-                    if (index > 0 && index % 50 == 0) {
-                        Log.d(
-                                TAG,
-                                "getVmInstallList: Processed $index/${sortedApplicationList.size} apps - ${MemoryManager.getMemoryInfo()}"
-                        )
-                    }
-                } catch (e: Exception) {
-                    Log.e(
-                            TAG,
-                            "getVmInstallList: Error processing app at index $index (${applicationInfo?.packageName}): ${e.message}"
-                    )
-                    
-                }
-            }
-
-            Log.d(
-                    TAG,
-                    "getVmInstallList: processed ${appInfoList.size} apps - ${MemoryManager.getMemoryInfo()}"
-            )
-
-            
-            
-            if (appInfoList.isEmpty()) {
-                Log.d(
-                        TAG,
-                        "getVmInstallList: No virtual apps found for userId=$userId, showing empty list (correct for new users)"
-                )
-            } else {
-                Log.d(
-                        TAG,
-                        "getVmInstallList: Showing ${appInfoList.size} virtual apps for userId=$userId"
-                )
-            }
-
-            
             try {
-                appsLiveData.postValue(appInfoList)
+                result.add(
+                        AppInfo(
+                                safeLoadAppLabel(applicationInfo),
+                                safeLoadAppIcon(applicationInfo),
+                                applicationInfo.packageName,
+                                applicationInfo.sourceDir ?: ""
+                        )
+                )
             } catch (e: Exception) {
-                Log.e(TAG, "getVmInstallList: Error posting to LiveData: ${e.message}")
-                
-                try {
-                    android.os.Handler(android.os.Looper.getMainLooper()).post {
-                        try {
-                            appsLiveData.postValue(appInfoList)
-                        } catch (e2: Exception) {
-                            Log.e(
-                                    TAG,
-                                    "getVmInstallList: Fallback posting also failed: ${e2.message}"
-                            )
-                        }
-                    }
-                } catch (e3: Exception) {
-                    Log.e(
-                            TAG,
-                            "getVmInstallList: Could not schedule fallback posting: ${e3.message}"
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error in getVmInstallList: ${e.message}")
-            try {
-                appsLiveData.postValue(emptyList())
-            } catch (e2: Exception) {
-                Log.e(TAG, "getVmInstallList: Error posting empty list: ${e2.message}")
+                Log.e(TAG, "getVmInstallList: error processing ${applicationInfo.packageName}", e)
             }
         }
+        Log.d(TAG, "getVmInstallList: userId=$userId, ${result.size} apps - ${MemoryManager.getMemoryInfo()}")
+        return result
     }
 
-    fun installApk(source: String, userId: Int, resultLiveData: MutableLiveData<String>) {
-        try {
-            
-            if (source.contains("blackbox") ||
-                            source.contains("niunaijun") ||
-                            source.contains("vspace") ||
-                            source.contains("virtual")
-            ) {
-                
-                try {
-                    val blackBoxCore = BlackBoxCore.get()
-                    val hostPackageName = BlackBoxCore.getHostPkg()
+    private fun loadApplicationsWithRetry(userId: Int): List<ApplicationInfo>? {
+        repeat(MAX_LOAD_ATTEMPTS) { attempt ->
+            try {
+                BlackBoxCore.get().getInstalledApplications(0, userId)?.let { return it }
+                Log.w(TAG, "getInstalledApplications returned null for userId=$userId (attempt ${attempt + 1})")
+            } catch (e: Exception) {
+                Log.e(TAG, "getInstalledApplications failed for userId=$userId (attempt ${attempt + 1})", e)
+            }
+            Thread.sleep(RETRY_DELAY_MS)
+        }
+        return null
+    }
 
-                    
-                    if (!URLUtil.isValidUrl(source)) {
-                        val file = File(source)
-                        if (file.exists()) {
-                            val packageInfo =
-                                    BlackBoxCore.getPackageManager()
-                                            .getPackageArchiveInfo(source, 0)
-                            if (packageInfo != null && packageInfo.packageName == hostPackageName) {
-                                resultLiveData.postValue(
-                                        "Cannot install BlackBox app from within BlackBox. This would create infinite recursion and is not allowed for security reasons."
-                                )
-                                return
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.w(TAG, "Could not verify if this is BlackBox app: ${e.message}")
-                }
+    suspend fun installApk(source: String, userId: Int): String = withContext(Dispatchers.IO) {
+        try {
+            if (isHostApk(source)) {
+                return@withContext getString(R.string.install_self_blocked)
             }
 
             val blackBoxCore = BlackBoxCore.get()
             val installResult =
                     if (URLUtil.isValidUrl(source)) {
-                        val uri = Uri.parse(source)
-                        blackBoxCore.installPackageAsUser(uri, userId)
+                        blackBoxCore.installPackageAsUser(Uri.parse(source), userId)
                     } else {
                         blackBoxCore.installPackageAsUser(source, userId)
                     }
 
             if (installResult.success) {
                 updateAppSortList(userId, installResult.packageName, true)
-                resultLiveData.postValue(getString(R.string.install_success))
+                getString(R.string.install_success)
             } else {
-                resultLiveData.postValue(getString(R.string.install_fail, installResult.msg))
+                getString(R.string.install_fail, installResult.msg)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error installing APK: ${e.message}")
-            resultLiveData.postValue(getString(R.string.install_error, e.message.orEmpty()))
+            Log.e(TAG, "Error installing APK", e)
+            getString(R.string.install_error, e.message.orEmpty())
         }
     }
 
-    fun unInstall(packageName: String, userID: Int, resultLiveData: MutableLiveData<String>) {
-        try {
-            BlackBoxCore.get().uninstallPackageAsUser(packageName, userID)
-            updateAppSortList(userID, packageName, false)
-            resultLiveData.postValue(getString(R.string.uninstall_success))
-        } catch (e: Exception) {
-            Log.e(TAG, "Error uninstalling APK: ${e.message}")
-            resultLiveData.postValue(getString(R.string.uninstall_error, e.message.orEmpty()))
+    /** True when [source] is a local APK of this very app, which must never be installed into itself. */
+    private fun isHostApk(source: String): Boolean {
+        if (URLUtil.isValidUrl(source) || !File(source).exists()) {
+            return false
         }
-    }
-
-    fun launchApk(packageName: String, userId: Int, launchLiveData: MutableLiveData<Boolean>) {
-        launchLiveData.postValue(launchApk(packageName, userId))
-    }
-
-    fun launchApk(packageName: String, userId: Int): Boolean {
         return try {
-            BlackBoxCore.get().launchApk(packageName, userId)
+            val archiveInfo = BlackBoxCore.getPackageManager().getPackageArchiveInfo(source, 0)
+            archiveInfo != null && archiveInfo.packageName == BlackBoxCore.getHostPkg()
         } catch (e: Exception) {
-            Log.e(TAG, "Error launching APK: ${e.message}")
+            Log.w(TAG, "Could not verify whether $source is this app", e)
             false
         }
     }
 
-    fun clearApkData(packageName: String, userID: Int, resultLiveData: MutableLiveData<String>) {
+    suspend fun unInstall(packageName: String, userID: Int): String = withContext(Dispatchers.IO) {
         try {
-            BlackBoxCore.get().clearPackage(packageName, userID)
-            resultLiveData.postValue(getString(R.string.clear_success))
+            BlackBoxCore.get().uninstallPackageAsUser(packageName, userID)
+            updateAppSortList(userID, packageName, false)
+            getString(R.string.uninstall_success)
         } catch (e: Exception) {
-            Log.e(TAG, "Error clearing APK data: ${e.message}")
-            resultLiveData.postValue(getString(R.string.clear_error, e.message.orEmpty()))
+            Log.e(TAG, "Error uninstalling APK", e)
+            getString(R.string.uninstall_error, e.message.orEmpty())
         }
     }
 
-    fun getUserList(usersLiveData: MutableLiveData<List<UserBean>>) {
+    suspend fun launchApk(packageName: String, userId: Int): Boolean = withContext(Dispatchers.IO) {
         try {
-            val blackBoxCore = BlackBoxCore.get()
-            val userIds = blackBoxCore.users.map { it.id }.ifEmpty { listOf(DEFAULT_USER_ID) }.sorted()
-            val users =
-                    userIds.map { id ->
-                        val apps = sortedInstalledApplications(id).filterNot { GmsCore.isGoogleAppOrService(it.packageName) }
-                        UserBean(
-                                id,
-                                getUserName(id),
-                                apps.size,
-                                apps.take(USER_PREVIEW_APP_COUNT).map {
-                                    AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir)
-                                }
-                        )
-                    }
-            usersLiveData.postValue(users)
+            BlackBoxCore.get().launchApk(packageName, userId)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error launching APK", e)
+            false
+        }
+    }
+
+    suspend fun clearApkData(packageName: String, userID: Int): String = withContext(Dispatchers.IO) {
+        try {
+            BlackBoxCore.get().clearPackage(packageName, userID)
+            getString(R.string.clear_success)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error clearing APK data", e)
+            getString(R.string.clear_error, e.message.orEmpty())
+        }
+    }
+
+    suspend fun getUserList(): List<UserBean> = withContext(Dispatchers.IO) {
+        try {
+            val userIds = BlackBoxCore.get().users.map { it.id }.ifEmpty { listOf(DEFAULT_USER_ID) }.sorted()
+            userIds.map { id ->
+                val apps = sortedInstalledApplications(id).filterNot { GmsCore.isGoogleAppOrService(it.packageName) }
+                UserBean(
+                        id,
+                        getUserName(id),
+                        apps.size,
+                        apps.take(USER_PREVIEW_APP_COUNT).map {
+                            AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir)
+                        }
+                )
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading user list", e)
-            usersLiveData.postValue(emptyList())
+            emptyList()
         }
     }
 
     fun isGmsSupported(): Boolean = BlackBoxCore.get().isSupportGms
 
-    fun createUser(
-            name: String,
-            installGms: Boolean,
-            createdLiveData: MutableLiveData<UserBean?>,
-            errorLiveData: MutableLiveData<String?>
-    ) {
+    suspend fun createUser(name: String, installGms: Boolean): UserCreationResult = withContext(Dispatchers.IO) {
         try {
-            val blackBoxCore = BlackBoxCore.get()
             val nextId = createNamedUser(name)
-            if (installGms) {
-                val result = blackBoxCore.installGms(nextId)
-                if (!result.success) {
-                    errorLiveData.postValue(getString(R.string.install_fail, result.msg))
-                }
-            }
-            createdLiveData.postValue(UserBean(nextId, getUserName(nextId), 0, emptyList()))
+            val gmsError =
+                    if (installGms) {
+                        BlackBoxCore.get().installGms(nextId).takeUnless { it.success }
+                                ?.let { getString(R.string.install_fail, it.msg) }
+                    } else {
+                        null
+                    }
+            UserCreationResult(UserBean(nextId, getUserName(nextId), 0, emptyList()), gmsError)
         } catch (e: Exception) {
             Log.e(TAG, "Error creating user", e)
-            errorLiveData.postValue(getString(R.string.create_user_failed))
+            UserCreationResult(null, getString(R.string.create_user_failed))
         }
     }
 
-    fun getDuplicateRequest(user: UserBean): DuplicateUserBean {
-        return DuplicateUserBean(user, getUserApps(user.id))
+    suspend fun getDuplicateRequest(user: UserBean): DuplicateUserBean = withContext(Dispatchers.IO) {
+        DuplicateUserBean(user, getUserApps(user.id))
     }
 
-    fun getUserApps(userId: Int): List<AppInfo> {
+    private fun getUserApps(userId: Int): List<AppInfo> {
         return sortedInstalledApplications(userId)
                 .sortedBy { GmsCore.isGoogleAppOrService(it.packageName) }
                 .map { AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir) }
     }
 
-    fun duplicateUser(
+    suspend fun duplicateUser(
             sourceUserId: Int,
             name: String,
-            copyDataFor: Set<String>,
-            createdLiveData: MutableLiveData<UserBean?>,
-            errorLiveData: MutableLiveData<String?>
-    ) {
+            copyDataFor: Set<String>
+    ): UserCreationResult = withContext(Dispatchers.IO) {
         try {
             val targetUserId = createNamedUser(name)
             val failedApps = mutableListOf<String>()
@@ -534,13 +372,13 @@ class AppsRepository {
             AppManager.mRemarkSharedPreferences.getString("AppList$sourceUserId", null)?.let {
                 AppManager.mRemarkSharedPreferences.edit().putString("AppList$targetUserId", it).apply()
             }
-            if (failedApps.isNotEmpty()) {
-                errorLiveData.postValue(getString(R.string.duplicate_failed_apps, failedApps.joinToString()))
-            }
-            createdLiveData.postValue(UserBean(targetUserId, getUserName(targetUserId), 0, emptyList()))
+            val error =
+                    if (failedApps.isEmpty()) null
+                    else getString(R.string.duplicate_failed_apps, failedApps.joinToString())
+            UserCreationResult(UserBean(targetUserId, getUserName(targetUserId), 0, emptyList()), error)
         } catch (e: Exception) {
             Log.e(TAG, "Error duplicating user $sourceUserId", e)
-            errorLiveData.postValue(getString(R.string.create_user_failed))
+            UserCreationResult(null, getString(R.string.create_user_failed))
         }
     }
 
@@ -594,7 +432,7 @@ class AppsRepository {
         }
     }
 
-    fun deleteUser(userId: Int) {
+    suspend fun deleteUser(userId: Int) = withContext(Dispatchers.IO) {
         try {
             BlackBoxCore.get().deleteUser(userId)
             AppManager.mRemarkSharedPreferences.edit().apply {
@@ -646,7 +484,7 @@ class AppsRepository {
     }
 
     
-    fun updateApkOrder(userID: Int, dataList: List<AppInfo>) {
+    suspend fun updateApkOrder(userID: Int, dataList: List<AppInfo>) = withContext(Dispatchers.IO) {
         try {
             AppManager.mRemarkSharedPreferences.edit().apply {
                 putString("AppList$userID", dataList.joinToString(",") { it.packageName })
