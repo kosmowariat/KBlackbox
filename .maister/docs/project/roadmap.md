@@ -11,7 +11,7 @@
 - [x] **Visual refresh / design system.** Migrate `Theme.BlackBox` from `MaterialComponents` to Material 3, define a real color palette (the primary/dark/light colors are all `#3F3F3F` today), and add typography and shape tokens. *Done 2026-09-27: `Theme.Material3.DayNight.NoActionBar`, custom blue `md_theme_*` palette (seed `#3F6FD8`), dynamic color on Android 12+, typography/shape tokens and `dimens.xml`.*
 - [x] **Dark mode.** Add a `values-night` theme and remove `forceDarkAllowed=false`. *Done 2026-09-27: `values-night` palette plus a Settings → Appearance → Theme preference (System default / Light / Dark).*
 - [ ] **App grid and main screen UX.** Improve `AppsFragment` / `item_app.xml`: clearer install FAB flow, empty and loading states, better long-press actions, and user-space switching in `MainActivity`.
-- [ ] **String externalization.** Move hard-coded dialog texts (e.g. the storage and VPN permission dialogs in `MainActivity`) to `strings.xml`, with `zh-rCN`/`zh-rTW` translations and optionally a Polish one.
+- [ ] **String externalization.** Move hard-coded dialog texts (e.g. the storage permission dialog in `MainActivity`) to `strings.xml`, with `zh-rCN`/`zh-rTW` translations and optionally a Polish one.
 - [ ] **Settings redesign.** Update `SettingFragment` (preference-ktx) to grouped Material 3 preferences.
 
 ### Medium Priority — UI architecture
@@ -29,7 +29,7 @@
 - [ ] **Release signing.** Release builds are still debug-signed. Decide on a proper signing config. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
 
 ## Future Considerations
-- **Feature ideas**: App import/export and backup, per-app spoofing profiles in the UI, onboarding flow for the required permissions (All Files Access, VPN), tablet/landscape layouts.
+- **Feature ideas**: App import/export and backup, per-app spoofing profiles in the UI, onboarding flow for the required permissions (All Files Access), tablet/landscape layouts.
 - **Platform**: `targetSdk` is 28 on purpose (the engine relies on legacy behaviors). Raising it is an engine-level decision, not a GUI one. Track Android 16+ hidden-API changes that may affect `Bcore`.
 
 ---

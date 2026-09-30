@@ -17,9 +17,8 @@ char *replace(const char *str, const char *src, const char *dst) {
         pos += strlen(src);
     }
 
-    size_t result_len = strlen(str) + (strlen(dst) - strlen(src)) * count + 1;
-    char *result = (char *) malloc(result_len);
-    memset(result, 0, strlen(result));
+    size_t result_len = strlen(str) + (size_t) count * strlen(dst) + 1;
+    char *result = (char *) calloc(1, result_len);
 
     const char *left = str;
     const char *right = nullptr;
@@ -74,8 +73,8 @@ const char *IO::redirectPath(const char *__path) {
     list<IO::RelocateInfo>::iterator iterator;
     for (iterator = relocate_rule.begin(); iterator != relocate_rule.end(); ++iterator) {
         IO::RelocateInfo info = *iterator;
-        if (strstr(__path, info.targetPath) && !strstr(__path, "/blackbox/")) {
-            char *ret = replace(__path, info.targetPath, info.relocatePath);
+        if (strstr(__path, info.targetPath.c_str()) && !strstr(__path, "/blackbox/")) {
+            char *ret = replace(__path, info.targetPath.c_str(), info.relocatePath.c_str());
             
             return ret;
         }

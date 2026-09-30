@@ -16,13 +16,11 @@ import java.util.List;
 import black.android.net.BRIConnectivityManagerStub;
 import black.android.os.BRServiceManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
-import top.niunaijun.blackbox.fake.hook.ScanClass;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
 import top.niunaijun.blackbox.utils.Slog;
 
 
-@ScanClass(VpnCommonProxy.class)
 public class IConnectivityManagerProxy extends BinderInvocationStub {
     public static final String TAG = "IConnectivityManagerProxy";
 

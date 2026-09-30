@@ -15,6 +15,7 @@ import android.os.IInterface;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -111,7 +112,9 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             Slog.w(TAG, "ActivityManager invoke: SecurityException in " + methodName + ", returning safe default", e);
             
             
-            if (methodName.startsWith("set") || methodName.startsWith("update")) {
+            if ("clearApplicationUserData".equals(methodName)) {
+                return false;
+            } else if (methodName.startsWith("set") || methodName.startsWith("update")) {
                 return null; 
             } else if (methodName.startsWith("get") || methodName.startsWith("query")) {
                 return null; 
@@ -382,6 +385,7 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                         flags &= ~Context.BIND_EXTERNAL_SERVICE;
                         args[flagsIndex] = flags;
                     }
+                    sanitizeProxyServiceInstanceName(method.getName(), args);
                 }
                 args[callingPackageIndex] = BlackBoxCore.getHostPkg();
 
@@ -391,9 +395,20 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 }
             }
             return method.invoke(who, args);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            throw cause == null ? e : cause;
         } catch (Exception e) {
             Slog.e(TAG, "BindServiceCommon: Unexpected error", e);
-            return method.invoke(who, args);
+            throw e;
+        }
+    }
+
+    static void sanitizeProxyServiceInstanceName(String methodName, Object[] args) {
+        if ("bindServiceInstance".equals(methodName) && args != null && args.length > 6) {
+            // The host proxy is not an Android isolated service. Passing through the guest's
+            // instance name makes ActivityManager reject the rewritten service on Android 10+.
+            args[6] = null;
         }
     }
 
@@ -461,6 +476,22 @@ public class IActivityManagerProxy extends ClassInvocationStub {
                 return method.invoke(who, args);
             }
             BlackBoxCore.getBActivityManager().unbindService(iServiceConnection.asBinder(), BActivityThread.getUserId());
+            ServiceConnectionDelegate delegate = ServiceConnectionDelegate.getDelegate(iServiceConnection.asBinder());
+            if (delegate != null) {
+                args[0] = delegate;
+            }
+            return method.invoke(who, args);
+        }
+    }
+
+    @ProxyMethod("updateServiceGroup")
+    public static class UpdateServiceGroup extends MethodHook {
+        @Override
+        protected Object hook(Object who, Method method, Object[] args) throws Throwable {
+            IServiceConnection iServiceConnection = (IServiceConnection) args[0];
+            if (iServiceConnection == null) {
+                return method.invoke(who, args);
+            }
             ServiceConnectionDelegate delegate = ServiceConnectionDelegate.getDelegate(iServiceConnection.asBinder());
             if (delegate != null) {
                 args[0] = delegate;
@@ -578,7 +609,7 @@ public class IActivityManagerProxy extends ClassInvocationStub {
             String resolvedType = (String) args[intentIndex + 1];
             Intent proxyIntent = BlackBoxCore.getBActivityManager().sendBroadcast(intent, resolvedType, BActivityThread.getUserId());
             if (proxyIntent != null) {
-                proxyIntent.setExtrasClassLoader(BActivityThread.getApplication().getClassLoader());
+                proxyIntent.setExtrasClassLoader(BlackBoxCore.getAppClassLoader());
                 ProxyBroadcastRecord.saveStub(proxyIntent, intent, BActivityThread.getUserId());
                 args[intentIndex] = proxyIntent;
             }

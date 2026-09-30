@@ -29,6 +29,7 @@ import top.niunaijun.blackbox.fake.service.IXiaomiSettingsProxy;
 import top.niunaijun.blackbox.fake.service.IXiaomiMiuiServicesProxy;
 import top.niunaijun.blackbox.fake.service.IDnsResolverProxy;
 import top.niunaijun.blackbox.fake.service.IContextHubServiceProxy;
+import top.niunaijun.blackbox.fake.service.ICrossProfileAppsProxy;
 import top.niunaijun.blackbox.fake.service.IDeviceIdentifiersPolicyProxy;
 import top.niunaijun.blackbox.fake.service.IDevicePolicyManagerProxy;
 import top.niunaijun.blackbox.fake.service.IDisplayManagerProxy;
@@ -37,6 +38,7 @@ import top.niunaijun.blackbox.fake.service.IGraphicsStatsProxy;
 import top.niunaijun.blackbox.fake.service.IJobServiceProxy;
 import top.niunaijun.blackbox.fake.service.ILauncherAppsProxy;
 import top.niunaijun.blackbox.fake.service.ILocationManagerProxy;
+import top.niunaijun.blackbox.fake.service.ILocaleManagerProxy;
 import top.niunaijun.blackbox.fake.service.IMediaRouterServiceProxy;
 import top.niunaijun.blackbox.fake.service.IMediaSessionManagerProxy;
 import top.niunaijun.blackbox.fake.service.IAudioServiceProxy;
@@ -78,7 +80,6 @@ import top.niunaijun.blackbox.fake.service.ITelephonyManagerProxy;
 import top.niunaijun.blackbox.fake.service.ITelephonyRegistryProxy;
 import top.niunaijun.blackbox.fake.service.IUserManagerProxy;
 import top.niunaijun.blackbox.fake.service.IVibratorServiceProxy;
-import top.niunaijun.blackbox.fake.service.IVpnManagerProxy;
 import top.niunaijun.blackbox.fake.service.IWifiManagerProxy;
 import top.niunaijun.blackbox.fake.service.IWifiScannerProxy;
 import top.niunaijun.blackbox.fake.service.IWindowManagerProxy;
@@ -144,6 +145,9 @@ public class HookManager {
             addInjector(new AndroidIdProxy());
             addInjector(new AudioPermissionProxy());
             addInjector(new ILocationManagerProxy());
+            if (android.os.Build.VERSION.SDK_INT >= 33) {
+                addInjector(new ILocaleManagerProxy());
+            }
             addInjector(new IStorageManagerProxy());
             addInjector(new ILauncherAppsProxy());
             addInjector(new IJobServiceProxy());
@@ -163,6 +167,9 @@ public class HookManager {
         addInjector(new IXiaomiAttributionSourceProxy());
         addInjector(new IXiaomiSettingsProxy());
         addInjector(new IXiaomiMiuiServicesProxy());
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                addInjector(new ICrossProfileAppsProxy());
+            }
             addInjector(new IPhoneSubInfoProxy());
             addInjector(new IMediaRouterServiceProxy());
             addInjector(new IPowerManagerProxy());
@@ -179,7 +186,6 @@ public class HookManager {
             
             if (BuildCompat.isS()) {
                 addInjector(new IActivityClientProxy(null));
-                addInjector(new IVpnManagerProxy());
             }
             
             if (BuildCompat.isS()) {

@@ -12,7 +12,7 @@ KBlackbox is an Android virtual-app sandbox: it installs and runs APKs inside an
 ## Purpose
 - Run several instances of the same app, or run untrusted apps, in isolated per-user spaces.
 - Spoof device identity (Android ID, device IDs, location) for virtual apps.
-- Provide GMS support, a VPN toggle and Xposed-style module hosting inside the sandbox.
+- Provide GMS support and Xposed-style module hosting inside the sandbox.
 - Offer a reusable engine (`Bcore`) that other host apps can integrate (see `Docs.md`).
 
 ## Goals (Next 6–12 Months)

@@ -55,8 +55,6 @@
     <string name="uninstall_module_toast">Please uninstall the xposed module in the Module Manager</string>
     <string name="other">Others</string>
     <string name="daemon_enable">Daemon</string>
-    <string name="use_vpn_network">Use VPN Network</string>
-    <string name="use_vpn_network_summary">Route traffic through VPN for sandboxed apps (may improve network access)</string>
     <string name="disable_flag_secure">Disable Flag Secure</string>
     <string name="disable_flag_secure_summary">Allow screenshots and screen recording in apps</string>
     <string name="gms_manager">GMS Manager</string>
@@ -100,4 +98,11 @@
         <item quantity="one">%d app</item>
         <item quantity="other">%d apps</item>
     </plurals>
+    <string name="storage_permission_title">Storage Permission Required</string>
+    <string name="storage_permission_message">This app needs \'All Files Access\' permission to properly run sandboxed apps. Without this permission, some apps may not work correctly.\n\nPlease grant permission in the next screen.</string>
+    <string name="storage_permission_grant">Grant Permission</string>
+    <string name="later">Later</string>
+    <string name="ok">OK</string>
+    <string name="error">Error</string>
+    <string name="init_failed">Failed to initialize app: %1$s</string>
 </resources>

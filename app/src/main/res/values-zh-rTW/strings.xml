@@ -88,4 +88,11 @@
     <plurals name="user_app_count">
         <item quantity="other">%d 個應用程式</item>
     </plurals>
+    <string name="storage_permission_title">需要儲存空間權限</string>
+    <string name="storage_permission_message">此應用程式需要「所有檔案存取」權限才能正常執行沙盒應用程式。沒有該權限，部分應用程式可能無法正常運作。\n\n請在下一個畫面中授予權限。</string>
+    <string name="storage_permission_grant">授予權限</string>
+    <string name="later">稍後</string>
+    <string name="ok">確定</string>
+    <string name="error">錯誤</string>
+    <string name="init_failed">應用程式初始化失敗：%1$s</string>
 </resources>

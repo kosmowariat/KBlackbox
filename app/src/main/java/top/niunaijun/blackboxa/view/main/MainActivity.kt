@@ -3,13 +3,14 @@ package top.niunaijun.blackboxa.view.main
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.net.VpnService
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
+import androidx.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,7 +43,7 @@ class MainActivity : LoadingActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val STORAGE_PERMISSION_REQUEST_CODE = 1001
-        private const val VPN_PERMISSION_REQUEST_CODE = 1002
+        private const val STORAGE_POSTPONED_KEY = "storage_permission_postponed"
 
         fun start(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
@@ -68,9 +69,6 @@ class MainActivity : LoadingActivity() {
             
             checkStoragePermission()
 
-            
-            checkVpnPermission()
-
             try {
                 BlackBoxCore.get().onAfterMainActivityOnCreate(this)
             } catch (e: Exception) {
@@ -79,7 +77,7 @@ class MainActivity : LoadingActivity() {
         } catch (e: Exception) {
             Log.e(TAG, "Critical error in onCreate: ${e.message}")
             
-            showErrorDialog("Failed to initialize app: ${e.message}")
+            showErrorDialog(getString(R.string.init_failed, e.message))
         }
     }
 
@@ -88,6 +86,11 @@ class MainActivity : LoadingActivity() {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 
                 if (!android.os.Environment.isExternalStorageManager()) {
+                    if (PreferenceManager.getDefaultSharedPreferences(this)
+                                    .getBoolean(STORAGE_POSTPONED_KEY, false)) {
+                        Log.d(TAG, "Storage permission already postponed by the user")
+                        return
+                    }
                     Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
                     showStoragePermissionDialog()
                 }
@@ -151,13 +154,14 @@ class MainActivity : LoadingActivity() {
     private fun showStoragePermissionDialog() {
         try {
             MaterialDialog(this).show {
-                title(text = "Storage Permission Required")
-                message(
-                        text =
-                                "This app needs 'All Files Access' permission to properly run sandboxed apps. Without this permission, some apps may not work correctly.\n\nPlease grant permission in the next screen."
-                )
-                positiveButton(text = "Grant Permission") { openAllFilesAccessSettings() }
-                negativeButton(text = "Later") { Log.w(TAG, "User postponed storage permission") }
+                title(R.string.storage_permission_title)
+                message(R.string.storage_permission_message)
+                positiveButton(R.string.storage_permission_grant) { openAllFilesAccessSettings() }
+                negativeButton(R.string.later) {
+                    PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
+                            .edit { putBoolean(STORAGE_POSTPONED_KEY, true) }
+                    Log.w(TAG, "User postponed storage permission")
+                }
                 cancelable(false)
             }
         } catch (e: Exception) {
@@ -204,43 +208,12 @@ class MainActivity : LoadingActivity() {
                 }
             }
 
-    
-    private fun checkVpnPermission() {
-        try {
-            val vpnIntent = VpnService.prepare(this)
-            if (vpnIntent != null) {
-                
-                Log.d(TAG, "VPN permission not granted, requesting...")
-                vpnPermissionResult.launch(vpnIntent)
-            } else {
-                
-                Log.d(TAG, "VPN permission already granted")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking VPN permission: ${e.message}")
-        }
-    }
-
-    private val vpnPermissionResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                try {
-                    if (result.resultCode == RESULT_OK) {
-                        Log.d(TAG, "VPN permission granted!")
-                        
-                    } else {
-                        Log.w(TAG, "VPN permission denied by user")
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error handling VPN permission result: ${e.message}")
-                }
-            }
-
     private fun showErrorDialog(message: String) {
         try {
             MaterialDialog(this).show {
-                title(text = "Error")
+                title(R.string.error)
                 message(text = message)
-                positiveButton(text = "OK") { finish() }
+                positiveButton(R.string.ok) { finish() }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error showing error dialog: ${e.message}")

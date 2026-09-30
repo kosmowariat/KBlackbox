@@ -1,32 +1,27 @@
 package top.niunaijun.blackbox.fake.service;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.os.Build;
-
 import java.lang.reflect.Method;
 
-import black.android.app.usage.BRIStorageStatsManagerStub;
+import black.android.app.BRICrossProfileAppsStub;
 import black.android.os.BRServiceManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.utils.MethodParameterUtils;
 
+public class ICrossProfileAppsProxy extends BinderInvocationStub {
+    private static final String TAG = "ICrossProfileAppsProxy";
 
-@TargetApi(Build.VERSION_CODES.O)
-public class IStorageStatsManagerProxy extends BinderInvocationStub {
-
-    public IStorageStatsManagerProxy() {
-        super(BRServiceManager.get().getService(Context.STORAGE_STATS_SERVICE));
+    public ICrossProfileAppsProxy() {
+        super(BRServiceManager.get().getService("crossprofileapps"));
     }
 
     @Override
     protected Object getWho() {
-        return BRIStorageStatsManagerStub.get().asInterface(BRServiceManager.get().getService(Context.STORAGE_STATS_SERVICE));
+        return BRICrossProfileAppsStub.get().asInterface(BRServiceManager.get().getService("crossprofileapps"));
     }
 
     @Override
     protected void inject(Object baseInvocation, Object proxyInvocation) {
-        replaceSystemService(Context.STORAGE_STATS_SERVICE);
+        replaceSystemService("crossprofileapps");
     }
 
     @Override
@@ -37,7 +32,6 @@ public class IStorageStatsManagerProxy extends BinderInvocationStub {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         MethodParameterUtils.replaceFirstAppPkg(args);
-        MethodParameterUtils.replaceLastUid(args);
         return super.invoke(proxy, method, args);
     }
 }

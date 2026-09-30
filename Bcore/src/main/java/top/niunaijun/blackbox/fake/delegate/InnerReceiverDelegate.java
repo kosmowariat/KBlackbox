@@ -56,11 +56,12 @@ public class InnerReceiverDelegate extends IIntentReceiver.Stub {
 
     @Override
     public void performReceive(Intent intent, int resultCode, String data, Bundle extras, boolean ordered, boolean sticky, int sendingUser) throws RemoteException {
-        intent.setExtrasClassLoader(BlackBoxCore.getApplication().getClassLoader());
+        ClassLoader classLoader = BlackBoxCore.getAppClassLoader();
+        intent.setExtrasClassLoader(classLoader);
         ProxyBroadcastRecord proxyBroadcastRecord = ProxyBroadcastRecord.create(intent);
         Intent perIntent;
         if (proxyBroadcastRecord.mIntent != null) {
-            proxyBroadcastRecord.mIntent.setExtrasClassLoader(BlackBoxCore.getApplication().getClassLoader());
+            proxyBroadcastRecord.mIntent.setExtrasClassLoader(classLoader);
             perIntent = proxyBroadcastRecord.mIntent;
         } else {
             perIntent = intent;

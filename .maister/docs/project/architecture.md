@@ -95,7 +95,6 @@ The `black-reflection` and `compiler` modules provide compile-time code generati
 - **Android framework**: accessed through hidden APIs (FreeReflection plus generated accessors) and binder interception
 - **Google Mobile Services**: optional GMS install and support (`GmsCore`, `GmsManagerActivity`)
 - **OpenStreetMap tiles**: osmdroid for the fake-location map
-- **VpnService**: `ProxyVpnService`, toggled from the UI
 
 ## Configuration
 - Build: the root `build.gradle` `ext` (SDK levels, version), `gradle.properties` (JVM args, AndroidX), `gradle/libs.versions.toml`
