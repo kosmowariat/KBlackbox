@@ -26,7 +26,7 @@ Coding standards, conventions, and best practices organized by domain: global, f
 Located in `.maister/docs/project/`
 
 ### Vision (`project/vision.md`)
-What KBlackbox is: an Android sandbox that runs APKs without really installing them, and a solo, independent fork of ALEX5402/NewBlackbox (no upstream sync). Covers the current state (v4.0.0, active), the target users (end users cloning or sandboxing apps, and developers embedding `Bcore`) and the product purpose (multi-instance, device spoofing, GMS, VPN, Xposed-style modules). The 6–12 month goal is to improve the GUI of the `app` module (modern look, dark mode, better UX for the core flows, a cleaner MVVM UI layer) while keeping the engine stable.
+What KBlackbox is: an Android sandbox that runs APKs without really installing them, and a solo, independent fork of ALEX5402/NewBlackbox (no upstream sync). Covers the current state (v4.0.0, active), the target users (end users cloning or sandboxing apps, and developers embedding `Bcore`) and the product purpose (multi-instance, device spoofing, GMS, Xposed-style modules). The 6–12 month goal is to improve the GUI of the `app` module (modern look, dark mode, better UX for the core flows, a cleaner MVVM UI layer) while keeping the engine stable.
 
 ### Roadmap (`project/roadmap.md`)
 The current feature set and upstream history, then planned work. High priority (GUI): Material 3 visual refresh and design tokens, dark mode, app grid and main screen UX, moving hard-coded strings into resources, settings redesign. Medium priority (UI architecture): updating lifecycle/preference/recyclerview/work, replacing material-dialogs and other niche UI libraries, StateFlow-based MVVM, evaluating Compose. Technical debt: no tests, CI without lint or tests, lint disabled in `Bcore`, ad-hoc `try/catch` error handling, upstream applicationId and debug-signed release builds. Also covers future ideas and why `targetSdk` stays at 28.
@@ -121,7 +121,7 @@ Each service is a triad: an AIDL `IB<Name>Service`, a `B<Name>Service` singleton
 Mirror interfaces go in `black.<package>` with `@BClassName` and `@BField`/`@BMethod`/`@BConstructor`/`@BParamClassName` annotations, versioned interfaces for SDK/OEM differences, and meaningful parameter names. Access goes through generated `BR*` accessors (`get()`, `_set_`, `_check_`), with raw reflection only as a fallback. The `compiler` annotation processor (AutoService + JavaPoet) generates the accessors. ProGuard keep rules are required for new reflection-driven classes outside the kept trees.
 
 #### Engine Runtime Rules (`standards/engine/runtime.md`)
-Engine logging uses `Slog` with a class-name `TAG` for logcat filtering. VPN mode requires `VpnService.prepare()` from an Activity (the setting defaults to OFF and needs a restart). Xposed support was removed and must not be reintroduced; its leftover UI resources are dead code. Bcore is distributed as an AAR, and Docs.md APIs must be verified against the source.
+Engine logging uses `Slog` with a class-name `TAG` for logcat filtering. Xposed support, the VPN mode and the log upload were removed and must not be reintroduced; its leftover UI resources are dead code. Bcore is distributed as an AAR, and Docs.md APIs must be verified against the source.
 
 ---
 

@@ -5,7 +5,6 @@ import android.content.ContextWrapper;
 import android.util.Log;
 import android.app.Application;
 
-import top.niunaijun.blackbox.BlackBoxCore;
 
 
 public class SimpleCrashFix {
@@ -105,11 +104,6 @@ public class SimpleCrashFix {
     private static void reportCrash(String rule, Thread thread, Throwable throwable, boolean swallowed) {
         Slog.w(TAG, "Crash [" + rule + "] on " + thread.getName()
                 + (swallowed ? " swallowed" : " not handled") + ": " + throwable.getMessage(), throwable);
-        try {
-            BlackBoxCore.get().sendLogs("CRASH [" + rule + "]: " + throwable.getMessage(), swallowed);
-        } catch (Throwable e) {
-            Slog.e(TAG, "Failed to report crash: " + e.getMessage());
-        }
     }
     
     
