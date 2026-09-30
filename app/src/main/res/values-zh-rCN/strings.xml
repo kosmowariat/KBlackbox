@@ -106,4 +106,6 @@
     <string name="hide_root_summary">对沙盒内运行的应用隐藏 Root</string>
     <string name="daemon_enable_summary">保持沙盒后台服务持续运行</string>
     <string name="google_services">谷歌服务</string>
+    <string name="disable_flag_secure">禁用 Flag Secure</string>
+    <string name="disable_flag_secure_summary">允许在应用内截图和录屏</string>
 </resources>

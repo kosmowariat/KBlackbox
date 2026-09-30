@@ -1,5 +1,6 @@
 package top.niunaijun.blackboxa.view.users
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -120,6 +121,8 @@ class UsersAdapter(
         private val DIFF = object : DiffUtil.ItemCallback<UserBean>() {
             override fun areItemsTheSame(oldItem: UserBean, newItem: UserBean) = oldItem.id == newItem.id
 
+            // Compares the package names, not the AppInfo instances, which have no equals().
+            @SuppressLint("DiffUtilEquals")
             override fun areContentsTheSame(oldItem: UserBean, newItem: UserBean) =
                     oldItem.name == newItem.name &&
                             oldItem.appCount == newItem.appCount &&

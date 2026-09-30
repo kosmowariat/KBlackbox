@@ -3,10 +3,12 @@ package top.niunaijun.blackboxa.app.rocker
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
+import androidx.core.content.ContextCompat
 import com.imuxuan.floatingview.FloatingMagnetView
 import com.imuxuan.floatingview.FloatingView
 import kotlin.math.cos
@@ -179,7 +181,9 @@ object RockerManager {
     fun checkPermissions(context: Context): Boolean {
         return try {
             
-            val hasOverlayPermission = android.provider.Settings.canDrawOverlays(context)
+            val hasOverlayPermission =
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                            android.provider.Settings.canDrawOverlays(context)
             if (!hasOverlayPermission) {
                 Log.w(
                         TAG,
@@ -190,7 +194,10 @@ object RockerManager {
 
             
             val hasLocationPermission =
-                    context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    ContextCompat.checkSelfPermission(
+                            context,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                    ) ==
                             android.content.pm.PackageManager.PERMISSION_GRANTED
             if (!hasLocationPermission) {
                 Log.w(TAG, "Location permission not granted - RockerManager cannot access location")

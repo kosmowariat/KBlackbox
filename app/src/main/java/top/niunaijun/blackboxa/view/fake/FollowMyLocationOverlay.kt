@@ -4,6 +4,7 @@ package top.niunaijun.blackboxa.view.fake
 import android.app.Activity
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
@@ -46,6 +47,7 @@ class FollowMyLocationOverlay : AppCompatActivity() {
 
         
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this) { finishWithResult(startPoint) }
 
         val location: BLocation? = intent.getParcelableExtra("location")
 
@@ -83,10 +85,6 @@ class FollowMyLocationOverlay : AppCompatActivity() {
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
     }
 
-    override fun onBackPressed() {
-        finishWithResult(startPoint)
-    }
-
     override fun onResume() {
         super.onResume()
         
@@ -110,6 +108,7 @@ class FollowMyLocationOverlay : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val permissionsToRequest = ArrayList<String>()
         var i = 0
         while (i < grantResults.size) {
