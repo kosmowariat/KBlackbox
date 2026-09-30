@@ -29,6 +29,6 @@ Settings are a `PreferenceFragmentCompat` loading `res/xml/setting.xml`, hosted 
 Engine-affecting settings flow app settings → `ClientConfiguration` → `BlackBoxCore` and need an app restart (tell the user via `R.string.restart_module`).
 
 ### Manifest and namespaces
-App namespace `top.niunaijun.blackboxa` (applicationId `top.niunaijun.blackbox`), Bcore namespace `top.niunaijun.blackbox`. Activities use the app theme; only the launcher uses the splash theme.
+App namespace `top.niunaijun.blackboxa` (applicationId `com.kosmowariat.appenclave`), Bcore namespace `top.niunaijun.blackbox`. Activities use the app theme; only the launcher uses the splash theme.
 
 Source: code, config, docs (RELEASE_NOTES), user decision K3.

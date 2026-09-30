@@ -19,7 +19,7 @@ The build config is the source of truth over README/Docs.md claims (JDK 17, API 
 
 ### Module configuration
 Groovy DSL for Android modules, Kotlin DSL (`build.gradle.kts`, `java-library`) for pure-Java modules. Enable only needed `buildFeatures` (app: viewBinding; Bcore: aidl, prefab).
-Release: `minifyEnabled true` with `proguard-android-optimize.txt` + module rules; Bcore exports `consumer-rules.pro`. APKs are named `BlackBox_<versionName>_<abi>-<buildType>.apk`.
+Release: `minifyEnabled true` with `proguard-android-optimize.txt` + module rules; Bcore exports `consumer-rules.pro`. APKs are named `APKEnclave_<versionName>_<abi>-<buildType>.apk`.
 
 ### Properties and lint state
 `gradle.properties`: AndroidX, non-transitive R, Jetifier, `-Xmx2048m` UTF-8, incremental + parallel annotation processing.

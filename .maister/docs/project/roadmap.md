@@ -26,7 +26,7 @@
 - [ ] **CI quality gates.** CI only builds and uploads artifacts. Add `lint` and unit tests to the workflow.
 - [ ] **Lint.** `Bcore` sets `checkReleaseBuilds false`. Re-enable lint for `app` at least.
 - [ ] **Error handling in UI.** `MainActivity` wraps almost everything in `try/catch` + `Log.e`. Surface errors to users through a single consistent pattern.
-- [ ] **Package/app ID.** The app still uses the upstream `top.niunaijun.blackbox` applicationId and debug signing for release. Decide on your own ID and signing config.
+- [ ] **Release signing.** Release builds are still debug-signed. Decide on a proper signing config. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
 
 ## Future Considerations
 - **Feature ideas**: App import/export and backup, per-app spoofing profiles in the UI, onboarding flow for the required permissions (All Files Access, VPN), tablet/landscape layouts.
