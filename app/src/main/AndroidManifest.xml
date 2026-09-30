@@ -49,10 +49,6 @@
             android:excludeFromRecents="true"
             android:exported="true" />
         <activity android:name=".view.main.MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
     </application>
 </manifest>
