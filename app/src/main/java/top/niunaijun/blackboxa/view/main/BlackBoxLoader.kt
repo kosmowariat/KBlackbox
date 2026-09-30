@@ -28,55 +28,22 @@ class BlackBoxLoader {
 
     private var mUserGridView by AppSharedPreferenceDelegate(App.getContext(), true)
 
-    fun hideRoot(): Boolean {
-        return try {
-            mHideRoot
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting hideRoot: ${e.message}")
-            false
-        }
-    }
+    fun hideRoot(): Boolean = mHideRoot
 
     fun invalidHideRoot(hideRoot: Boolean) {
-        try {
-            this.mHideRoot = hideRoot
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting hideRoot: ${e.message}")
-        }
+        mHideRoot = hideRoot
     }
 
-    fun themeMode(): String {
-        return try {
-            mThemeMode
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting themeMode: ${e.message}")
-            "system"
-        }
-    }
+    fun themeMode(): String = mThemeMode
 
     fun invalidThemeMode(value: String) {
-        try {
-            this.mThemeMode = value
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting themeMode: ${e.message}")
-        }
+        mThemeMode = value
     }
 
-    fun userGridView(): Boolean {
-        return try {
-            mUserGridView
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting userGridView: ${e.message}")
-            true
-        }
-    }
+    fun userGridView(): Boolean = mUserGridView
 
     fun invalidUserGridView(value: Boolean) {
-        try {
-            this.mUserGridView = value
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting userGridView: ${e.message}")
-        }
+        mUserGridView = value
     }
 
     fun themeNightMode(): Int {
@@ -87,55 +54,22 @@ class BlackBoxLoader {
         }
     }
 
-    fun disableFlagSecure(): Boolean {
-        return try {
-            mDisableFlagSecure
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting disableFlagSecure: ${e.message}")
-            false
-        }
-    }
+    fun disableFlagSecure(): Boolean = mDisableFlagSecure
 
     fun invalidDisableFlagSecure(disable: Boolean) {
-        try {
-            this.mDisableFlagSecure = disable
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting disableFlagSecure: ${e.message}")
-        }
+        mDisableFlagSecure = disable
     }
 
-    fun daemonEnable(): Boolean {
-        return try {
-            mDaemonEnable
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting daemonEnable: ${e.message}")
-            false
-        }
-    }
+    fun daemonEnable(): Boolean = mDaemonEnable
 
     fun invalidDaemonEnable(enable: Boolean) {
-        try {
-            this.mDaemonEnable = enable
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting daemonEnable: ${e.message}")
-        }
+        mDaemonEnable = enable
     }
 
-    fun showShortcutPermissionDialog(): Boolean {
-        return try {
-            mShowShortcutPermissionDialog
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting showShortcutPermissionDialog: ${e.message}")
-            true
-        }
-    }
+    fun showShortcutPermissionDialog(): Boolean = mShowShortcutPermissionDialog
 
     fun invalidShortcutPermissionDialog(show: Boolean) {
-        try {
-            this.mShowShortcutPermissionDialog = show
-        } catch (e: Exception) {
-            Log.e(TAG, "Error setting showShortcutPermissionDialog: ${e.message}")
-        }
+        mShowShortcutPermissionDialog = show
     }
 
     fun getBlackBoxCore(): BlackBoxCore {
