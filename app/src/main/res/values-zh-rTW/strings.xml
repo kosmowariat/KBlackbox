@@ -124,4 +124,7 @@
     <string name="health_unavailable">無法開啟此設定頁面</string>
     <string name="close_app">關閉應用程式</string>
     <string name="close_app_hint">關閉應用程式，下次啟動時套用沙盒設定</string>
+    <string name="stop_all_apps">停止所有應用程式</string>
+    <string name="all_apps_stopped">已停止所有應用程式</string>
+    <string name="running_label">執行中</string>
 </resources>

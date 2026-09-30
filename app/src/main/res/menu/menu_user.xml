@@ -19,4 +19,9 @@
             android:icon="@drawable/ic_delete"
             android:title="@string/delete_user"
             app:showAsAction="always" />
+
+    <item
+            android:id="@+id/user_stop_all"
+            android:title="@string/stop_all_apps"
+            app:showAsAction="never" />
 </menu>

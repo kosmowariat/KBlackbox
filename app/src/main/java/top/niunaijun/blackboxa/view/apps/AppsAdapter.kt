@@ -13,8 +13,10 @@ import top.niunaijun.blackboxa.util.BindingAdapter
 
 private const val MAX_ICON_SIZE = 96
 
-fun appsAdapter() = BindingAdapter(ItemAppBinding::inflate, AppInfo::packageName) { binding, item ->
+fun appsAdapter(isRunning: (AppInfo) -> Boolean) =
+        BindingAdapter(ItemAppBinding::inflate, AppInfo::packageName) { binding, item ->
     binding.name.text = item.name
+    binding.runningDot.visibility = if (isRunning(item)) View.VISIBLE else View.GONE
     binding.icon.setImageDrawable(item.icon?.let { downscale(binding.root, it) } ?: placeholder(binding.root))
 }
 

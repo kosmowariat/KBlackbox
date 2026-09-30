@@ -128,4 +128,7 @@
     <string name="health_unavailable">Nie można otworzyć tego ekranu ustawień</string>
     <string name="close_app">Zamknij aplikację</string>
     <string name="close_app_hint">Zamknij aplikację, aby zastosować ustawienia piaskownicy przy następnym starcie</string>
+    <string name="stop_all_apps">Zatrzymaj wszystkie aplikacje</string>
+    <string name="all_apps_stopped">Zatrzymano wszystkie aplikacje</string>
+    <string name="running_label">Działa</string>
 </resources>

@@ -17,6 +17,15 @@
                 android:layout_height="@dimen/icon_size"
                 android:importantForAccessibility="no"
                 android:scaleType="centerCrop" />
+
+        <View
+                android:id="@+id/runningDot"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_running_dot"
+                android:contentDescription="@string/running_label"
+                android:visibility="gone" />
     </FrameLayout>
 
     <TextView

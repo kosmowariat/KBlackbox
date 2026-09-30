@@ -106,6 +106,7 @@ class UserAppsActivity : LoadingActivity() {
             }
             R.id.user_duplicate -> viewModel.requestDuplicate(user)
             R.id.user_delete -> userDialogs.showDeleteDialog(user)
+            R.id.user_stop_all -> appsFragment.stopAllApps()
             else -> return super.onOptionsItemSelected(item)
         }
         return true

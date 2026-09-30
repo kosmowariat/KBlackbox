@@ -42,6 +42,8 @@ class AppsFragment : Fragment() {
 
     private var popupMenu: PopupMenu? = null
 
+    private var running: Set<String> = emptySet()
+
     companion object {
         private const val TAG = "AppsFragment"
         private const val GRID_SPAN_COUNT = 4
@@ -70,7 +72,7 @@ class AppsFragment : Fragment() {
     ): View {
         viewBinding.stateView.showEmpty()
 
-        mAdapter = appsAdapter()
+        mAdapter = appsAdapter { it.packageName in running }
         viewBinding.recyclerView.adapter = mAdapter
         viewBinding.recyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_SPAN_COUNT).apply {
             isItemPrefetchEnabled = true
@@ -214,6 +216,7 @@ class AppsFragment : Fragment() {
         viewLifecycleOwner.collectStarted(viewModel.apps) { apps ->
             if (apps != null) {
                 mAdapter.setItems(apps)
+                viewModel.refreshRunning(userID)
                 if (apps.isEmpty()) {
                     viewBinding.stateView.showEmpty()
                 } else {
@@ -222,14 +225,23 @@ class AppsFragment : Fragment() {
             }
         }
 
+        viewLifecycleOwner.collectStarted(viewModel.running) { packages ->
+            running = packages
+            mAdapter.notifyItemRangeChanged(0, mAdapter.itemCount, Unit)
+        }
+
         viewLifecycleOwner.collectStarted(viewModel.events) { event ->
             hideLoading()
             when (event) {
+                is AppsEvent.Notice -> requireContext().toast(event.text)
                 is AppsEvent.Message -> {
                     requireContext().toast(event.text)
                     viewModel.getInstalledApps(userID)
                 }
-                is AppsEvent.LaunchResult -> if (!event.launched) toast(R.string.start_fail)
+                is AppsEvent.LaunchResult -> {
+                    if (!event.launched) toast(R.string.start_fail)
+                    viewModel.refreshRunning(userID)
+                }
             }
         }
     }
@@ -268,6 +280,10 @@ class AppsFragment : Fragment() {
             showLoading()
             viewModel.clearApkData(info.packageName, userID)
         }
+    }
+
+    fun stopAllApps() {
+        viewModel.stopAll(userID, getString(R.string.all_apps_stopped))
     }
 
     fun installApk(source: String) {

@@ -293,6 +293,21 @@ class AppsRepository {
         }
     }
 
+    suspend fun getRunningPackages(userId: Int, packages: List<String>): Set<String> = withContext(Dispatchers.IO) {
+        packages.filter { BlackBoxCore.isRunningApplication(it, userId) }.toSet()
+    }
+
+    suspend fun stopAll(userId: Int, packages: List<String>) = withContext(Dispatchers.IO) {
+        val core = BlackBoxCore.get()
+        packages.forEach {
+            try {
+                core.stopPackage(it, userId)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error stopping $it", e)
+            }
+        }
+    }
+
     suspend fun clearApkData(packageName: String, userID: Int): String = withContext(Dispatchers.IO) {
         try {
             BlackBoxCore.get().clearPackage(packageName, userID)

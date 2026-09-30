@@ -14,6 +14,7 @@ import top.niunaijun.blackboxa.view.base.BaseViewModel
 
 sealed interface AppsEvent {
     data class Message(val text: String) : AppsEvent
+    data class Notice(val text: String) : AppsEvent
     data class LaunchResult(val launched: Boolean) : AppsEvent
 }
 
@@ -22,6 +23,10 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
     /** The apps of the current user; null until the first load finishes. */
     private val _apps = MutableStateFlow<List<AppInfo>?>(null)
     val apps: StateFlow<List<AppInfo>?> = _apps.asStateFlow()
+
+    /** Packages of the current user that have a live task in the sandbox. */
+    private val _running = MutableStateFlow<Set<String>>(emptySet())
+    val running: StateFlow<Set<String>> = _running.asStateFlow()
 
     private val _events = Channel<AppsEvent>(Channel.BUFFERED)
     val events: Flow<AppsEvent> = _events.receiveAsFlow()
@@ -44,6 +49,20 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
                 Log.d(TAG, "No apps loaded, retrying... ($attempt/$maxRetries)")
                 delay(RETRY_DELAY_MS)
             }
+        }
+    }
+
+    fun refreshRunning(userId: Int) {
+        val packages = _apps.value.orEmpty().map { it.packageName }
+        launch { _running.value = repo.getRunningPackages(userId, packages) }
+    }
+
+    fun stopAll(userId: Int, messageAfter: String) {
+        val packages = _apps.value.orEmpty().map { it.packageName }
+        launch {
+            repo.stopAll(userId, packages)
+            _running.value = emptySet()
+            _events.send(AppsEvent.Notice(messageAfter))
         }
     }
 

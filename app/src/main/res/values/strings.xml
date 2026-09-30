@@ -139,4 +139,7 @@
     <string name="health_unavailable">Cannot open this settings screen</string>
     <string name="close_app">Close app</string>
     <string name="close_app_hint">Close the app to apply sandbox settings on the next start</string>
+    <string name="stop_all_apps">Stop all apps</string>
+    <string name="all_apps_stopped">All apps stopped</string>
+    <string name="running_label">Running</string>
 </resources>
