@@ -2,7 +2,7 @@
 
 ### Dialogs (target)
 Target: `MaterialAlertDialogBuilder` (Material Components/M3), with titles/messages/buttons from string resources; confirm/cancel reuse `R.string.done` / `R.string.cancel`.
-Legacy (migrate when touching): afollestad `MaterialDialog(ctx).show { ... }` DSL (used in all 5 current dialog sites). Don't add new usages.
+Use the `Context.showConfirmDialog` / `showInfoDialog` helpers in `util/DialogEx.kt` for simple confirm and info dialogs; build custom ones (with an input) with `MaterialAlertDialogBuilder` directly. The afollestad `MaterialDialog` library has been removed.
 
 ### Toasts
 Always use the `util/ToastEx.kt` helpers (`toast(@StringRes)`, `toast(String)`, `Context.toast`) — they cancel the previous toast. Never call `Toast.makeText` directly.

@@ -10,13 +10,13 @@
 ### High Priority — GUI
 - [x] **Visual refresh / design system.** Migrate `Theme.BlackBox` from `MaterialComponents` to Material 3, define a real color palette (the primary/dark/light colors are all `#3F3F3F` today), and add typography and shape tokens. *Done 2026-09-27: `Theme.Material3.DayNight.NoActionBar`, custom blue `md_theme_*` palette (seed `#3F6FD8`), dynamic color on Android 12+, typography/shape tokens and `dimens.xml`.*
 - [x] **Dark mode.** Add a `values-night` theme and remove `forceDarkAllowed=false`. *Done 2026-09-27: `values-night` palette plus a Settings → Appearance → Theme preference (System default / Light / Dark).*
-- [ ] **App grid and main screen UX.** Improve `AppsFragment` / `item_app.xml`: clearer install FAB flow, empty and loading states, better long-press actions, and user-space switching in `MainActivity`.
-- [ ] **String externalization.** Move hard-coded dialog texts (e.g. the storage permission dialog in `MainActivity`) to `strings.xml`, with `zh-rCN`/`zh-rTW` translations and optionally a Polish one.
-- [ ] **Settings redesign.** Update `SettingFragment` (preference-ktx) to grouped Material 3 preferences.
+- [x] **App grid and main screen UX.** *Done 2026-09-30: users list is the main screen (list/grid toggle, launch apps, rename/duplicate/delete), per-user apps screen with a labelled "Add app" FAB, loading and empty states.*
+- [x] **String externalization.** Move hard-coded dialog texts (e.g. the storage permission dialog in `MainActivity`) to `strings.xml`, with `zh-rCN`/`zh-rTW` translations and optionally a Polish one.
+- [x] **Settings redesign.** Grouped preferences (Appearance, Sandbox, Google services) with icons and summaries.
 
 ### Medium Priority — UI architecture
-- [ ] **Update UI dependencies.** lifecycle 2.3.1 → 2.8+, preference 1.1.1 → 1.2+, recyclerview 1.2 → 1.3+, work 2.7 → 2.9+.
-- [ ] **Consolidate dialogs.** Replace `afollestad:material-dialogs` with `MaterialAlertDialogBuilder`.
+- [x] **Update UI dependencies.** lifecycle 2.8.7, preference 1.2.1, recyclerview 1.3.2, work 2.9.1, all in the version catalog.
+- [x] **Consolidate dialogs.** `afollestad:material-dialogs` is gone; dialogs use `MaterialAlertDialogBuilder` (helpers in `util/DialogEx.kt`).
 - [ ] **Replace niche UI libraries.** Consider dropping `RVAdapter` (gitee), `CornerLabelView` and `SimpleSearchView` in favor of `ListAdapter`/`DiffUtil`, Material badges and `SearchView`.
 - [ ] **Consistent MVVM.** Move from `LiveData` + manual `*Factory` classes (`InjectionUtil`) to `StateFlow` and `viewModel {}` initializers; later consider Hilt/Koin if the number of screens grows.
 - [ ] **Possible Jetpack Compose adoption.** Evaluate this for new screens. The current UI is XML + ViewBinding.
