@@ -4,11 +4,9 @@
     <string name="choose">Choose</string>
     <string name="choose_app">Choose App</string>
     <string name="installed_app">Installed App</string>
-    <string name="installed_module">Installed Module</string>
     <string name="empty_empty">Empty</string>
     <string name="filter">Filter</string>
     <string name="open_source_path">Open Source</string>
-    <string name="xp_setting">Xposed Setting</string>
     <string name="fake_location">Fake Location(Preview)</string>
     <string name="real_location">Real Location</string>
     <string name="set_location">Set Fake Location Successfully:%s-%s</string>
@@ -16,13 +14,7 @@
     <string name="close_app_fake_location">Disable FakeLocation for %s</string>
     <string name="close_fake_location_success">Disable FakeLocation for %s Successfully</string>
     <string name="setting">Setting</string>
-    <string name="jump_module">Go to Module Manager</string>
-    <string name="module_setting">Module Manager</string>
-    <string name="enable_xposed">Enable Xposed Framework</string>
-    <string name="hider">Hide</string>
     <string name="hide_root">Hide Root</string>
-    <string name="hide_xposed">Hide Xposed</string>
-    <string name="userRemark">User Remark</string>
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="permission_setting">Setting</string>
@@ -36,20 +28,15 @@
     <string name="app_shortcut">Create Shortcut</string>
     <string name="shortcut_name">Shortcut Name</string>
     <string name="try_add_shortcut">Try Added To Desktop</string>
-    <string name="add_shortcut_fail_msg">If the addition fails, please go to system settings and open the permission of "create desktop shortcut" for BlackBox</string>
-    <string name="install_success">Installed Successfully</string>
-    <string name="install_fail">Installed Failed: %s</string>
-    <string name="install_fail_no_msg">Installed Failed</string>
-    <string name="uninstall_success">Uninstalled Successfully</string>
-    <string name="uninstall_fail">Uninstalled Failed</string>
+    <string name="add_shortcut_fail_msg">If the addition fails, please go to system settings and open the permission of "create desktop shortcut" for APKEnclave</string>
+    <string name="install_success">Installed successfully</string>
+    <string name="install_fail">Installation failed: %s</string>
+    <string name="uninstall_success">Uninstalled successfully</string>
+    <string name="uninstall_fail">Uninstallation failed</string>
     <string name="uninstall_app">Uninstall App</string>
     <string name="uninstall_app_hint">Uninstall %s, and relevant data will be cleared after uninstallation?</string>
-    <string name="uninstall_module">Uninstall Module</string>
-    <string name="uninstall_module_hint">Do you want to uninstall this module? It will no longer work after uninstallation?</string>
-    <string name="remove_success">Removed Successfully</string>
-    <string name="clear_success">Cleared Successfully</string>
-    <string name="start_fail">Launched Failed</string>
-    <string name="start_in_outside">Start module in outside</string>
+    <string name="clear_success">Cleared successfully</string>
+    <string name="start_fail">Could not launch the app</string>
     <string name="restart_module">Restart app to apply change</string>
     <string name="cannot_create_shortcut">This desktop does not support creating shortcuts</string>
     <string name="daemon_enable">Daemon</string>
@@ -115,4 +102,19 @@
     <string name="google_services">Google services</string>
     <string name="installed_label">Installed</string>
     <string name="install_self_blocked">This is the app itself, it cannot be installed inside itself.</string>
+    <string name="app_language">Language</string>
+    <string-array name="app_language_entries">
+        <item>System default</item>
+        <item>English</item>
+        <item>Polski</item>
+        <item>简体中文</item>
+        <item>繁體中文</item>
+    </string-array>
+    <string-array name="app_language_values" translatable="false">
+        <item>system</item>
+        <item>en</item>
+        <item>pl</item>
+        <item>zh-CN</item>
+        <item>zh-TW</item>
+    </string-array>
 </resources>

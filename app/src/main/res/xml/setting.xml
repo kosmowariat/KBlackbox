@@ -14,6 +14,16 @@
                 app:title="@string/theme_mode"
                 app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+                android:persistent="false"
+                app:defaultValue="system"
+                app:entries="@array/app_language_entries"
+                app:entryValues="@array/app_language_values"
+                app:icon="@drawable/ic_pref_language"
+                app:key="app_language"
+                app:title="@string/app_language"
+                app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/sandbox_settings">

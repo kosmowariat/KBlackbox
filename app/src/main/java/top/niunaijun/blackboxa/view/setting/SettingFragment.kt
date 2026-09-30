@@ -2,6 +2,7 @@ package top.niunaijun.blackboxa.view.setting
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -17,6 +18,8 @@ class SettingFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.setting, rootKey)
 
         initThemeMode()
+
+        initLanguage()
 
         initGms()
 
@@ -48,6 +51,20 @@ class SettingFragment : PreferenceFragmentCompat() {
         themeModePreference.setOnPreferenceChangeListener { _, newValue ->
             AppManager.mBlackBoxLoader.invalidThemeMode(newValue as String)
             AppCompatDelegate.setDefaultNightMode(AppManager.mBlackBoxLoader.themeNightMode())
+            true
+        }
+    }
+
+    private fun initLanguage() {
+        val languagePreference: ListPreference = findPreference("app_language")!!
+        val values = resources.getStringArray(R.array.app_language_values)
+        val currentTags = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+        languagePreference.value =
+                values.firstOrNull { it != SYSTEM_LANGUAGE && currentTags.equals(it, ignoreCase = true) }
+                        ?: SYSTEM_LANGUAGE
+        languagePreference.setOnPreferenceChangeListener { _, newValue ->
+            val tags = if (newValue == SYSTEM_LANGUAGE) "" else newValue as String
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags))
             true
         }
     }
@@ -87,5 +104,9 @@ class SettingFragment : PreferenceFragmentCompat() {
             toast(R.string.restart_module)
             return@setOnPreferenceChangeListener true
         }
+    }
+
+    private companion object {
+        const val SYSTEM_LANGUAGE = "system"
     }
 }

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">APKEnclave</string>
+    <string name="choose">Wybierz</string>
+    <string name="choose_app">Wybierz aplikację</string>
+    <string name="installed_app">Zainstalowane aplikacje</string>
+    <string name="empty_empty">Pusto</string>
+    <string name="filter">Filtruj</string>
+    <string name="open_source_path">Kod źródłowy</string>
+    <string name="fake_location">Fałszywa lokalizacja (podgląd)</string>
+    <string name="real_location">Prawdziwa lokalizacja</string>
+    <string name="set_location">Ustawiono fałszywą lokalizację: %s-%s</string>
+    <string name="close_fake_location">Wyłącz fałszywą lokalizację</string>
+    <string name="close_app_fake_location">Wyłączyć fałszywą lokalizację dla %s?</string>
+    <string name="close_fake_location_success">Wyłączono fałszywą lokalizację dla %s</string>
+    <string name="setting">Ustawienia</string>
+    <string name="hide_root">Ukryj roota</string>
+    <string name="done">Gotowe</string>
+    <string name="cancel">Anuluj</string>
+    <string name="permission_setting">Ustawienia</string>
+    <string name="no_reminders">Nie przypominaj</string>
+    <string name="app_stop">Zatrzymaj</string>
+    <string name="app_stop_hint">Zatrzymać %s siłą?</string>
+    <string name="is_stop">Zatrzymano %s</string>
+    <string name="app_clear">Wyczyść dane</string>
+    <string name="app_clear_hint">Wyczyścić dane aplikacji %s?</string>
+    <string name="app_remove">Odinstaluj aplikację</string>
+    <string name="app_shortcut">Utwórz skrót</string>
+    <string name="shortcut_name">Nazwa skrótu</string>
+    <string name="try_add_shortcut">Próba dodania na ekran główny</string>
+    <string name="add_shortcut_fail_msg">Jeśli dodanie się nie uda, wejdź w ustawienia systemu i włącz dla APKEnclave uprawnienie „tworzenie skrótów na pulpicie”</string>
+    <string name="install_success">Zainstalowano</string>
+    <string name="install_fail">Nie udało się zainstalować: %s</string>
+    <string name="uninstall_success">Odinstalowano</string>
+    <string name="uninstall_fail">Nie udało się odinstalować</string>
+    <string name="uninstall_app">Odinstaluj aplikację</string>
+    <string name="uninstall_app_hint">Odinstalować %s? Powiązane dane zostaną usunięte.</string>
+    <string name="clear_success">Wyczyszczono</string>
+    <string name="start_fail">Nie udało się uruchomić aplikacji</string>
+    <string name="restart_module">Uruchom aplikację ponownie, aby zastosować zmianę</string>
+    <string name="cannot_create_shortcut">Ten launcher nie obsługuje tworzenia skrótów</string>
+    <string name="daemon_enable">Usługa w tle</string>
+    <string name="disable_flag_secure">Wyłącz FLAG_SECURE</string>
+    <string name="disable_flag_secure_summary">Zezwól na zrzuty i nagrywanie ekranu w aplikacjach</string>
+    <string name="gms_manager">Menedżer GMS</string>
+    <string name="jump_gms">Przejdź do menedżera GMS</string>
+    <string name="enable_gms">Włącz usługi</string>
+    <string name="enable_gms_hint">Włączenie usług Google pozwala działać YouTube i innym aplikacjom, które mocno zależą od usług Google Play.</string>
+    <string name="disable_gms">Wyłącz usługi</string>
+    <string name="disable_gms_hint">Wyczyścić obecne środowisko usług Google? Dane usług Google zostaną usunięte.</string>
+    <string name="no_gms">Na tym telefonie nie ma środowiska usług Google.</string>
+    <string name="appearance">Wygląd</string>
+    <string name="theme_mode">Motyw</string>
+    <string-array name="theme_mode_entries">
+        <item>Systemowy</item>
+        <item>Jasny</item>
+        <item>Ciemny</item>
+    </string-array>
+    <string name="grid_view">Widok siatki</string>
+    <string name="list_view">Widok listy</string>
+    <string name="new_user">Nowy użytkownik</string>
+    <string name="default_user_name">Użytkownik %s</string>
+    <string name="rename_user">Zmień nazwę</string>
+    <string name="delete_user">Usuń użytkownika</string>
+    <string name="delete_user_hint">Usunąć %s? Wszystkie aplikacje i dane w tej przestrzeni zostaną usunięte.</string>
+    <string name="install_gms_option">Zainstaluj usługi Google (GMS)</string>
+    <string name="create_user_failed">Nie udało się utworzyć użytkownika</string>
+    <string name="duplicate_user">Duplikuj</string>
+    <string name="duplicate_user_title">Duplikuj użytkownika</string>
+    <string name="duplicate_user_default_name">%s (kopia)</string>
+    <string name="duplicate_copy_data">Kopiuj dane aplikacji</string>
+    <string name="duplicate_copy_data_hint">Wszystkie aplikacje zostaną zainstalowane w kopii. Zaznaczone dostaną też swoje dane (logowania, ustawienia, pliki). Konta Google nie są kopiowane.</string>
+    <string name="duplicate_failed_apps">Nie udało się skopiować: %s</string>
+    <string name="user_name">Nazwa</string>
+    <string name="all_apps">Pokaż wszystkie aplikacje</string>
+    <plurals name="user_app_count">
+        <item quantity="one">%d aplikacja</item>
+        <item quantity="few">%d aplikacje</item>
+        <item quantity="many">%d aplikacji</item>
+        <item quantity="other">%d aplikacji</item>
+    </plurals>
+    <string name="storage_permission_title">Wymagane uprawnienie do pamięci</string>
+    <string name="storage_permission_message">Ta aplikacja potrzebuje uprawnienia „Dostęp do wszystkich plików”, aby poprawnie uruchamiać aplikacje w piaskownicy. Bez niego niektóre aplikacje mogą nie działać.\n\nPrzyznaj uprawnienie na następnym ekranie.</string>
+    <string name="storage_permission_grant">Przyznaj uprawnienie</string>
+    <string name="later">Później</string>
+    <string name="ok">OK</string>
+    <string name="error">Błąd</string>
+    <string name="init_failed">Nie udało się uruchomić aplikacji: %1$s</string>
+    <string name="install_error">Błąd instalacji: %s</string>
+    <string name="uninstall_error">Błąd odinstalowania: %s</string>
+    <string name="clear_error">Błąd czyszczenia: %s</string>
+    <string name="stop_error">Nie można zatrzymać %s</string>
+    <string name="add_app">Dodaj aplikację</string>
+    <string name="storage_settings_unavailable">Nie można otworzyć ustawień. Przyznaj aplikacji dostęp do wszystkich plików ręcznie w ustawieniach systemu.</string>
+    <string name="sandbox_settings">Piaskownica</string>
+    <string name="hide_root_summary">Ukrywaj roota przed aplikacjami w piaskownicy</string>
+    <string name="daemon_enable_summary">Utrzymuj działającą usługę piaskownicy w tle</string>
+    <string name="google_services">Usługi Google</string>
+    <string name="installed_label">Zainstalowano</string>
+    <string name="install_self_blocked">To jest ta sama aplikacja, nie można jej zainstalować w sobie.</string>
+    <string name="app_language">Język</string>
+    <string-array name="app_language_entries">
+        <item>Systemowy</item>
+        <item>English</item>
+        <item>Polski</item>
+        <item>简体中文</item>
+        <item>繁體中文</item>
+    </string-array>
+</resources>
