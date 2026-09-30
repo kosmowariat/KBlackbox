@@ -6,13 +6,14 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import cbfg.rvadapter.RVAdapter
-import com.afollestad.materialdialogs.MaterialDialog
 import com.google.android.material.materialswitch.MaterialSwitch
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.databinding.ActivityGmsBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
+import top.niunaijun.blackboxa.util.showConfirmDialog
+import top.niunaijun.blackboxa.util.showInfoDialog
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
 
@@ -65,11 +66,7 @@ class GmsManagerActivity : LoadingActivity() {
             if (result.success) {
                 toast(result.msg)
             } else {
-                MaterialDialog(this).show {
-                    title(R.string.gms_manager)
-                    message(text = result.msg)
-                    positiveButton(R.string.done)
-                }
+                showInfoDialog(R.string.gms_manager, result.msg)
             }
         }
 
@@ -91,30 +88,24 @@ class GmsManagerActivity : LoadingActivity() {
     }
 
     private fun installGms(userID: Int, checkbox: MaterialSwitch){
-        MaterialDialog(this).show {
-            title(R.string.enable_gms)
-            message(R.string.enable_gms_hint)
-            positiveButton(R.string.done){
-                showLoading()
-                viewModel.installGms(userID)
-            }
-            negativeButton(R.string.cancel){
-                checkbox.isChecked = !checkbox.isChecked
-            }
+        showConfirmDialog(
+                R.string.enable_gms,
+                getString(R.string.enable_gms_hint),
+                onCancel = { checkbox.isChecked = !checkbox.isChecked }
+        ) {
+            showLoading()
+            viewModel.installGms(userID)
         }
     }
 
     private fun uninstallGms(userID: Int, checkbox: MaterialSwitch){
-        MaterialDialog(this).show {
-            title(R.string.disable_gms)
-            message(R.string.disable_gms_hint)
-            positiveButton(R.string.done){
-                showLoading()
-                viewModel.uninstallGms(userID)
-            }
-            negativeButton(R.string.cancel){
-                checkbox.isChecked = !checkbox.isChecked
-            }
+        showConfirmDialog(
+                R.string.disable_gms,
+                getString(R.string.disable_gms_hint),
+                onCancel = { checkbox.isChecked = !checkbox.isChecked }
+        ) {
+            showLoading()
+            viewModel.uninstallGms(userID)
         }
     }
 

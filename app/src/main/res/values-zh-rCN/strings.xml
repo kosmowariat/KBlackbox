@@ -100,4 +100,7 @@
     <string name="install_error">安装失败：%s</string>
     <string name="uninstall_error">卸载失败：%s</string>
     <string name="clear_error">清除失败：%s</string>
+    <string name="stop_error">无法停止%s</string>
+    <string name="add_app">添加应用</string>
+    <string name="storage_settings_unavailable">无法打开设置页面，请在系统设置中手动授予应用所有文件访问权限。</string>
 </resources>

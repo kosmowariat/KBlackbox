@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import cbfg.rvadapter.RVAdapter
-import com.afollestad.materialdialogs.MaterialDialog
 import com.ferfalk.simplesearchview.SimpleSearchView
 import top.niunaijun.blackbox.entity.location.BLocation
 import top.niunaijun.blackbox.fake.frameworks.BLocationManager
@@ -19,6 +18,7 @@ import top.niunaijun.blackboxa.bean.FakeLocationBean
 import top.niunaijun.blackboxa.databinding.ActivityListBinding
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
+import top.niunaijun.blackboxa.util.showConfirmDialog
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.BaseActivity
 
@@ -62,16 +62,14 @@ class FakeManagerActivity : BaseActivity() {
     }
 
     private fun disableFakeLocation(item: FakeLocationBean,position:Int) {
-        MaterialDialog(this).show {
-            title(R.string.close_fake_location)
-            message(text = getString(R.string.close_app_fake_location,item.name))
-            negativeButton(R.string.cancel)
-            positiveButton(R.string.done){
-                BLocationManager.disableFakeLocation(currentUserID(),item.packageName)
-                toast(getString(R.string.close_fake_location_success,item.name))
-                item.fakeLocationPattern = BLocationManager.CLOSE_MODE
-                mAdapter.replaceAt(position,item)
-            }
+        showConfirmDialog(
+                R.string.close_fake_location,
+                getString(R.string.close_app_fake_location, item.name)
+        ) {
+            BLocationManager.disableFakeLocation(currentUserID(), item.packageName)
+            toast(getString(R.string.close_fake_location_success, item.name))
+            item.fakeLocationPattern = BLocationManager.CLOSE_MODE
+            mAdapter.replaceAt(position, item)
         }
     }
 

@@ -3,18 +3,26 @@ package top.niunaijun.blackboxa.view.main
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.Manifest
+import android.content.ActivityNotFoundException
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.afollestad.materialdialogs.MaterialDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
@@ -44,6 +52,10 @@ class MainActivity : LoadingActivity() {
         private const val TAG = "MainActivity"
         private const val STORAGE_PERMISSION_REQUEST_CODE = 1001
         private const val STORAGE_POSTPONED_KEY = "storage_permission_postponed"
+        private val LEGACY_STORAGE_PERMISSIONS = arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
 
         fun start(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
@@ -52,84 +64,63 @@ class MainActivity : LoadingActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        try {
-            super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
 
-            try {
-                BlackBoxCore.get().onBeforeMainActivityOnCreate(this)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in onBeforeMainActivityOnCreate: ${e.message}")
-            }
+        if (!runEngineHook { BlackBoxCore.get().onBeforeMainActivityOnCreate(this) }) {
+            return
+        }
 
-            setContentView(viewBinding.root)
-            initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
-            initUserList()
-            initFab()
+        setContentView(viewBinding.root)
+        initToolbar(viewBinding.toolbarLayout.toolbar, R.string.app_name)
+        initUserList()
+        initFab()
+        checkStoragePermission()
 
-            
-            checkStoragePermission()
+        runEngineHook { BlackBoxCore.get().onAfterMainActivityOnCreate(this) }
+    }
 
-            try {
-                BlackBoxCore.get().onAfterMainActivityOnCreate(this)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error in onAfterMainActivityOnCreate: ${e.message}")
-            }
+    /** Engine lifecycle hooks are the boundary where a failure must be shown to the user. */
+    private fun runEngineHook(hook: () -> Unit): Boolean {
+        return try {
+            hook()
+            true
         } catch (e: Exception) {
-            Log.e(TAG, "Critical error in onCreate: ${e.message}")
-            
-            showErrorDialog(getString(R.string.init_failed, e.message))
+            Log.e(TAG, "Engine hook failed in MainActivity", e)
+            showErrorDialog(getString(R.string.init_failed, e.message.orEmpty()))
+            false
         }
     }
 
     private fun checkStoragePermission() {
-        try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                
-                if (!android.os.Environment.isExternalStorageManager()) {
-                    if (PreferenceManager.getDefaultSharedPreferences(this)
-                                    .getBoolean(STORAGE_POSTPONED_KEY, false)) {
-                        Log.d(TAG, "Storage permission already postponed by the user")
-                        return
-                    }
-                    Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
-                    showStoragePermissionDialog()
-                }
-            } else {
-                
-                if (androidx.core.content.ContextCompat.checkSelfPermission(
-                                this,
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
-                                androidx.core.content.ContextCompat.checkSelfPermission(
-                                        this,
-                                        android.Manifest.permission.READ_EXTERNAL_STORAGE
-                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-                ) {
-                    Log.w(
-                            TAG,
-                            "Storage permissions not granted on Android ${android.os.Build.VERSION.SDK_INT}"
-                    )
-                    requestLegacyStoragePermission()
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (Environment.isExternalStorageManager()) {
+                return
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error checking storage permission: ${e.message}")
+            if (PreferenceManager.getDefaultSharedPreferences(this)
+                            .getBoolean(STORAGE_POSTPONED_KEY, false)) {
+                Log.d(TAG, "Storage permission already postponed by the user")
+                return
+            }
+            Log.w(TAG, "MANAGE_EXTERNAL_STORAGE permission not granted")
+            showStoragePermissionDialog()
+        } else if (!hasLegacyStoragePermissions()) {
+            Log.w(TAG, "Storage permissions not granted on Android ${Build.VERSION.SDK_INT}")
+            requestLegacyStoragePermission()
+        }
+    }
+
+    private fun hasLegacyStoragePermissions(): Boolean {
+        return LEGACY_STORAGE_PERMISSIONS.all {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
     private fun requestLegacyStoragePermission() {
-        try {
-            androidx.core.app.ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ),
-                    STORAGE_PERMISSION_REQUEST_CODE
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Error requesting storage permission: ${e.message}")
-        }
+        ActivityCompat.requestPermissions(
+                this,
+                LEGACY_STORAGE_PERMISSIONS,
+                STORAGE_PERMISSION_REQUEST_CODE
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -139,11 +130,7 @@ class MainActivity : LoadingActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() &&
-                            grantResults.all {
-                                it == android.content.pm.PackageManager.PERMISSION_GRANTED
-                            }
-            ) {
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 Log.d(TAG, "Storage permissions granted")
             } else {
                 Log.w(TAG, "Storage permissions denied")
@@ -152,73 +139,56 @@ class MainActivity : LoadingActivity() {
     }
 
     private fun showStoragePermissionDialog() {
-        try {
-            MaterialDialog(this).show {
-                title(R.string.storage_permission_title)
-                message(R.string.storage_permission_message)
-                positiveButton(R.string.storage_permission_grant) { openAllFilesAccessSettings() }
-                negativeButton(R.string.later) {
-                    PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
+        MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.storage_permission_title)
+                .setMessage(R.string.storage_permission_message)
+                .setPositiveButton(R.string.storage_permission_grant) { _, _ -> openAllFilesAccessSettings() }
+                .setNegativeButton(R.string.later) { _, _ ->
+                    PreferenceManager.getDefaultSharedPreferences(this)
                             .edit { putBoolean(STORAGE_POSTPONED_KEY, true) }
                     Log.w(TAG, "User postponed storage permission")
                 }
-                cancelable(false)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing storage permission dialog: ${e.message}")
-        }
+                .setCancelable(false)
+                .show()
     }
 
     private fun openAllFilesAccessSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return
+        }
+        val appIntent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                .setData(Uri.parse("package:$packageName"))
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                val intent =
-                        Intent(
-                                android.provider.Settings
-                                        .ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
-                        )
-                intent.data = Uri.parse("package:$packageName")
-                storagePermissionResult.launch(intent)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error opening storage settings: ${e.message}")
-            
+            storagePermissionResult.launch(appIntent)
+        } catch (e: ActivityNotFoundException) {
+            Log.w(TAG, "Per-app all-files settings unavailable, using the global screen", e)
             try {
-                val intent =
-                        Intent(android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                storagePermissionResult.launch(intent)
-            } catch (e2: Exception) {
-                Log.e(TAG, "Error opening fallback storage settings: ${e2.message}")
+                storagePermissionResult.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+            } catch (e2: ActivityNotFoundException) {
+                Log.e(TAG, "No screen to grant all-files access", e2)
+                toast(R.string.storage_settings_unavailable)
             }
         }
     }
 
     private val storagePermissionResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                try {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                        if (android.os.Environment.isExternalStorageManager()) {
-                            Log.d(TAG, "Storage permission granted!")
-                        } else {
-                            Log.w(TAG, "Storage permission still not granted")
-                        }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (Environment.isExternalStorageManager()) {
+                        Log.d(TAG, "Storage permission granted!")
+                    } else {
+                        Log.w(TAG, "Storage permission still not granted")
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error handling storage permission result: ${e.message}")
                 }
             }
 
     private fun showErrorDialog(message: String) {
-        try {
-            MaterialDialog(this).show {
-                title(R.string.error)
-                message(text = message)
-                positiveButton(R.string.ok) { finish() }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error showing error dialog: ${e.message}")
-            finish()
-        }
+        MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.error)
+                .setMessage(message)
+                .setPositiveButton(R.string.ok) { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
     }
 
     override fun onResume() {
@@ -287,52 +257,32 @@ class MainActivity : LoadingActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        try {
-            menuInflater.inflate(R.menu.menu_main, menu)
-            menu?.findItem(R.id.main_layout)?.let { item ->
-                val grid = AppManager.mBlackBoxLoader.userGridView()
-                item.setIcon(if (grid) R.drawable.ic_view_list else R.drawable.ic_view_grid)
-                item.setTitle(if (grid) R.string.list_view else R.string.grid_view)
-            }
-            return true
-        } catch (e: Exception) {
-            Log.e(TAG, "Error creating options menu: ${e.message}")
-            return false
+        menuInflater.inflate(R.menu.menu_main, menu)
+        menu?.findItem(R.id.main_layout)?.let { item ->
+            val grid = AppManager.mBlackBoxLoader.userGridView()
+            item.setIcon(if (grid) R.drawable.ic_view_list else R.drawable.ic_view_grid)
+            item.setTitle(if (grid) R.string.list_view else R.string.grid_view)
         }
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        try {
-            when (item.itemId) {
-                R.id.main_layout -> {
-                    val grid = !AppManager.mBlackBoxLoader.userGridView()
-                    AppManager.mBlackBoxLoader.invalidUserGridView(grid)
-                    applyUserLayout(grid)
-                    invalidateOptionsMenu()
-                }
-                R.id.main_git -> {
-                    val intent =
-                            Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/ALEX5402/NewBlackbox")
-                            )
-                    startActivity(intent)
-                }
-                R.id.main_setting -> {
-                    SettingActivity.start(this)
-                }
-                R.id.fake_location -> {
-                    
-                    val intent = Intent(this, FakeManagerActivity::class.java)
-                    intent.putExtra("userID", 0)
-                    startActivity(intent)
-                }
+        when (item.itemId) {
+            R.id.main_layout -> {
+                val grid = !AppManager.mBlackBoxLoader.userGridView()
+                AppManager.mBlackBoxLoader.invalidUserGridView(grid)
+                applyUserLayout(grid)
+                invalidateOptionsMenu()
             }
-
-            return true
-        } catch (e: Exception) {
-            Log.e(TAG, "Error handling menu item selection: ${e.message}")
-            return false
+            R.id.main_git -> {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ALEX5402/NewBlackbox")))
+            }
+            R.id.main_setting -> SettingActivity.start(this)
+            R.id.fake_location -> {
+                startActivity(Intent(this, FakeManagerActivity::class.java).putExtra("userID", 0))
+            }
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 }

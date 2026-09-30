@@ -99,4 +99,7 @@
     <string name="install_error">安裝失敗：%s</string>
     <string name="uninstall_error">解除安裝失敗：%s</string>
     <string name="clear_error">清除失敗：%s</string>
+    <string name="stop_error">無法停止%s</string>
+    <string name="add_app">新增應用程式</string>
+    <string name="storage_settings_unavailable">無法開啟設定頁面，請在系統設定中手動授予應用程式所有檔案存取權限。</string>
 </resources>

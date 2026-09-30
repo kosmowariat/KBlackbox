@@ -109,4 +109,7 @@
     <string name="install_error">Installation failed: %s</string>
     <string name="uninstall_error">Uninstallation failed: %s</string>
     <string name="clear_error">Clear failed: %s</string>
+    <string name="stop_error">Cannot stop %s</string>
+    <string name="add_app">Add app</string>
+    <string name="storage_settings_unavailable">Cannot open the settings screen. Grant all files access to the app manually in system settings.</string>
 </resources>

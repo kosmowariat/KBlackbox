@@ -52,10 +52,6 @@
 
         <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.Material3.Corner.Large</item>
         <item name="shapeAppearanceCornerExtraLarge">@style/ShapeAppearance.Material3.Corner.ExtraLarge</item>
-
-        <item name="md_background_color">?attr/colorSurfaceContainerHigh</item>
-        <item name="md_color_button_text">?attr/colorPrimary</item>
-        <item name="md_corner_radius">28dp</item>
     </style>
 
     <style name="Theme.BlackBox" parent="Base.Theme.BlackBox" />
