@@ -24,7 +24,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
-$appId = 'top.niunaijun.blackbox'
+$appId = 'com.kosmowariat.appenclave'
 $launcher = "$appId/top.niunaijun.blackboxa.view.main.WelcomeActivity"
 $variant = if ($Release) { 'release' } else { 'debug' }
 
@@ -74,9 +74,9 @@ if ($ready.Count -gt 1 -and -not $Serial) {
 # Pick the APK that matches the device ABI.
 $abi = (& $adb @adbArgs shell getprop ro.product.cpu.abi).Trim()
 $apkDir = Join-Path $root "app\build\outputs\apk\$variant"
-$apk = Get-ChildItem $apkDir -Filter "*_${abi}-${variant}.apk" -ErrorAction SilentlyContinue | Select-Object -First 1
+$apk = Get-ChildItem $apkDir -Filter "*_${abi}-${variant}.apk" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if (-not $apk) {
-    $apk = Get-ChildItem $apkDir -Filter "*_universal-${variant}.apk" -ErrorAction SilentlyContinue | Select-Object -First 1
+    $apk = Get-ChildItem $apkDir -Filter "*_universal-${variant}.apk" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 }
 if (-not $apk) {
     throw "No $variant APK for ABI '$abi' in $apkDir. Run with -Build."
