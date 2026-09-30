@@ -29,7 +29,8 @@
 - [ ] **Release signing.** Release builds are still debug-signed. Decide on a proper signing config. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
 
 ## Future Considerations
-- **Feature ideas**: App import/export and backup, per-app spoofing profiles in the UI, onboarding flow for the required permissions (All Files Access), tablet/landscape layouts.
+- **Feature ideas** (see `.maister/tasks/research/2026-09-30-feature-ideas/outputs/research-report.md`): space backup/export via SAF, per-app spoofing profiles in the UI, tablet/landscape layouts, app grid details sheet and clone-to-space, fake-location favourites and space picker, local diagnostics export, freeze/auto-stop idle apps. Biometric lock and shortcut hardening were deliberately dropped.
+- **Shipped from that list (2026-09-30)**: Polish locale with in-app language picker, launcher shortcuts (recent apps, fake location), permissions and health screen, running indicator with "Stop all apps".
 - **Platform**: `targetSdk` is 28 on purpose (the engine relies on legacy behaviors). Raising it is an engine-level decision, not a GUI one. Track Android 16+ hidden-API changes that may affect `Bcore`.
 
 ---
