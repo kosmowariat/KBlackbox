@@ -421,7 +421,7 @@ class AppsRepository {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error installing APK: ${e.message}")
-            resultLiveData.postValue("Installation failed: ${e.message}")
+            resultLiveData.postValue(getString(R.string.install_error, e.message.orEmpty()))
         }
     }
 
@@ -432,7 +432,7 @@ class AppsRepository {
             resultLiveData.postValue(getString(R.string.uninstall_success))
         } catch (e: Exception) {
             Log.e(TAG, "Error uninstalling APK: ${e.message}")
-            resultLiveData.postValue("Uninstallation failed: ${e.message}")
+            resultLiveData.postValue(getString(R.string.uninstall_error, e.message.orEmpty()))
         }
     }
 
@@ -455,7 +455,7 @@ class AppsRepository {
             resultLiveData.postValue(getString(R.string.clear_success))
         } catch (e: Exception) {
             Log.e(TAG, "Error clearing APK data: ${e.message}")
-            resultLiveData.postValue("Clear failed: ${e.message}")
+            resultLiveData.postValue(getString(R.string.clear_error, e.message.orEmpty()))
         }
     }
 

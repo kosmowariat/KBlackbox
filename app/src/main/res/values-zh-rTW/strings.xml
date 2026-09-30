@@ -95,4 +95,8 @@
     <string name="ok">確定</string>
     <string name="error">錯誤</string>
     <string name="init_failed">應用程式初始化失敗：%1$s</string>
+    <string name="unknown_app">未知應用程式</string>
+    <string name="install_error">安裝失敗：%s</string>
+    <string name="uninstall_error">解除安裝失敗：%s</string>
+    <string name="clear_error">清除失敗：%s</string>
 </resources>
