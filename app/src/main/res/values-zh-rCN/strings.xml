@@ -53,7 +53,6 @@
     <string name="restart_module">重新启动软件修改才能生效</string>
     <string name="cannot_create_shortcut">该桌面不支持创建快捷方式</string>
     <string name="uninstall_module_toast">Xposed模块请在管理界面卸载</string>
-    <string name="other">其它</string>
     <string name="daemon_enable">开启守护进程</string>
     <string name="gms_manager">GMS管理</string>
     <string name="jump_gms">跳转到GMS管理界面</string>
@@ -103,4 +102,8 @@
     <string name="stop_error">无法停止%s</string>
     <string name="add_app">添加应用</string>
     <string name="storage_settings_unavailable">无法打开设置页面，请在系统设置中手动授予应用所有文件访问权限。</string>
+    <string name="sandbox_settings">沙盒</string>
+    <string name="hide_root_summary">对沙盒内运行的应用隐藏 Root</string>
+    <string name="daemon_enable_summary">保持沙盒后台服务持续运行</string>
+    <string name="google_services">谷歌服务</string>
 </resources>

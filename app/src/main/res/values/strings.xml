@@ -53,7 +53,6 @@
     <string name="restart_module">Restart app to apply change</string>
     <string name="cannot_create_shortcut">This desktop does not support creating shortcuts</string>
     <string name="uninstall_module_toast">Please uninstall the xposed module in the Module Manager</string>
-    <string name="other">Others</string>
     <string name="daemon_enable">Daemon</string>
     <string name="disable_flag_secure">Disable Flag Secure</string>
     <string name="disable_flag_secure_summary">Allow screenshots and screen recording in apps</string>
@@ -112,4 +111,8 @@
     <string name="stop_error">Cannot stop %s</string>
     <string name="add_app">Add app</string>
     <string name="storage_settings_unavailable">Cannot open the settings screen. Grant all files access to the app manually in system settings.</string>
+    <string name="sandbox_settings">Sandbox</string>
+    <string name="hide_root_summary">Hide root from apps running inside the sandbox</string>
+    <string name="daemon_enable_summary">Keep the sandbox background service running</string>
+    <string name="google_services">Google services</string>
 </resources>

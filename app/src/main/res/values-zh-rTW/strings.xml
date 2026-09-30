@@ -52,7 +52,6 @@
     <string name="restart_module">重新啟動應用程序以應用更改</string>
     <string name="cannot_create_shortcut">此案頭不支持創建快捷方式</string>
     <string name="uninstall_module_toast">請在模塊管理器中卸載xposed模塊</string>
-    <string name="other">其他</string>
     <string name="daemon_enable">守護進程</string>
     <string name="gms_manager">GMS管理</string>
     <string name="jump_gms">去找GMS管理</string>
@@ -102,4 +101,8 @@
     <string name="stop_error">無法停止%s</string>
     <string name="add_app">新增應用程式</string>
     <string name="storage_settings_unavailable">無法開啟設定頁面，請在系統設定中手動授予應用程式所有檔案存取權限。</string>
+    <string name="sandbox_settings">沙盒</string>
+    <string name="hide_root_summary">對沙盒內執行的應用程式隱藏 Root</string>
+    <string name="daemon_enable_summary">保持沙盒背景服務持續執行</string>
+    <string name="google_services">Google 服務</string>
 </resources>

@@ -5,37 +5,46 @@
     <PreferenceCategory app:title="@string/appearance">
 
         <ListPreference
-                app:key="theme_mode"
-                app:title="@string/theme_mode"
+                android:persistent="false"
+                app:defaultValue="system"
                 app:entries="@array/theme_mode_entries"
                 app:entryValues="@array/theme_mode_values"
-                app:defaultValue="system"
-                app:useSimpleSummaryProvider="true"
-                android:persistent="false" />
+                app:icon="@drawable/ic_pref_palette"
+                app:key="theme_mode"
+                app:title="@string/theme_mode"
+                app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/other">
-
-        <Preference
-                android:key="gms_manager"
-                android:title="@string/gms_manager"
-                android:summary="@string/jump_gms"/>
-
-
+    <PreferenceCategory app:title="@string/sandbox_settings">
 
         <SwitchPreferenceCompat
+                app:icon="@drawable/ic_pref_security"
                 app:key="root_hide"
+                app:summary="@string/hide_root_summary"
                 app:title="@string/hide_root" />
 
         <SwitchPreferenceCompat
+                app:icon="@drawable/ic_pref_sync"
                 app:key="daemon_enable"
+                app:summary="@string/daemon_enable_summary"
                 app:title="@string/daemon_enable" />
 
         <SwitchPreferenceCompat
+                app:icon="@drawable/ic_pref_smartphone"
                 app:key="disable_flag_secure"
-                app:title="@string/disable_flag_secure"
-                app:summary="@string/disable_flag_secure_summary" />
+                app:summary="@string/disable_flag_secure_summary"
+                app:title="@string/disable_flag_secure" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/google_services">
+
+        <Preference
+                app:icon="@drawable/ic_pref_cloud"
+                app:key="gms_manager"
+                app:summary="@string/jump_gms"
+                app:title="@string/gms_manager" />
 
     </PreferenceCategory>
 
