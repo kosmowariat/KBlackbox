@@ -1421,6 +1421,14 @@ public class BlackBoxCore extends ClientConfiguration {
         }
     }
 
+    public static ClassLoader getAppClassLoader() {
+        Application application = getApplication();
+        if (application != null) {
+            return application.getClassLoader();
+        }
+        return BlackBoxCore.class.getClassLoader();
+    }
+
     public static int getAppPid() {
         try {
             return BActivityThread.getAppPid();

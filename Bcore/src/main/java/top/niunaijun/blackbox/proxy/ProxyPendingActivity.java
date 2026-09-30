@@ -24,7 +24,7 @@ public class ProxyPendingActivity extends Activity {
         if (pendingActivityRecord.mTarget == null)
             return;
         pendingActivityRecord.mTarget.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        pendingActivityRecord.mTarget.setExtrasClassLoader(BlackBoxCore.getApplication().getClassLoader());
+        pendingActivityRecord.mTarget.setExtrasClassLoader(BlackBoxCore.getAppClassLoader());
         startActivity(pendingActivityRecord.mTarget);
     }
 
