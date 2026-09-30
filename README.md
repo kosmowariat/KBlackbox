@@ -47,6 +47,23 @@ cd NewBlackbox
 ./gradlew assembleRelease
 ```
 
+### Helper Scripts (Windows / PowerShell)
+
+The `scripts/` folder wraps the common build and device workflow. Run the scripts from the repository root.
+
+```powershell
+# Build the debug APKs (add -Release for release, -Clean to clean first)
+.\scriptsuild.ps1
+
+# Update the app on a phone connected over adb (data is kept)
+.\scripts\install.ps1
+
+# Build, install and start the app in one go
+.\scripts\install.ps1 -Build -Launch
+```
+
+`install.ps1` finds `adb` through `sdk.dir` in `local.properties` (or `ANDROID_HOME`) and installs the APK matching the device ABI. Use `-Serial <id>` when more than one device is connected and `-Release` to install the release variant.
+
 ## Integration
 
 To use BlackBox Core in your own project, add the AAR dependency:
