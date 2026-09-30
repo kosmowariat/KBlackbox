@@ -154,7 +154,7 @@ public class FileUtils {
         ByteArrayOutputStream swapStream = new ByteArrayOutputStream();
         byte[] buff = new byte[100];
         int rc;
-        while ((rc = inStream.read(buff, 0, 100)) > 0) {
+        while ((rc = inStream.read(buff, 0, 100)) != -1) {
             swapStream.write(buff, 0, rc);
         }
         return swapStream.toByteArray();
@@ -171,8 +171,10 @@ public class FileUtils {
             }
             if (!link) {
                 String[] children = dir.list();
-                for (String file : children) {
-                    count += deleteDir(new File(dir, file));
+                if (children != null) {
+                    for (String file : children) {
+                        count += deleteDir(new File(dir, file));
+                    }
                 }
             }
         }
@@ -189,12 +191,15 @@ public class FileUtils {
     public static void writeToFile(InputStream dataIns, File target) throws IOException {
         final int BUFFER = 1024;
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(target));
-        int count;
-        byte data[] = new byte[BUFFER];
-        while ((count = dataIns.read(data, 0, BUFFER)) != -1) {
-            bos.write(data, 0, count);
+        try {
+            int count;
+            byte data[] = new byte[BUFFER];
+            while ((count = dataIns.read(data, 0, BUFFER)) != -1) {
+                bos.write(data, 0, count);
+            }
+        } finally {
+            bos.close();
         }
-        bos.close();
     }
 
     public static void writeToFile(byte[] data, File target) throws IOException {
