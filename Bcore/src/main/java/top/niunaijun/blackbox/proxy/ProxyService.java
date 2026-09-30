@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat;
 
 import top.niunaijun.blackbox.BlackBoxCore;
 import top.niunaijun.blackbox.app.dispatcher.AppServiceDispatcher;
+import top.niunaijun.blackbox.utils.Slog;
 import top.niunaijun.blackbox.utils.compat.BuildCompat;
 
 
@@ -25,7 +26,7 @@ public class ProxyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
-            Log.w(TAG, "Ignoring empty service restart intent");
+            Slog.w(TAG, "Ignoring empty service restart intent");
             return START_NOT_STICKY;
         }
         AppServiceDispatcher.get().onStartCommand(intent, flags, startId);

@@ -99,9 +99,7 @@
         <item quantity="other">%d apps</item>
     </plurals>
     <string name="storage_permission_title">Storage Permission Required</string>
-    <string name="storage_permission_message">This app needs 'All Files Access' permission to properly run sandboxed apps. Without this permission, some apps may not work correctly.
-
-Please grant permission in the next screen.</string>
+    <string name="storage_permission_message">This app needs \'All Files Access\' permission to properly run sandboxed apps. Without this permission, some apps may not work correctly.\n\nPlease grant permission in the next screen.</string>
     <string name="storage_permission_grant">Grant Permission</string>
     <string name="later">Later</string>
     <string name="ok">OK</string>
