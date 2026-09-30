@@ -33,7 +33,7 @@ function Get-Adb {
     $props = Join-Path $root 'local.properties'
     if (Test-Path $props) {
         $line = Get-Content $props | Where-Object { $_ -match '^\s*sdk\.dir\s*=' } | Select-Object -First 1
-        if ($line) { $sdk = ($line -split '=', 2)[1].Trim() -replace '\:', ':' -replace '\\', '\' }
+        $sdk = ($line -split '=', 2)[1].Trim().Replace('\:', ':').Replace('\\', '\')
     }
     if (-not $sdk) { $sdk = $env:ANDROID_HOME }
     if (-not $sdk) { $sdk = $env:ANDROID_SDK_ROOT }

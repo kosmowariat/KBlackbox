@@ -17,7 +17,7 @@
 ### Medium Priority — UI architecture
 - [x] **Update UI dependencies.** lifecycle 2.8.7, preference 1.2.1, recyclerview 1.3.2, work 2.9.1, all in the version catalog.
 - [x] **Consolidate dialogs.** `afollestad:material-dialogs` is gone; dialogs use `MaterialAlertDialogBuilder` (helpers in `util/DialogEx.kt`).
-- [ ] **Replace niche UI libraries.** Consider dropping `RVAdapter` (gitee), `CornerLabelView` and `SimpleSearchView` in favor of `ListAdapter`/`DiffUtil`, Material badges and `SearchView`.
+- [x] **Replace niche UI libraries.** `RVAdapter`, `CornerLabelView` and `SimpleSearchView` are gone: lists use `util/BindingAdapter` (DiffUtil), the badge is a themed label, search is a standard `SearchView`.
 - [ ] **Consistent MVVM.** Move from `LiveData` + manual `*Factory` classes (`InjectionUtil`) to `StateFlow` and `viewModel {}` initializers; later consider Hilt/Koin if the number of screens grows.
 - [ ] **Possible Jetpack Compose adoption.** Evaluate this for new screens. The current UI is XML + ViewBinding.
 

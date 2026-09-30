@@ -25,7 +25,7 @@ This document describes the technology choices for KBlackbox. The project is a m
 - AndroidX AppCompat 1.7.0, Material Components 1.12.0 (Material 3 theme `Theme.Material3.DayNight.NoActionBar`: `md_theme_*` palette from seed `#3F6FD8` in `values/` + `values-night/`, dynamic color on API 31+ in the main process, theme mode System/Light/Dark stored via `BlackBoxLoader` and applied with `AppCompatDelegate.setDefaultNightMode`), ConstraintLayout 2.2.0, core-ktx 1.15.0
 - Lifecycle ViewModel/LiveData/Runtime KTX 2.8.7 (MVVM with manual `ViewModelProvider` factories)
 - ViewPager2 (multi-user pages), RecyclerView 1.3.2, Preference KTX 1.2.1, WorkManager 2.9.1
-- Third-party UI: `Othershe:CornerLabelView` 1.0.0, `Ferfalk:SimpleSearchView` 0.2.0, `cbfg5210:RVAdapter` 0.3.7
+- Third-party UI: none beyond StateView (local AAR), osmdroid and the floating-view library
 - Maps: osmdroid 6.1.11 (fake location)
 
 ### Engine (`Bcore`)
