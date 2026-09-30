@@ -1,0 +1,38 @@
+orchestrator:
+  started_phase: phase-1
+  completed_phases: [phase-1, phase-6]
+  skipped_phases: {phase-2: user chose direct implementation, phase-3: skipped, phase-4: skipped, phase-5: skipped}
+  failed_phases: []
+  options:
+    html_output: true
+    mockup_format: html
+    brainstorming_enabled: false
+    design_enabled: false
+  created: 2026-09-30T17:02:19Z
+  updated: 2026-09-30T17:07:51Z
+  task_path: .maister/tasks/research/2026-09-30-feature-ideas
+task:
+  title: Feature ideas for APKEnclave
+  description: What features could we still add to APKEnclave?
+  status: completed
+research_context:
+  research_type: mixed
+  research_question: What features could we still add to APKEnclave (Android virtual-app sandbox, solo fork, M3 UI, not yet public)?
+  scope:
+    included: [user-facing features, QoL, privacy/security controls, backup/restore, per-space settings, notifications, widgets/shortcuts, diagnostics, tablet layouts, localisation]
+    excluded: [Xposed, Telegram, monetisation, cloud sync, engine rewrite for new Android versions]
+    constraints: [solo dev, engine targetSdk 28, no public release yet, Play policy undecided, one test phone]
+  project_doc_paths:
+    - .maister/docs/project/vision.md
+    - .maister/docs/project/roadmap.md
+    - .maister/docs/project/tech-stack.md
+    - .maister/docs/project/architecture.md
+  confidence_level: medium
+  gathering_strategy:
+    categories: [codebase-app, codebase-engine, documentation, external-competitors, external-platform, external-policy]
+    count: 6
+    source: planner
+  phase_summaries:
+    phase-1:
+      summary: Ranked top-10 UI-only feature ideas with evidence; first batch is housekeeping, Polish locale, shortcut hardening, health screen, running indicator, then lock.
+      steps_completed: [initialize, plan, gather, synthesize]

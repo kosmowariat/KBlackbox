@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Report — Feature ideas for APKEnclave</title>
+<style>
+:root {
+  --bg:#f6f7f9; --surface:#fff; --border:#e2e5ea; --text:#1a1d23; --dim:#6b7280;
+  --accent:#4f46e5; --accent-soft:#eef2ff; --ok:#16a34a; --ok-soft:#ecfdf3;
+  --warn:#d97706; --warn-soft:#fffbeb; --crit:#dc2626; --crit-soft:#fef2f2;
+  --info:#2563eb; --info-soft:#eff6ff; --radius:10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#111418; --surface:#1a1f26; --border:#2e3640; --text:#e6e9ee; --dim:#9aa4b2;
+    --accent:#818cf8; --accent-soft:#26294a; --ok:#4ade80; --ok-soft:#11291a;
+    --warn:#fbbf24; --warn-soft:#2e2410; --crit:#f87171; --crit-soft:#321616;
+    --info:#60a5fa; --info-soft:#15233a; }
+}
+* { box-sizing:border-box; }
+body { margin:0 auto; max-width:1100px; padding:24px 20px 64px; background:var(--bg);
+  color:var(--text); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+h1 { font-size:22px; letter-spacing:-.01em; } h2 { font-size:16px; margin-top:28px; } h3 { font-size:14px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin:14px 0; }
+.badge { display:inline-block; font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; padding:2px 8px; border-radius:99px; background:var(--accent-soft); color:var(--accent); }
+.sev { display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase;
+  padding:1.5px 7px; border-radius:99px; margin-right:6px; }
+.sev.critical { background:var(--crit-soft); color:var(--crit); }
+.sev.warning  { background:var(--warn-soft); color:var(--warn); }
+.sev.info     { background:var(--info-soft); color:var(--info); }
+.sev.ok       { background:var(--ok-soft); color:var(--ok); }
+.pass { color:var(--ok); font-weight:600; } .fail { color:var(--crit); font-weight:600; }
+table { width:100%; border-collapse:collapse; }
+th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
+code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+  background:var(--accent-soft); padding:1px 5px; border-radius:4px; }
+details > summary { cursor:pointer; font-weight:600; }
+.crumbs { display:flex; gap:14px; font-size:13px; margin-bottom:18px; flex-wrap:wrap; }
+.crumbs a.md { margin-left:auto; color:var(--dim); }
+.crumbs .here { font-weight:650; color:var(--text); }
+.tiles { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0; }
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:10px 16px; text-align:center; min-width:90px; }
+.tile b { display:block; font-size:20px; letter-spacing:-.01em; }
+.tile span { font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--dim); }
+.tldr { border-left:4px solid var(--accent); }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:760px){ .grid2 { grid-template-columns:1fr; } .wrap { overflow-x:auto; } }
+.wrap { overflow-x:auto; }
+.toc { font-size:13px; margin:12px 0; }
+.small { font-size:12.5px; color:var(--dim); }
+ul { margin:6px 0; padding-left:20px; }
+</style>
+</head>
+<body>
+<nav class="crumbs">
+  <a href="../dashboard.html">&larr; Dashboard</a>
+  <span class="here">Report</span>
+  <a href="research-report.md" target="_blank" rel="noopener" class="md">md twin &nearr;</a>
+</nav>
+
+<header>
+  <h1>Feature ideas for APKEnclave <span class="badge">research report</span></h1>
+  <div class="small">Mixed research &middot; 2026-09-30 &middot; Also: <a href="../analysis/synthesis.md" target="_blank" rel="noopener">synthesis.md</a></div>
+</header>
+
+<div class="tiles">
+  <div class="tile"><b>6</b><span>findings files</span></div>
+  <div class="tile"><b>10</b><span>ranked features</span></div>
+  <div class="tile"><b>10 / 10</b><span>UI-only (no Bcore)</span></div>
+  <div class="tile"><b>~40</b><span>external URLs</span></div>
+  <div class="tile"><b>Medium</b><span>overall confidence</span></div>
+</div>
+
+<section class="card tldr" id="tldr">
+  <h2 style="margin-top:0">TL;DR</h2>
+  <ul>
+    <li>The engine offers far more than the app exposes (about 25 engine entry points used). Ten strong features are UI-only, no Bcore change.</li>
+    <li>Top externally validated feature: <b>biometric space/app lock</b> (4 of 7 competitor families). It must also gate <code>ShortcutActivity</code>, which is exported and unvalidated today.</li>
+    <li>First batch (UI-only, low risk, testable on the single Realme RMX3363 / Android 13): housekeeping + Polish locale, hardened launcher shortcuts, permissions/health screen with restart button, running-apps indicator, then the lock.</li>
+    <li>Do not plan from <code>Docs.md</code> (APIs mostly fictional). Avoid notification listener, accessibility, Xposed, host VPN, log upload.</li>
+    <li>Play is largely moot for now: targetSdk 28 blocks the current target-API rule, and two shipped toggles (disable FLAG_SECURE, hide root) are high-risk on Play.</li>
+  </ul>
+  <h3>Key Decisions</h3>
+  <ul>
+    <li>UI-only first; Bcore only when a shipped UI feature needs it.</li>
+    <li>Harden <code>ShortcutActivity</code> before shipping the lock (shortcuts otherwise bypass it).</li>
+    <li>Default to sideload/GitHub distribution; Play is a later, separate decision.</li>
+    <li>Backup via SAF only, never All Files Access or Auto Backup.</li>
+  </ul>
+  <h3>Open Questions / Risks</h3>
+  <ul>
+    <li><span class="sev warning">warning</span>Nothing run on a device; one phone (Android 13).</li>
+    <li><span class="sev warning">warning</span>Lock is a UI gate, not encryption; other launch paths unverified.</li>
+    <li><span class="sev warning">warning</span><code>isRunningApplication</code> uses reflection on <code>mTasks</code>; service-only apps may be misreported.</li>
+    <li><span class="sev info">info</span>Play target-API facts come from a summarised fetch; competitor evidence is snippet-level.</li>
+    <li><span class="sev info">info</span>Brief says icon variants exist; manifest has no <code>activity-alias</code>.</li>
+  </ul>
+</section>
+
+<p class="toc">Contents: <a href="#top10">Top 10</a> &middot; <a href="#batch">First batch</a> &middot; <a href="#gap">Engine-vs-UI gaps</a> &middot; <a href="#comp">Competitors</a> &middot; <a href="#plat">Platform</a> &middot; <a href="#risk">Risk view</a> &middot; <a href="#house">Housekeeping</a> &middot; <a href="#contra">Contradictions &amp; confidence</a> &middot; <a href="#concl">Conclusions</a></p>
+
+<main>
+
+<h2 id="top10">1. Ranked top-10 features</h2>
+<p class="small">Ordered by value/effort, UI-only first. Source tags: app = codebase-app-gaps, engine = codebase-engine-gap-analysis, comp = competitors, plat = platform, policy = Google Play, docs = roadmap/claims. Paths: app files under <code>app/src/main/java/top/niunaijun/blackboxa/</code> (J/).</p>
+<div class="wrap"><table>
+<tr><th>#</th><th>Feature</th><th>What it is</th><th>Value</th><th>Effort</th><th>Bcore?</th><th>Play risk</th><th>Evidence</th><th>Existing hook</th></tr>
+<tr><td>1</td><td><b>Biometric lock</b> + auto-lock timer</td><td>BiometricPrompt gate on main, space and shortcut entry</td><td>High</td><td>S-M</td><td>N</td><td><span class="sev ok">low</span></td><td>comp F1,F2,F7,F8; plat 5; app F5</td><td><code>ShortcutActivity.kt:10-23</code>, <code>WelcomeActivity.kt:13-33</code>, <code>UserAppsActivity.kt</code></td></tr>
+<tr><td>2</td><td><b>Launcher shortcuts</b> + <code>ShortcutActivity</code> hardening</td><td>Dynamic/static shortcuts, stale cleanup, validate extras, space badge</td><td>Medium + security fix</td><td>S</td><td>N</td><td><span class="sev ok">low</span></td><td>app F2; plat 1</td><td><code>ShortcutUtil.kt:22-53</code>, manifest <code>:59-62</code></td></tr>
+<tr><td>3</td><td><b>Polish locale</b>, per-app language, string cleanup</td><td><code>values-pl</code>, <code>locales_config.xml</code>, Settings row, fix "BlackBox" and typos</td><td>Medium</td><td>S</td><td>N</td><td><span class="sev ok">none</span></td><td>app F11; plat 4; docs #9</td><td><code>values-zh-*</code>, <code>res/xml/setting.xml</code>, AppCompat 1.7.0</td></tr>
+<tr><td>4</td><td><b>Permissions/health screen</b> + restart button</td><td>Live checklist (All Files, battery opt, shortcuts, notifications); wire dead storage callback</td><td>Med-high</td><td>S-M</td><td>N</td><td><span class="sev warning">med</span></td><td>app F4,F5; engine B4; docs #3</td><td><code>MainActivity.kt:96-112</code>, <code>BlackBoxLoader.kt:156-163</code>, <code>BlackBoxCore.java:1030-1075</code>, <code>SettingFragment.kt:88</code></td></tr>
+<tr><td>5</td><td><b>Running indicator</b>, stop-all, task manager</td><td>Running badge, stop all in space, process list with kill</td><td>Med-high</td><td>S-M</td><td>N (small wrapper for list)</td><td><span class="sev ok">low</span></td><td>engine B1,B2; comp F10</td><td><code>BlackBoxCore.java:1570</code>, <code>BActivityManager.java:378,387</code>, <code>AppsFragment.kt:252</code></td></tr>
+<tr><td>6</td><td><b>Fake-location upgrade</b></td><td>Space picker (user 0 only today), favourites, coordinates, per-app disable</td><td>Medium</td><td>S-M</td><td>N</td><td><span class="sev warning">med</span></td><td>app F6; engine B3</td><td><code>MainActivity.kt:279</code>, <code>FakeLocationRepository.kt:15-45</code>, <code>BLocationManager.java:32-166</code></td></tr>
+<tr><td>7</td><td><b>Backup/export &amp; import</b> (SAF zip)</td><td>Zip app/space data to a document; import into new space; stop app first</td><td>High</td><td>M</td><td>N</td><td><span class="sev warning">med</span> (low if SAF only)</td><td>docs #1; engine C; plat 7; app F8</td><td><code>DataDirCopier.kt:8-22</code>, <code>AppsRepository.kt:355-426</code>, <code>BEnvironment.java:87-96</code></td></tr>
+<tr><td>8</td><td><b>App grid upgrade</b></td><td>Details sheet, clone to space, search/sort/favourites, last-used</td><td>Medium</td><td>S-M</td><td>N</td><td><span class="sev ok">low</span></td><td>app F1,F9; engine B11</td><td><code>AppsFragment.kt:189-207</code>, <code>AppsRepository.kt:396,413</code></td></tr>
+<tr><td>9</td><td><b>About + diagnostics</b> (local log export)</td><td>Version, engine ABI/SDK, share log zip; no upload</td><td>Medium</td><td>S</td><td>N</td><td><span class="sev ok">low</span></td><td>app F5; engine B16; docs E</td><td><code>SettingFragment.kt</code>, <code>Slog</code></td></tr>
+<tr><td>10</td><td><b>Freeze / auto-stop</b> idle apps + unfreeze shortcut</td><td>Idle timeout stops apps; shortcut to start</td><td>Medium</td><td>S-M</td><td>N (hidden-state setter = small Bcore)</td><td><span class="sev ok">low</span></td><td>comp F4-F6; engine B9</td><td><code>AppsFragment.kt:252</code>, <code>BPackageUserState.java:8-12</code></td></tr>
+</table></div>
+
+<details class="card"><summary>Next tier (not in top 10)</summary>
+<div class="wrap"><table>
+<tr><th>Feature</th><th>Effort</th><th>Bcore?</th><th>Play risk</th><th>Why later</th></tr>
+<tr><td>Icon/label disguise via <code>activity-alias</code></td><td>S</td><td>N</td><td>low (disguise higher)</td><td>Art exists but not wired (plat 14)</td></tr>
+<tr><td>Tablet two-pane, adaptive span, edge-to-edge</td><td>M</td><td>N</td><td>none</td><td>Roadmap item, medium value (app F10)</td></tr>
+<tr><td>Share / "Open with" into a space, URL install, multi-select</td><td>M</td><td>maybe</td><td>med</td><td>APK handler risk (plat 8, policy)</td></tr>
+<tr><td>Per-space notification mute/clear</td><td>M</td><td>Y</td><td>unknown</td><td>Needs <code>INotificationManagerProxy</code> config (engine B5)</td></tr>
+<tr><td>Per-app hideRoot / disableFlagSecure</td><td>S-M</td><td>Y</td><td>high</td><td>Hooks read global flags (engine B15)</td></tr>
+<tr><td>QS tile (fake location), home widget</td><td>M</td><td>maybe</td><td>low</td><td>Overlaps shortcuts (plat 2,3)</td></tr>
+<tr><td>Jobs viewer/cancel</td><td>S-M</td><td>N</td><td>low/med</td><td>Niche (engine B6)</td></tr>
+<tr><td>Permission deny-list, block network</td><td>M-L</td><td>Y</td><td>med</td><td>Apps crash on deny (engine C)</td></tr>
+<tr><td>Spoof profile UI, split-APK/XAPK, clipboard isolation</td><td>L / L / M</td><td>Y</td><td>med-high / med-high / low</td><td>Need new engine plumbing (engine C)</td></tr>
+</table></div></details>
+
+<h2 id="batch">2. Recommended first batch</h2>
+<p class="small">All UI-only and verifiable on the Realme RMX3363 (Android 13) with one guest app.</p>
+<div class="wrap"><table>
+<tr><th>Step</th><th>Work</th><th>Size</th><th>Verify on phone</th></tr>
+<tr><td>0</td><td>Housekeeping: delete dead strings/layouts/class, fix "BlackBox" text and typos</td><td>S</td><td>Build, lint and unit tests pass; screens unchanged</td></tr>
+<tr><td>1</td><td>Polish locale + <code>localeConfig</code> + language row (#3)</td><td>S</td><td>Switch language, check recreated screens</td></tr>
+<tr><td>2</td><td><code>ShortcutActivity</code> hardening, then dynamic/static shortcuts + stale cleanup (#2)</td><td>S</td><td>Long-press icon; pin then uninstall; <code>adb am start</code> with bad extras</td></tr>
+<tr><td>3</td><td>Permissions/health screen + restart button (#4)</td><td>S-M</td><td>Revoke All Files Access, status changes; change engine setting, restart</td></tr>
+<tr><td>4</td><td>Running indicator + stop-all (#5)</td><td>S-M</td><td>Launch, background, check badge; service-only apps are the weak spot</td></tr>
+<tr><td>5</td><td>Biometric lock + timer gating main, space, shortcut (#1)</td><td>S-M</td><td>Try pinned shortcut, <code>adb</code> intent, recents after lock</td></tr>
+<tr><td>6</td><td>Fake-location (#6) and app grid (#8) upgrades</td><td>S-M each</td><td>Favourite on space 1; clone app to second space</td></tr>
+</table></div>
+<p class="small">Step 2 precedes 5 (lock must close the shortcut bypass); step 3 precedes 4 (restart button speeds testing). Backup (#7) is the first "M" item after the batch. Other Android versions cannot be verified with one phone.</p>
+
+<h2 id="gap">3. Engine-vs-UI gaps (exists in Bcore, no UI)</h2>
+<div class="wrap"><table>
+<tr><th>Engine capability</th><th>Defined</th><th>Idea</th><th>Bcore?</th><th>Risk</th></tr>
+<tr><td><code>isRunningApplication</code></td><td><code>BlackBoxCore.java:1570</code></td><td>Running badge, stop-all</td><td>N (reflection on <code>mTasks</code>)</td><td>Low/Med</td></tr>
+<tr><td>Process list / kill</td><td><code>BActivityManager.java:378,387</code>; <code>BProcessManagerService.java:230-263</code></td><td>Task manager</td><td>small wrapper</td><td>Med</td></tr>
+<tr><td>Fake-location extras (global, cell, disable)</td><td><code>BLocationManager.java:32-166</code></td><td>Favourites, disable toggle</td><td>N (cell API suspected buggy)</td><td>Low/Med</td></tr>
+<tr><td>Storage helpers</td><td><code>BlackBoxCore.java:1030-1075</code></td><td>Permissions checklist</td><td>N</td><td>Low (All Files Play-sensitive)</td></tr>
+<tr><td>Notification service</td><td><code>BNotificationManager.java:19-100</code></td><td>Mute/clear</td><td>Y for mute</td><td>Med</td></tr>
+<tr><td><code>BJobManager</code></td><td><code>BJobManager.java:24-50</code></td><td>Jobs viewer</td><td>N</td><td>Low/Med</td></tr>
+<tr><td><code>BAccountManager</code></td><td><code>BAccountManager.java:19-327</code></td><td>Accounts per space</td><td>N</td><td>Med/High</td></tr>
+<tr><td><code>BPackageUserState</code> hidden/stopped</td><td><code>BPackageUserState.java:8-12</code></td><td>Hide/freeze</td><td>setter missing</td><td>Low/Med</td></tr>
+<tr><td><code>AppLifecycleCallback</code></td><td><code>AppLifecycleCallback.java:15-23</code></td><td>Launch history, last-used</td><td>N</td><td>Low</td></tr>
+<tr><td><code>Slog</code></td><td><code>utils/Slog</code></td><td>Log export</td><td>N</td><td>Low</td></tr>
+<tr><td>Global <code>hideRoot</code>/<code>disableFlagSecure</code></td><td><code>BlackBoxCore.java:1240-1245</code></td><td>Per-app/per-space</td><td>Y (S)</td><td>Low/Med</td></tr>
+<tr><td>Shortcut / AppWidget hooks</td><td><code>IShortcutManagerProxy.java:65-101</code>; <code>IAppWidgetManagerProxy.java:14-25</code></td><td>Guest shortcuts/widgets</td><td>Y (M / L)</td><td>Med / High</td></tr>
+</table></div>
+<p class="small"><b>Not in the engine:</b> per-app permission control (blanket grants), per-app device profile (IMEI = md5 of host package, fixed Wi-Fi identifiers), per-space VPN/proxy, split-APK install, clipboard hook, hide/freeze setter.</p>
+
+<h2 id="comp">4. Competitor matrix</h2>
+<p class="small">Y = documented, ? = not verified. Mostly snippet-level (Medium); Island, Shelter README and Private Space are High.</p>
+<div class="wrap"><table>
+<tr><th>Feature</th><th>Parallel Space</th><th>Dual Space</th><th>App Cloner</th><th>Island/Insular</th><th>Shelter</th><th>Secure Folder</th><th>Private Space</th><th>APKEnclave</th></tr>
+<tr><td>Space lock</td><td>Y</td><td>Y (VIP)</td><td>?</td><td>OS</td><td>OS</td><td>Y</td><td>Y</td><td>No</td></tr>
+<tr><td>Auto-lock timer</td><td>?</td><td>?</td><td>?</td><td>n/a</td><td>n/a</td><td>Y</td><td>Y</td><td>No</td></tr>
+<tr><td>Hide / incognito</td><td>Y</td><td>Y</td><td>?</td><td>Y</td><td>?</td><td>Y</td><td>Y</td><td>No</td></tr>
+<tr><td>Name/icon disguise</td><td>?</td><td>Y</td><td>Y</td><td>?</td><td>?</td><td>Y</td><td>?</td><td>Art only</td></tr>
+<tr><td>Freeze</td><td>?</td><td>?</td><td>?</td><td>Y</td><td>Y</td><td>?</td><td>Y</td><td>Stop only</td></tr>
+<tr><td>Notification control</td><td>?</td><td>manual</td><td>block autostart</td><td>n/a</td><td>n/a</td><td>Y</td><td>Y</td><td>No</td></tr>
+<tr><td>VPN/proxy per side</td><td>?</td><td>?</td><td>SOCKS</td><td>Y</td><td>?</td><td>?</td><td>?</td><td>No</td></tr>
+<tr><td>Permission stripping</td><td>?</td><td>?</td><td>Y (premium)</td><td>?</td><td>?</td><td>?</td><td>?</td><td>No</td></tr>
+<tr><td>File transfer</td><td>?</td><td>?</td><td>?</td><td>?</td><td>Y</td><td>Y</td><td>?</td><td>No</td></tr>
+<tr><td>Backup/restore</td><td>?</td><td>?</td><td>?</td><td>?</td><td>?</td><td>restore only</td><td>?</td><td>No</td></tr>
+<tr><td>Screenshots toggle</td><td>?</td><td>?</td><td>Y</td><td>?</td><td>?</td><td>?</td><td>?</td><td>Global</td></tr>
+</table></div>
+<p class="small"><b>Recurring complaints:</b> unreliable clone notifications, battery drain, ads and paywalls, crashes after Android updates. Private Space (Android 15+) gives a native lock, so the APKEnclave lock must be per-space and work on older versions.</p>
+
+<h2 id="plat">5. Platform enablers under targetSdk 28</h2>
+<div class="wrap"><table>
+<tr><th>Enabler</th><th>Works at targetSdk 28?</th><th>Note</th></tr>
+<tr><td>Static/dynamic shortcuts</td><td class="pass">Yes</td><td>Compat API 25+, pinned 26; only launcher activity owns shortcuts</td></tr>
+<tr><td>Biometric</td><td class="pass">Yes</td><td>Library minSdk 21; on API 29 and below no STRONG+DEVICE_CREDENTIAL combo; UI gate, not encryption</td></tr>
+<tr><td>Per-app language</td><td class="pass">Yes</td><td>AppCompat 1.7.0 backport; host only</td></tr>
+<tr><td>SAF export/import</td><td class="pass">Yes</td><td>No runtime permission; Auto Backup unsuitable (25 MB, <code>allowBackup=false</code>)</td></tr>
+<tr><td>Notification channels</td><td class="pass">Required</td><td>Android 13+ shows POST_NOTIFICATIONS prompt automatically after first channel; no re-prompt after decline</td></tr>
+<tr><td>QS tile / widgets</td><td>Yes</td><td>Docs discourage launch-only tiles; Glance is Compose-only</td></tr>
+<tr><td>Icon switching</td><td class="pass">Yes</td><td>Launcher delay; add <code>monochrome</code> layer</td></tr>
+<tr><td>Edge-to-edge, predictive back</td><td>Not forced</td><td>Forced at targetSdk 35 / 36; opt-in already set</td></tr>
+<tr><td>Play target-API rule</td><td class="fail">Blocks Play</td><td>36 for new apps/updates from 2026-08-31 (extension to 2026-11-01); summary-level fact</td></tr>
+<tr><td>Android 16 changes</td><td>Affect all apps</td><td>Non-SDK reliance, JobScheduler quotas, intent redirection; only Android 13 phone available</td></tr>
+</table></div>
+
+<h2 id="risk">6. Risk view</h2>
+<div class="grid2">
+  <div class="card"><h3>Sideload / GitHub build OK; Play needs care or exclusion</h3>
+    <ul>
+      <li><span class="sev critical">exclude on Play</span>Disable FLAG_SECURE (high: policy forbids workarounds)</li>
+      <li><span class="sev critical">exclude on Play</span>Hide root / anti-detection (high, medium confidence)</li>
+      <li><span class="sev warning">risky</span>Device/ID spoofing profiles; APK "Open with", URL/XAPK install; disguise icon; All Files Access</li>
+      <li><span class="sev warning">risky</span>Import from installed apps: use targeted <code>&lt;queries&gt;</code>, not QUERY_ALL_PACKAGES</li>
+      <li><span class="sev info">declaration</span>Any <code>VpnService</code> use needs disclosure (host VPN removed anyway)</li>
+    </ul>
+  </div>
+  <div class="card"><h3>Fine on both</h3>
+    <ul>
+      <li>Biometric lock, shortcuts, locale, health screen, running manager, freeze, diagnostics, app grid (low)</li>
+      <li>Fake location (medium; page not fetched)</li>
+      <li>Backup via SAF (medium, low if no All Files Access)</li>
+    </ul>
+    <p class="small">Core container itself: medium on Play (no <code>REQUIRE_SECURE_ENV</code> apps; no installs without consent). targetSdk 28 is the first blocker.</p>
+  </div>
+</div>
+<div class="card"><h3>Ideas to avoid</h3>
+  <ul>
+    <li>Notification listener (read-only, special access, high policy sensitivity)</li>
+    <li>Accessibility service features (high risk)</li>
+    <li>Xposed/LSPosed and host VPN reintroduction (removed by decision, <code>runtime.md:6-10</code>)</li>
+    <li>Crash/log upload or telemetry (diagnostics stay local)</li>
+    <li>Telegram, cloud sync/accounts, ads, paywalls</li>
+    <li>Auto Backup of the virtual data dir</li>
+    <li>Cell-tower spoof until <code>setNeighboringCell</code> bug is checked</li>
+    <li>Cross-space account copying (credentials)</li>
+    <li>Guest home-screen widgets (<code>IAppWidgetManagerProxy</code>, L, high)</li>
+    <li>Planning from <code>Docs.md</code> APIs; marketing the lock as encryption</li>
+  </ul>
+</div>
+
+<h2 id="house">7. Housekeeping and stale claims</h2>
+<div class="card"><ul>
+  <li><code>Docs.md</code>: fictional APIs (<code>clearAppData</code>, <code>getInstalledApps</code>, <code>setAppPermission</code>, <code>optimizeMemory</code>, <code>startVirtualProcess</code>, <code>WebViewProxy</code>, ...); "BlackBox forums".</li>
+  <li><code>README.md</code>: Android 5-14 / x86 / ARMv7, JDK 17, <code>your-repo/NewBlackbox</code> URL, "No Root" vs "Root recommended", upstream title and credits.</li>
+  <li>Roadmap/vision still list Xposed and VPN toggle; RELEASE_NOTES lacks a Removed note and a 2026-09-30 entry; tech-stack says CI runs no tests or lint while the roadmap says it does.</li>
+  <li>Dead Xposed-era resources: 5 orphan layouts, <code>XpModuleInfo.kt</code>, about 14 unused strings.</li>
+  <li>"BlackBox" left in <code>add_shortcut_fail_msg</code> (en <code>:39</code>, zh-CN <code>:38</code>); typos "Launched Failed" etc.; "Fake Location(Preview)".</li>
+  <li>Launcher icon variants are assets only, not wired via <code>activity-alias</code>.</li>
+  <li><code>ShortcutActivity</code> exported without validation (<code>AndroidManifest.xml:59-62</code>).</li>
+  <li>Dead code: <code>requestInstallPackage</code> always false; storage broadcast without receiver; unused <code>finishWithResult</code>, <code>ListActivity.start</code>; <code>STORAGE_POSTPONED_KEY</code> never reset.</li>
+  <li>Release readiness: debug-signed release, cleartext allowed host-wide, inline osmdroid dependency, <code>main_git</code> link while repo not public.</li>
+  <li>Possible bugs: permission re-request loop in <code>FollowMyLocationOverlay.kt:106-122</code>; Hangzhou default centre; <code>setNeighboringCell</code> writes <code>allCell</code>.</li>
+  <li>Accessibility: only 6 <code>contentDescription</code>s; no non-drag reorder.</li>
+</ul></div>
+
+<h2 id="contra">8. Contradictions and confidence</h2>
+<div class="wrap"><table>
+<tr><th>#</th><th>Conflict</th><th>Resolution</th></tr>
+<tr><td>C1</td><td>Brief lists launcher icon variants as a feature; manifest has no <code>activity-alias</code> (app, plat 14)</td><td>Art exists, runtime switching does not; next-tier S</td></tr>
+<tr><td>C2</td><td>Play target-API rule: plat states dates, policy calls it unverified; both from summarised fetches</td><td>Likely true, Medium; verify the page before deciding</td></tr>
+<tr><td>C3</td><td>Lock "may need engine hook" (comp) vs pure UI gate (plat)</td><td>Both true; UI gate covers host entry points, other paths unverified</td></tr>
+<tr><td>C4</td><td>String counts differ (16 vs 14 unused; 103 vs 104 strings)</td><td>Use "about"; recount before cleanup</td></tr>
+<tr><td>C5</td><td>VPN: old docs/INDEX copy vs <code>runtime.md</code> and source</td><td>Removed; trust runtime.md and code</td></tr>
+<tr><td>C6</td><td>tech-stack: CI has no tests; roadmap: CI runs them</td><td>Tech-stack stale</td></tr>
+<tr><td>C7</td><td>Sandbox medium Play risk vs two high-risk toggles</td><td>Depends on build flavour</td></tr>
+<tr><td>C8</td><td><code>getRunningAppProcesses</code> name implies list, returns one info</td><td>Confirm before promising a task manager</td></tr>
+</table></div>
+<div class="wrap"><table>
+<tr><th>Conclusion</th><th>Confidence</th></tr>
+<tr><td>Ten features are UI-only</td><td><span class="badge">High / Med-High</span> (hooks cited, none executed)</td></tr>
+<tr><td>Biometric lock is top-validated</td><td><span class="badge">Medium</span></td></tr>
+<tr><td>Backup needs no Bcore change</td><td><span class="badge">Med-High</span></td></tr>
+<tr><td>Running indicator reliability</td><td><span class="badge">Low-Medium</span></td></tr>
+<tr><td>Docs.md APIs largely fictional</td><td><span class="badge">High</span></td></tr>
+<tr><td>Play risk tags</td><td><span class="badge">Low-Medium</span></td></tr>
+<tr><td>targetSdk 28 blocks Play</td><td><span class="badge">Medium</span></td></tr>
+<tr><td>Platform API levels</td><td><span class="badge">High</span></td></tr>
+<tr><td><b>Overall</b></td><td><span class="badge">Medium</span></td></tr>
+</table></div>
+
+<h2 id="concl">9. Conclusions and recommendations</h2>
+<div class="card">
+  <p><b>Direct answer:</b> add, in order, biometric lock, hardened launcher shortcuts, Polish/per-app language, permissions/health screen, running-apps manager, fake-location upgrade, backup/export, app grid upgrades, local diagnostics, freeze/auto-stop. Bcore work only for notification mute, per-app hideRoot/FLAG_SECURE, permission deny-list and spoof profiles, after the UI batch.</p>
+  <div class="wrap"><table>
+  <tr><th>Priority</th><th>Action</th><th>Effort</th></tr>
+  <tr><td>1</td><td>Harden <code>ShortcutActivity</code> (validate extras; real exposure today)</td><td>S</td></tr>
+  <tr><td>2</td><td>Run the first batch</td><td>M total</td></tr>
+  <tr><td>3</td><td>Add <code>androidx.biometric</code> via <code>gradle/libs.versions.toml</code> only</td><td>S</td></tr>
+  <tr><td>4</td><td>Update roadmap: drop Xposed/VPN, add ranked list</td><td>S</td></tr>
+  <tr><td>5</td><td>Verify the Play target-API page before any Play decision</td><td>S</td></tr>
+  <tr><td>6</td><td>Test running indicator on a service-only guest app first</td><td>S</td></tr>
+  </table></div>
+</div>
+
+<details class="card"><summary>Methodology, gaps and sources</summary>
+<p>Mixed gap analysis: six gatherers (two codebase, one docs, three external) produced findings; synthesis cross-referenced code vs docs and competitor vs platform vs policy, then ranked by value/effort with UI-only first.</p>
+<p><b>Gaps:</b> nothing executed on device; Android 13 only; competitor sources are snippets; mock-location, notification-access and overlay policy not fetched; guest-side effects of host features untested; Android 16 hook impact unknown; launcher icon <code>monochrome</code> layer unverified by the app finding (platform finding says none).</p>
+<p><b>Sources:</b> <code>analysis/findings/</code> codebase-app-gaps, codebase-engine-gap-analysis, docs-roadmap-and-claims, external-competitors-feature-matrix, external-platform-enablers, external-policy-google-play; <code>planning/research-brief.md</code>, <code>planning/research-plan.md</code>.</p>
+</details>
+
+</main>
+</body>
+</html>
