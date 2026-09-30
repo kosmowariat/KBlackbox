@@ -62,6 +62,15 @@ The `scripts/` folder wraps the common build and device workflow. Run the script
 .\scripts\install.ps1 -Build -Launch
 ```
 
+To test on an emulator instead of a phone, set one up once (downloads the emulator and an arm64-v8a system image, creates the `kblackbox_arm64` AVD):
+
+```powershell
+.\scripts\setup-emulator.ps1 -Start
+.\scripts\install.ps1 -Build -Launch -Serial emulator-5554
+```
+
+The app ships ARM libraries only, so on an x86_64 PC the emulator runs fully emulated: it works, but the first boot takes minutes and it is slow.
+
 `install.ps1` finds `adb` through `sdk.dir` in `local.properties` (or `ANDROID_HOME`) and installs the APK matching the device ABI. Use `-Serial <id>` when more than one device is connected and `-Release` to install the release variant.
 
 ## Integration
