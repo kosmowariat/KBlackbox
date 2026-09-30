@@ -8,14 +8,15 @@ import android.view.Menu
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
-import cbfg.rvadapter.RVAdapter
-import com.ferfalk.simplesearchview.SimpleSearchView
 import top.niunaijun.blackbox.entity.location.BLocation
 import top.niunaijun.blackbox.fake.frameworks.BLocationManager
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.FakeLocationBean
 import top.niunaijun.blackboxa.databinding.ActivityListBinding
+import top.niunaijun.blackboxa.databinding.ItemFakeBinding
+import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
@@ -28,12 +29,13 @@ class FakeManagerActivity : BaseActivity() {
 
     private val viewBinding: ActivityListBinding by inflate()
 
-    
-    private lateinit var mAdapter: RVAdapter<FakeLocationBean>
+    private lateinit var mAdapter: BindingAdapter<FakeLocationBean, ItemFakeBinding>
 
     private lateinit var viewModel: FakeLocationViewModel
 
     private var appList: List<FakeLocationBean> = ArrayList()
+
+    private var query = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,22 +44,18 @@ class FakeManagerActivity : BaseActivity() {
 
         initToolbar(viewBinding.toolbarLayout.toolbar, R.string.fake_location, true)
 
-        mAdapter = RVAdapter<FakeLocationBean>(this,FakeLocationAdapter()).bind(viewBinding.recyclerView)
-            .setItemClickListener { _, data, _ ->
+        mAdapter = fakeLocationAdapter()
+        mAdapter.onItemClick = { _, data, _ ->
+            val intent = Intent(this, FollowMyLocationOverlay::class.java)
+            intent.putExtra("location", data.fakeLocation)
+            intent.putExtra("pkg", data.packageName)
 
-                val intent = Intent(this, FollowMyLocationOverlay::class.java)
-                intent.putExtra("location", data.fakeLocation)
-                intent.putExtra("pkg", data.packageName)
-
-                locationResult.launch(intent)
-            }.setItemLongClickListener { _, item, position ->
-                disableFakeLocation(item,position)
-            }
-
+            locationResult.launch(intent)
+        }
+        mAdapter.onItemLongClick = { _, item, position -> disableFakeLocation(item, position) }
+        viewBinding.recyclerView.adapter = mAdapter
         viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        initSearchView()
         initViewModel()
     }
 
@@ -73,25 +71,6 @@ class FakeManagerActivity : BaseActivity() {
         }
     }
 
-    private fun initSearchView() {
-        viewBinding.searchView.setOnQueryTextListener(object :
-            SimpleSearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String): Boolean {
-                filterApp(newText)
-                return true
-            }
-
-            override fun onQueryTextCleared(): Boolean {
-                return true
-            }
-
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-        })
-    }
-
     private fun initViewModel() {
         viewModel = ViewModelProvider(this, InjectionUtil.getFakeLocationFactory()).get(
             FakeLocationViewModel::class.java
@@ -102,8 +81,7 @@ class FakeManagerActivity : BaseActivity() {
         viewModel.appsLiveData.observe(this) {
             if (it != null) {
                 this.appList = it
-                viewBinding.searchView.setQuery("", false)
-                filterApp("")
+                filterApp(query)
                 if (it.isNotEmpty()) {
                     viewBinding.stateView.showContent()
                 } else {
@@ -157,18 +135,19 @@ class FakeManagerActivity : BaseActivity() {
     }
 
 
-    override fun onBackPressed() {
-        if (viewBinding.searchView.isSearchOpen) {
-            viewBinding.searchView.closeSearch()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_search, menu)
-        val item = menu!!.findItem(R.id.list_search)
-        viewBinding.searchView.setMenuItem(item)
+        val searchView = menu!!.findItem(R.id.list_search).actionView as SearchView
+        searchView.queryHint = getString(R.string.filter)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                query = newText.orEmpty()
+                filterApp(query)
+                return true
+            }
+
+            override fun onQueryTextSubmit(query: String?) = true
+        })
         return true
     }
 

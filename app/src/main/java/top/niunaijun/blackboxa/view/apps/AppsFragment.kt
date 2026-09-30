@@ -15,11 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import cbfg.rvadapter.RVAdapter
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.databinding.FragmentAppsBinding
+import top.niunaijun.blackboxa.databinding.ItemAppBinding
+import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.ShortcutUtil
@@ -27,7 +28,6 @@ import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
-import java.util.Collections
 import kotlin.math.abs
 
 class AppsFragment : Fragment() {
@@ -36,7 +36,7 @@ class AppsFragment : Fragment() {
 
     private lateinit var viewModel: AppsViewModel
 
-    private lateinit var mAdapter: RVAdapter<AppInfo>
+    private lateinit var mAdapter: BindingAdapter<AppInfo, ItemAppBinding>
 
     private val viewBinding: FragmentAppsBinding by inflate()
 
@@ -70,7 +70,7 @@ class AppsFragment : Fragment() {
     ): View {
         viewBinding.stateView.showEmpty()
 
-        mAdapter = RVAdapter<AppInfo>(requireContext(), AppsAdapter()).bind(viewBinding.recyclerView)
+        mAdapter = appsAdapter()
         viewBinding.recyclerView.adapter = mAdapter
         viewBinding.recyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_SPAN_COUNT).apply {
             isItemPrefetchEnabled = true
@@ -99,7 +99,7 @@ class AppsFragment : Fragment() {
         }
         ItemTouchHelper(touchCallBack).attachToRecyclerView(viewBinding.recyclerView)
 
-        mAdapter.setItemClickListener { _, data, _ ->
+        mAdapter.onItemClick = { _, data, _ ->
             showLoading()
             viewModel.launchApk(data.packageName, userID)
         }
@@ -177,37 +177,21 @@ class AppsFragment : Fragment() {
     }
 
     private fun onItemMove(fromPosition: Int, toPosition: Int) {
-        val items = mAdapter.getItems()
-        if (fromPosition !in items.indices || toPosition !in items.indices) {
-            Log.w(TAG, "Invalid positions for move: from=$fromPosition, to=$toPosition, size=${items.size}")
+        val size = mAdapter.itemCount
+        if (fromPosition !in 0 until size || toPosition !in 0 until size) {
+            Log.w(TAG, "Invalid positions for move: from=$fromPosition, to=$toPosition, size=$size")
             return
         }
-
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                Collections.swap(items, i, i + 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(items, i, i - 1)
-            }
-        }
-        mAdapter.notifyItemMoved(fromPosition, toPosition)
+        mAdapter.moveItem(fromPosition, toPosition)
     }
 
     private fun setOnLongClick() {
-        mAdapter.setItemLongClickListener { view, data, _ ->
+        mAdapter.onItemLongClick = { view, data, _ ->
             popupMenu = PopupMenu(requireContext(), view).also {
                 it.inflate(R.menu.app_menu)
                 it.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
-                        R.id.app_remove -> {
-                            if (data.isXpModule) {
-                                toast(R.string.uninstall_module_toast)
-                            } else {
-                                unInstallApk(data)
-                            }
-                        }
+                        R.id.app_remove -> unInstallApk(data)
 
                         R.id.app_clear -> clearApk(data)
 

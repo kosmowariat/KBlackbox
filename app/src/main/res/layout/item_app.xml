@@ -14,20 +14,9 @@
         <ImageView
                 android:id="@+id/icon"
                 android:layout_width="@dimen/icon_size"
-                android:layout_height="@dimen/icon_size" />
-
-        <com.othershe.cornerlabelview.CornerLabelView
-                android:id="@+id/cornerLabel"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="top|start"
-                android:visibility="invisible"
-                app:bg_color="?attr/colorTertiaryContainer"
-                app:position="left_top"
-                app:side_length="22dp"
-                app:text="XP"
-                app:text_color="?attr/colorOnTertiaryContainer"
-                app:text_size="8sp" />
+                android:layout_height="@dimen/icon_size"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
     </FrameLayout>
 
     <TextView

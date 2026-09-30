@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:aapt="http://schemas.android.com/aapt"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -8,41 +7,11 @@
         android:orientation="vertical"
         tools:context=".view.list.ListActivity">
 
-    <FrameLayout
+    <include
+            android:id="@+id/toolbar_layout"
+            layout="@layout/view_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        <include
-                android:id="@+id/toolbar_layout"
-                layout="@layout/view_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        <com.ferfalk.simplesearchview.SimpleSearchView
-                android:id="@+id/searchView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/colorSurface"
-                android:textColor="?attr/colorOnSurface"
-                app:backIconAlpha="1.0"
-                app:backIconTint="?attr/colorOnSurfaceVariant"
-                app:cursorColor="?attr/colorPrimary"
-                app:hintColor="?attr/colorOnSurfaceVariant"
-                app:iconsAlpha="1.0"
-                app:iconsTint="?attr/colorOnSurfaceVariant"
-                app:type="card">
-
-            <aapt:attr name="app:searchBackground">
-                <shape android:shape="rectangle">
-                    <solid android:color="?attr/colorSurfaceContainerHigh" />
-                    <corners android:radius="28dp" />
-                </shape>
-            </aapt:attr>
-        </com.ferfalk.simplesearchview.SimpleSearchView>
-
-    </FrameLayout>
-
+            android:layout_height="wrap_content" />
 
     <com.github.nukc.stateview.StateView
             android:id="@+id/stateView"

@@ -15,18 +15,6 @@
                 android:id="@+id/icon"
                 android:layout_width="@dimen/icon_size"
                 android:layout_height="@dimen/icon_size" />
-
-        <com.othershe.cornerlabelview.CornerLabelView
-                android:id="@+id/cornerLabel"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="top|start"
-                android:visibility="invisible"
-                app:bg_color="?attr/colorTertiaryContainer"
-                app:position="left_top"
-                app:side_length="22dp"
-                app:text="*"
-                app:text_color="?attr/colorOnTertiaryContainer" />
     </FrameLayout>
 
     <LinearLayout
@@ -51,5 +39,18 @@
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
+
+    <TextView
+            android:id="@+id/installedLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/bg_badge"
+            android:paddingHorizontal="@dimen/spacing_small"
+            android:paddingVertical="2dp"
+            android:text="@string/installed_label"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            android:visibility="gone" />
 
 </LinearLayout>

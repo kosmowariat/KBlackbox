@@ -52,7 +52,6 @@
     <string name="start_in_outside">Start module in outside</string>
     <string name="restart_module">Restart app to apply change</string>
     <string name="cannot_create_shortcut">This desktop does not support creating shortcuts</string>
-    <string name="uninstall_module_toast">Please uninstall the xposed module in the Module Manager</string>
     <string name="daemon_enable">Daemon</string>
     <string name="disable_flag_secure">Disable Flag Secure</string>
     <string name="disable_flag_secure_summary">Allow screenshots and screen recording in apps</string>
@@ -104,7 +103,6 @@
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="init_failed">Failed to initialize app: %1$s</string>
-    <string name="unknown_app">Unknown app</string>
     <string name="install_error">Installation failed: %s</string>
     <string name="uninstall_error">Uninstallation failed: %s</string>
     <string name="clear_error">Clear failed: %s</string>
@@ -115,4 +113,5 @@
     <string name="hide_root_summary">Hide root from apps running inside the sandbox</string>
     <string name="daemon_enable_summary">Keep the sandbox background service running</string>
     <string name="google_services">Google services</string>
+    <string name="installed_label">Installed</string>
 </resources>

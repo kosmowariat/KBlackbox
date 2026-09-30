@@ -114,8 +114,6 @@ class AppsRepository {
                             continue
                         }
 
-                        val isXpModule = false
-
                         val info =
                                 AppInfo(
                                         safeLoadAppLabel(installedApplication),
@@ -123,8 +121,7 @@ class AppsRepository {
                                                 installedApplication
                                         ), 
                                         installedApplication.packageName,
-                                        installedApplication.sourceDir,
-                                        isXpModule
+                                        installedApplication.sourceDir
                                 )
                         installedList.add(info)
                     } catch (e: Exception) {
@@ -296,8 +293,7 @@ class AppsRepository {
                                             applicationInfo
                                     ), 
                                     applicationInfo.packageName,
-                                    applicationInfo.sourceDir ?: "",
-                                    false
+                                    applicationInfo.sourceDir ?: ""
                             )
 
                     appInfoList.add(info)
@@ -471,7 +467,7 @@ class AppsRepository {
                                 getUserName(id),
                                 apps.size,
                                 apps.take(USER_PREVIEW_APP_COUNT).map {
-                                    AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir, false)
+                                    AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir)
                                 }
                         )
                     }
@@ -513,7 +509,7 @@ class AppsRepository {
     fun getUserApps(userId: Int): List<AppInfo> {
         return sortedInstalledApplications(userId)
                 .sortedBy { GmsCore.isGoogleAppOrService(it.packageName) }
-                .map { AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir, false) }
+                .map { AppInfo(safeLoadAppLabel(it), safeLoadAppIcon(it), it.packageName, it.sourceDir) }
     }
 
     fun duplicateUser(

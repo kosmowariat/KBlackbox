@@ -52,7 +52,6 @@
     <string name="start_in_outside">请在外部启动模块</string>
     <string name="restart_module">重新启动软件修改才能生效</string>
     <string name="cannot_create_shortcut">该桌面不支持创建快捷方式</string>
-    <string name="uninstall_module_toast">Xposed模块请在管理界面卸载</string>
     <string name="daemon_enable">开启守护进程</string>
     <string name="gms_manager">GMS管理</string>
     <string name="jump_gms">跳转到GMS管理界面</string>
@@ -95,7 +94,6 @@
     <string name="ok">确定</string>
     <string name="error">错误</string>
     <string name="init_failed">应用初始化失败：%1$s</string>
-    <string name="unknown_app">未知应用</string>
     <string name="install_error">安装失败：%s</string>
     <string name="uninstall_error">卸载失败：%s</string>
     <string name="clear_error">清除失败：%s</string>
@@ -108,4 +106,5 @@
     <string name="google_services">谷歌服务</string>
     <string name="disable_flag_secure">禁用 Flag Secure</string>
     <string name="disable_flag_secure_summary">允许在应用内截图和录屏</string>
+    <string name="installed_label">已安装</string>
 </resources>

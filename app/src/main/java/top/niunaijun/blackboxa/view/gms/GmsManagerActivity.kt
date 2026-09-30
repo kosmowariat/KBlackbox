@@ -5,11 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import cbfg.rvadapter.RVAdapter
 import com.google.android.material.materialswitch.MaterialSwitch
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.bean.GmsBean
 import top.niunaijun.blackboxa.databinding.ActivityGmsBinding
+import top.niunaijun.blackboxa.databinding.ItemGmsBinding
+import top.niunaijun.blackboxa.util.BindingAdapter
 import top.niunaijun.blackboxa.util.InjectionUtil
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.showConfirmDialog
@@ -22,7 +23,7 @@ class GmsManagerActivity : LoadingActivity() {
 
     private lateinit var viewModel: GmsViewModel
 
-    private lateinit var mAdapter: RVAdapter<GmsBean>
+    private lateinit var mAdapter: BindingAdapter<GmsBean, ItemGmsBinding>
 
     private val viewBinding: ActivityGmsBinding by inflate()
 
@@ -74,15 +75,16 @@ class GmsManagerActivity : LoadingActivity() {
     }
 
     private fun initRecyclerView() {
-        mAdapter = RVAdapter<GmsBean>(this, GmsAdapter()).bind(viewBinding.recyclerView)
-            .setItemClickListener { view, item, _ ->
-                val checkbox = view.findViewById<MaterialSwitch>(R.id.checkbox)
-                if (item.isInstalledGms) {
-                    uninstallGms(item.userID, checkbox)
-                } else {
-                    installGms(item.userID, checkbox)
-                }
+        mAdapter = gmsAdapter()
+        mAdapter.onItemClick = { view, item, _ ->
+            val checkbox = view.findViewById<MaterialSwitch>(R.id.checkbox)
+            if (item.isInstalledGms) {
+                uninstallGms(item.userID, checkbox)
+            } else {
+                installGms(item.userID, checkbox)
             }
+        }
+        viewBinding.recyclerView.adapter = mAdapter
         viewBinding.recyclerView.layoutManager = LinearLayoutManager(this)
 
     }
