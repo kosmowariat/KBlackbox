@@ -108,4 +108,24 @@
     </string-array>
     <string name="shortcut_fake_location">Fałszywa lokalizacja</string>
     <string name="shortcut_removed">Aplikacja usunięta</string>
+    <string name="health_title">Uprawnienia i stan</string>
+    <string name="health_summary">Sprawdź, czego piaskownica potrzebuje do stabilnej pracy</string>
+    <string name="health_storage">Dostęp do wszystkich plików</string>
+    <string name="health_battery">Optymalizacja baterii</string>
+    <string name="health_notifications">Powiadomienia</string>
+    <string name="health_shortcuts">Skróty w launcherze</string>
+    <string name="health_engine">Urządzenie i silnik</string>
+    <string name="health_granted">Przyznano</string>
+    <string name="health_not_granted">Nie przyznano, niektóre aplikacje mogą się nie uruchomić</string>
+    <string name="health_battery_ok">Bez ograniczeń, usługa piaskownicy może działać w tle</string>
+    <string name="health_battery_limited">Optymalizowana przez system, może zatrzymać usługę w tle</string>
+    <string name="health_enabled">Włączone</string>
+    <string name="health_disabled">Wyłączone, aplikacje w piaskownicy nie wyślą powiadomień</string>
+    <string name="health_supported">Obsługiwane</string>
+    <string name="health_not_supported">Nieobsługiwane przez Twój launcher</string>
+    <string name="health_engine_info">Android %1$s, %2$s, wersja %3$s</string>
+    <string name="health_open_settings">Otwórz ustawienia</string>
+    <string name="health_unavailable">Nie można otworzyć tego ekranu ustawień</string>
+    <string name="close_app">Zamknij aplikację</string>
+    <string name="close_app_hint">Zamknij aplikację, aby zastosować ustawienia piaskownicy przy następnym starcie</string>
 </resources>

@@ -119,4 +119,24 @@
     </string-array>
     <string name="shortcut_fake_location">Fake location</string>
     <string name="shortcut_removed">App removed</string>
+    <string name="health_title">Permissions &amp; health</string>
+    <string name="health_summary">Check what the sandbox needs to run reliably</string>
+    <string name="health_storage">All files access</string>
+    <string name="health_battery">Battery optimisation</string>
+    <string name="health_notifications">Notifications</string>
+    <string name="health_shortcuts">Launcher shortcuts</string>
+    <string name="health_engine">Device and engine</string>
+    <string name="health_granted">Granted</string>
+    <string name="health_not_granted">Not granted, some apps may not start</string>
+    <string name="health_battery_ok">Unrestricted, the sandbox service can keep running</string>
+    <string name="health_battery_limited">Optimised by the system, it may stop the background service</string>
+    <string name="health_enabled">Enabled</string>
+    <string name="health_disabled">Disabled, apps in the sandbox cannot notify you</string>
+    <string name="health_supported">Supported</string>
+    <string name="health_not_supported">Not supported by your launcher</string>
+    <string name="health_engine_info">Android %1$s, %2$s, version %3$s</string>
+    <string name="health_open_settings">Open settings</string>
+    <string name="health_unavailable">Cannot open this settings screen</string>
+    <string name="close_app">Close app</string>
+    <string name="close_app_hint">Close the app to apply sandbox settings on the next start</string>
 </resources>

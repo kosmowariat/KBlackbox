@@ -104,4 +104,24 @@
     </string-array>
     <string name="shortcut_fake_location">虛擬定位</string>
     <string name="shortcut_removed">應用程式已移除</string>
+    <string name="health_title">權限與狀態</string>
+    <string name="health_summary">檢查沙盒穩定運作所需的條件</string>
+    <string name="health_storage">所有檔案存取權限</string>
+    <string name="health_battery">電池最佳化</string>
+    <string name="health_notifications">通知</string>
+    <string name="health_shortcuts">桌面捷徑</string>
+    <string name="health_engine">裝置與引擎</string>
+    <string name="health_granted">已授予</string>
+    <string name="health_not_granted">未授予，部分應用程式可能無法啟動</string>
+    <string name="health_battery_ok">無限制，沙盒服務可在背景持續執行</string>
+    <string name="health_battery_limited">受系統最佳化，可能會停止背景服務</string>
+    <string name="health_enabled">已開啟</string>
+    <string name="health_disabled">已關閉，沙盒內的應用程式無法通知您</string>
+    <string name="health_supported">支援</string>
+    <string name="health_not_supported">您的桌面不支援</string>
+    <string name="health_engine_info">Android %1$s，%2$s，版本 %3$s</string>
+    <string name="health_open_settings">開啟設定</string>
+    <string name="health_unavailable">無法開啟此設定頁面</string>
+    <string name="close_app">關閉應用程式</string>
+    <string name="close_app_hint">關閉應用程式，下次啟動時套用沙盒設定</string>
 </resources>

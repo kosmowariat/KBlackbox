@@ -28,6 +28,12 @@
 
     <PreferenceCategory app:title="@string/sandbox_settings">
 
+        <Preference
+                app:icon="@drawable/ic_pref_health"
+                app:key="health"
+                app:summary="@string/health_summary"
+                app:title="@string/health_title" />
+
         <SwitchPreferenceCompat
                 app:icon="@drawable/ic_pref_security"
                 app:key="root_hide"

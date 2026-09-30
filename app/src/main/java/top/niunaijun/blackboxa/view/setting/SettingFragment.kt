@@ -6,10 +6,12 @@ import androidx.core.os.LocaleListCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.snackbar.Snackbar
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
-import top.niunaijun.blackboxa.util.toast
+import top.niunaijun.blackboxa.util.closeApp
+import top.niunaijun.blackboxa.view.health.HealthActivity
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
 
 class SettingFragment : PreferenceFragmentCompat() {
@@ -20,6 +22,8 @@ class SettingFragment : PreferenceFragmentCompat() {
         initThemeMode()
 
         initLanguage()
+
+        initHealth()
 
         initGms()
 
@@ -69,6 +73,13 @@ class SettingFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun initHealth() {
+        findPreference<Preference>("health")!!.setOnPreferenceClickListener {
+            HealthActivity.start(requireContext())
+            true
+        }
+    }
+
     private fun initGms() {
         val gmsManagerPreference: Preference = (findPreference("gms_manager")!!)
 
@@ -101,7 +112,9 @@ class SettingFragment : PreferenceFragmentCompat() {
                 }
             }
 
-            toast(R.string.restart_module)
+            Snackbar.make(requireView(), R.string.restart_module, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.close_app) { requireActivity().closeApp() }
+                    .show()
             return@setOnPreferenceChangeListener true
         }
     }
