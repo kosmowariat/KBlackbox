@@ -22,9 +22,9 @@
 - [ ] **Possible Jetpack Compose adoption.** Evaluate this for new screens. The current UI is XML + ViewBinding.
 
 ### Technical Debt
-- [ ] **Testing.** There is effectively no test suite: one file, `JarManagerTest.java`, sits in `src/main`. Add ViewModel unit tests and a few Espresso smoke tests for the main flows.
-- [ ] **CI quality gates.** CI only builds and uploads artifacts. Add `lint` and unit tests to the workflow.
-- [ ] **Lint.** `Bcore` sets `checkReleaseBuilds false`. Re-enable lint for `app` at least.
+- [ ] **Testing.** First JVM unit tests exist (`DataDirCopier`, `MathUtil`). Next: ViewModel unit tests and a few Espresso smoke tests for the main flows; `JarManagerTest.java` still sits in Bcore `src/main`.
+- [x] **CI quality gates.** CI runs `app` lint and unit tests before building; failing runs upload the reports.
+- [x] **Lint.** `app` lint runs clean of errors and gates CI (warnings remain); `Bcore` still sets `checkReleaseBuilds false`.
 - [ ] **Error handling in UI.** `MainActivity` wraps almost everything in `try/catch` + `Log.e`. Surface errors to users through a single consistent pattern.
 - [ ] **Release signing.** Release builds are still debug-signed. Decide on a proper signing config. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
 

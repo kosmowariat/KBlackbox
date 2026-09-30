@@ -146,7 +146,7 @@ These standards apply to the Gradle build of all modules, the build configuratio
 Toolchain: JDK 21, Gradle 8.14.5, AGP 8.13.2, Kotlin 1.9.23 and a pinned NDK. Covers the standard assemble commands and the full CI command set. Dependencies are declared only in the version catalog, with central repositories (`FAIL_ON_PROJECT_REPOS`) (K2). SDK/version properties are shared in the root `ext` block. Platform targets are compileSdk 35, targetSdk 28 (deliberate) and minSdk 21, ARM ABIs only, and the build config beats README claims (K4). Groovy DSL is used for Android modules and KTS for pure-Java ones, with minimal `buildFeatures`, minified releases and the APK naming scheme. Documents the `gradle.properties` settings and relaxed Bcore lint, and notes that no formatter or linter is configured.
 
 #### CI & Distribution (`standards/build/ci.md`)
-The `build.yml` workflow (push to `main`/manual) builds all APKs/AARs/JARs with JDK 21 and uploads them with upload-artifact as 4 GitHub Actions artifacts (30-day retention), downloadable from the run page. No tests or lint run in CI. The workflow needs no secrets, and secrets are never committed.
+The `build.yml` workflow (push to `main`/manual) runs `app` lint and unit tests, builds all APKs/AARs/JARs with JDK 21 and uploads them with upload-artifact as 4 GitHub Actions artifacts (30-day retention), downloadable from the run page. The workflow needs no secrets, and secrets are never committed.
 
 ---
 
@@ -176,7 +176,7 @@ Located in `.maister/docs/standards/testing/`
 These standards apply to all testing code (unit, instrumented, integration).
 
 #### Test Writing (`standards/testing/test-writing.md`)
-Test behavior rather than implementation details, clear descriptive test names, mock external dependencies, fast tests, risk-based prioritization, balance coverage with velocity, focus on critical paths, appropriate test depth. Current state: no automated tests exist and none run in CI. Tests are encouraged, not required (K5). Unit tests go in `app/src/test/...` (JUnit 4) and instrumented tests in `app/src/androidTest/...`, with ViewModels and repositories as the first targets. The engine is verified manually via `adb logcat` per Android version.
+Test behavior rather than implementation details, clear descriptive test names, mock external dependencies, fast tests, risk-based prioritization, balance coverage with velocity, focus on critical paths, appropriate test depth. Current state: a small JVM unit-test suite exists in `app/src/test` and runs in CI. Tests are encouraged, not required (K5). Unit tests go in `app/src/test/...` (JUnit 4) and instrumented tests in `app/src/androidTest/...`, with ViewModels and repositories as the first targets. The engine is verified manually via `adb logcat` per Android version.
 
 ---
 

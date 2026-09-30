@@ -44,7 +44,7 @@ This document describes the technology choices for KBlackbox. The project is a m
 
 ### Testing
 - Declared: JUnit 4.13.2, AndroidX Test ext-junit 1.2.1, Espresso 3.6.1, AndroidJUnitRunner
-- Actual coverage: effectively none. There is one test-like file in `src/main` and no `src/test` or `src/androidTest` source sets.
+- Actual coverage: a small JVM suite in `app/src/test` (file copying for user duplication, math helpers), run in CI together with `app` lint. No `src/androidTest` yet; `JarManagerTest.java` in Bcore `src/main` is not a real test.
 
 ## Database
 There is no SQL database. State lives in:

@@ -17,6 +17,7 @@ import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.bean.UserBean
+import top.niunaijun.blackboxa.util.DataDirCopier
 import top.niunaijun.blackboxa.util.MemoryManager
 import top.niunaijun.blackboxa.util.getString
 
@@ -25,7 +26,6 @@ class AppsRepository {
     companion object {
         const val DEFAULT_USER_ID = 0
         const val USER_PREVIEW_APP_COUNT = 5
-        private val NON_COPIED_DATA_DIRS = setOf("lib", "cache", "code_cache")
     }
 
     val TAG: String = "AppsRepository"
@@ -584,19 +584,11 @@ class AppsRepository {
                 BEnvironment.getExternalDataDir(packageName, sourceUserId) to BEnvironment.getExternalDataDir(packageName, targetUserId)
         ).forEach { (source, target) ->
             try {
-                copyDataDir(source, target)
+                DataDirCopier.copy(source, target)
             } catch (e: Exception) {
                 Log.e(TAG, "Duplicate: copying ${source.path} failed", e)
             }
         }
-    }
-
-    private fun copyDataDir(source: File, target: File) {
-        val entries = source.listFiles() ?: return
-        val canonicalSource = source.canonicalFile
-        target.mkdirs()
-        entries.filter { it.name !in NON_COPIED_DATA_DIRS && it.canonicalFile == File(canonicalSource, it.name) }
-                .forEach { it.copyRecursively(File(target, it.name), overwrite = true) }
     }
 
     fun renameUser(userId: Int, name: String) {
