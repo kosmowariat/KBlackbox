@@ -53,7 +53,7 @@ The `scripts/` folder wraps the common build and device workflow. Run the script
 
 ```powershell
 # Build the debug APKs (add -Release for release, -Clean to clean first)
-.\scriptsuild.ps1
+.\scripts\build.ps1
 
 # Update the app on a phone connected over adb (data is kept)
 .\scripts\install.ps1
