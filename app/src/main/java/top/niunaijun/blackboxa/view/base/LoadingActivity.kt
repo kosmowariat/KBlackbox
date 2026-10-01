@@ -1,38 +1,33 @@
 package top.niunaijun.blackboxa.view.base
 
-import android.view.KeyEvent
-import com.roger.catloadinglibrary.CatLoadingView
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackboxa.R
 
 
 abstract class LoadingActivity : BaseActivity() {
 
-    private lateinit var loadingView: CatLoadingView
+    private var loadingDialog: AlertDialog? = null
 
 
     fun showLoading() {
-        if (!this::loadingView.isInitialized) {
-            loadingView = CatLoadingView()
+        if (loadingDialog?.isShowing == true || isFinishing) {
+            return
         }
-
-        if (!loadingView.isAdded) {
-            loadingView.setBackgroundColor(R.color.primary)
-            loadingView.show(supportFragmentManager, "")
-            supportFragmentManager.executePendingTransactions()
-            loadingView.setClickCancelAble(false)
-            loadingView.dialog?.setOnKeyListener { _, keyCode, _ ->
-                if (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_ESCAPE) {
-                    return@setOnKeyListener true
-                }
-                false
-            }
-        }
+        loadingDialog = MaterialAlertDialogBuilder(this)
+                .setView(R.layout.dialog_loading)
+                .setCancelable(false)
+                .show()
     }
 
 
     fun hideLoading() {
-        if (this::loadingView.isInitialized) {
-            loadingView.dismiss()
-        }
+        loadingDialog?.dismiss()
+        loadingDialog = null
+    }
+
+    override fun onDestroy() {
+        hideLoading()
+        super.onDestroy()
     }
 }

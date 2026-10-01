@@ -38,6 +38,9 @@ Pick the space, type coordinates, and keep favourite places (long press removes 
 #### About and Logs
 Settings → About shows the version and credits and can share the app log file.
 
+#### Open Source Licenses
+Settings → Open source licenses lists the libraries and their license texts. The loading dialog is now an own Material dialog; the CatLoadingView library, which has no published license, was removed.
+
 #### PC Web Panel Hardening
 - The server listens only on the Wi-Fi address instead of every network interface
 - 16-character token; the API accepts it only in the `X-Token` header, never in the address

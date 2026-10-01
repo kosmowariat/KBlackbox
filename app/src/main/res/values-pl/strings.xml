@@ -173,4 +173,8 @@
     <string name="stop_all_spaces">Zatrzymaj wszystkie aplikacje we wszystkich przestrzeniach</string>
     <string name="all_spaces_stopped">Zatrzymano wszystkie aplikacje we wszystkich przestrzeniach</string>
     <string name="user_empty_hint">Brak aplikacji</string>
+    <string name="licenses_title">Licencje open source</string>
+    <string name="licenses_summary">Biblioteki używane w aplikacji</string>
+    <string name="licenses_load_failed">Nie udało się otworzyć listy licencji</string>
+    <string name="loading_message">Ładowanie…</string>
 </resources>

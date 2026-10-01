@@ -169,4 +169,8 @@
     <string name="stop_all_spaces">停止所有空間中的所有應用程式</string>
     <string name="all_spaces_stopped">已停止所有空間中的所有應用程式</string>
     <string name="user_empty_hint">尚無應用程式</string>
+    <string name="licenses_title">開放原始碼授權</string>
+    <string name="licenses_summary">應用程式使用的函式庫</string>
+    <string name="licenses_load_failed">無法開啟授權清單</string>
+    <string name="loading_message">載入中…</string>
 </resources>

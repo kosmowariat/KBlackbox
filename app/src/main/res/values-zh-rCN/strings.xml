@@ -170,4 +170,8 @@
     <string name="stop_all_spaces">停止所有空间中的所有应用</string>
     <string name="all_spaces_stopped">已停止所有空间中的所有应用</string>
     <string name="user_empty_hint">还没有应用</string>
+    <string name="licenses_title">开源许可</string>
+    <string name="licenses_summary">应用使用的库</string>
+    <string name="licenses_load_failed">无法打开许可列表</string>
+    <string name="loading_message">加载中…</string>
 </resources>

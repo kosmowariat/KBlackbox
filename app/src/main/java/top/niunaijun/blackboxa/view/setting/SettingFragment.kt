@@ -45,6 +45,8 @@ class SettingFragment : PreferenceFragmentCompat() {
 
         initAbout()
 
+        initLicenses()
+
         invalidHideState {
             val rootHidePreference: Preference = (findPreference("root_hide")!!)
             val hideRoot = AppManager.mBlackBoxLoader.hideRoot()
@@ -118,6 +120,29 @@ class SettingFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun initLicenses() {
+        findPreference<Preference>("licenses")!!.setOnPreferenceClickListener {
+            showLicensesDialog()
+            true
+        }
+    }
+
+    private fun showLicensesDialog() {
+        val context = requireContext()
+        val notices = try {
+            context.assets.open(NOTICES_ASSET).bufferedReader().use { it.readText() }
+        } catch (e: IOException) {
+            Log.e(TAG, "Error reading the license list", e)
+            toast(R.string.licenses_load_failed)
+            return
+        }
+        MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.licenses_title)
+                .setMessage(notices)
+                .setPositiveButton(R.string.done, null)
+                .show()
+    }
+
     private fun showAboutDialog() {
         val context = requireContext()
         val version = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
@@ -187,6 +212,7 @@ class SettingFragment : PreferenceFragmentCompat() {
     private companion object {
         const val TAG = "SettingFragment"
         const val SYSTEM_LANGUAGE = "system"
+        const val NOTICES_ASSET = "licenses/NOTICES.txt"
         const val SOURCE_URL = "https://github.com/kosmowariat/KBlackbox"
     }
 }

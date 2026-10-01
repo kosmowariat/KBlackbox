@@ -184,4 +184,8 @@
     <string name="stop_all_spaces">Stop all apps in all spaces</string>
     <string name="all_spaces_stopped">All apps in all spaces stopped</string>
     <string name="user_empty_hint">No apps yet</string>
+    <string name="licenses_title">Open source licenses</string>
+    <string name="licenses_summary">Libraries used by the app</string>
+    <string name="licenses_load_failed">Could not open the license list</string>
+    <string name="loading_message">Loading…</string>
 </resources>

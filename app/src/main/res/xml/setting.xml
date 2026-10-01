@@ -83,6 +83,12 @@
                 app:summary="@string/about_summary"
                 app:title="@string/about_title" />
 
+        <Preference
+                app:icon="@drawable/ic_pref_info"
+                app:key="licenses"
+                app:summary="@string/licenses_summary"
+                app:title="@string/licenses_title" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
