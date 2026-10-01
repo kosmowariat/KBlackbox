@@ -35,7 +35,7 @@
                 android:maxLines="1"
                 android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:textColor="?attr/colorOnSurface"
-                app:layout_constraintEnd_toStartOf="@id/actions"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/avatar"
                 app:layout_constraintTop_toTopOf="@id/avatar" />
 
@@ -46,9 +46,16 @@
                 android:layout_marginStart="@dimen/spacing_medium"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintEnd_toStartOf="@id/actions"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/avatar"
                 app:layout_constraintTop_toBottomOf="@id/name" />
+
+        <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/contentBarrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="avatar,previews,emptyHint" />
 
         <LinearLayout
                 android:id="@+id/actions"
@@ -56,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/contentBarrier">
 
             <ImageButton
                     android:id="@+id/rename"
@@ -117,5 +124,23 @@
                     android:textAppearance="?attr/textAppearanceLabelMedium"
                     android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
+
+        <TextView
+                android:id="@+id/emptyHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_small"
+                android:drawablePadding="@dimen/spacing_small"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/icon_size"
+                android:text="@string/user_empty_hint"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_add"
+                app:drawableTint="?attr/colorOnSurfaceVariant"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/avatar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

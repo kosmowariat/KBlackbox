@@ -38,6 +38,12 @@ Pick the space, type coordinates, and keep favourite places (long press removes 
 #### About and Logs
 Settings → About shows the version and credits and can share the app log file.
 
+#### Space Card Polish
+- A space without apps shows a "No apps yet" hint with a plus instead of only its name
+- In the list view the rename, duplicate and delete buttons sit in their own row, so long names are no longer cut off
+- Long-pressing a card in the grid view shows only rename, duplicate and delete (it also listed items the card could not handle)
+- Decorative icons are hidden from screen readers
+
 ---
 
 ### Bug Fixes

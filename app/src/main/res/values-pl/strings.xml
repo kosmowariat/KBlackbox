@@ -166,4 +166,5 @@
     <string name="fake_switch_space">Zmień przestrzeń</string>
     <string name="stop_all_spaces">Zatrzymaj wszystkie aplikacje we wszystkich przestrzeniach</string>
     <string name="all_spaces_stopped">Zatrzymano wszystkie aplikacje we wszystkich przestrzeniach</string>
+    <string name="user_empty_hint">Brak aplikacji</string>
 </resources>

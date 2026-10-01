@@ -162,4 +162,5 @@
     <string name="fake_switch_space">切換空間</string>
     <string name="stop_all_spaces">停止所有空間中的所有應用程式</string>
     <string name="all_spaces_stopped">已停止所有空間中的所有應用程式</string>
+    <string name="user_empty_hint">尚無應用程式</string>
 </resources>
