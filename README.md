@@ -120,7 +120,7 @@ limitations under the License.
 
 ## Signing the release build
 
-Without any configuration the release build is signed with the debug key, which differs on every machine. To sign with your own key, create a keystore **outside the repository** and set four values:
+Without any configuration both builds are signed with the debug key, which differs on every machine. To sign with your own key (release and debug builds both use it), create a keystore **outside the repository** and set four values:
 
 | Name | Meaning |
 |------|---------|
