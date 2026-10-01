@@ -164,4 +164,6 @@
     <string name="fake_place_name">Nazwa miejsca</string>
     <string name="fake_place_delete">Usunąć %s z ulubionych?</string>
     <string name="fake_switch_space">Zmień przestrzeń</string>
+    <string name="stop_all_spaces">Zatrzymaj wszystkie aplikacje we wszystkich przestrzeniach</string>
+    <string name="all_spaces_stopped">Zatrzymano wszystkie aplikacje we wszystkich przestrzeniach</string>
 </resources>

@@ -9,6 +9,11 @@
             app:showAsAction="always" />
 
     <item
+            android:id="@+id/main_stop_all"
+            android:title="@string/stop_all_spaces"
+            app:showAsAction="never" />
+
+    <item
             android:id="@+id/main_setting"
             android:title="@string/setting"
             app:showAsAction="never" />

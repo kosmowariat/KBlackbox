@@ -57,6 +57,13 @@ class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
         launch { publish(repo.importUser(source)) }
     }
 
+    fun stopAllApps(messageAfter: String) {
+        launch {
+            repo.stopAllEverywhere()
+            _events.send(UsersEvent.Message(messageAfter))
+        }
+    }
+
     fun launchApp(packageName: String, userId: Int) {
         launch { _events.send(UsersEvent.LaunchResult(repo.launchApk(packageName, userId))) }
     }

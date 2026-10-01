@@ -175,4 +175,6 @@
     <string name="fake_place_name">Place name</string>
     <string name="fake_place_delete">Remove %s from favourites?</string>
     <string name="fake_switch_space">Switch space</string>
+    <string name="stop_all_spaces">Stop all apps in all spaces</string>
+    <string name="all_spaces_stopped">All apps in all spaces stopped</string>
 </resources>

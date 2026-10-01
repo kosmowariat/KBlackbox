@@ -285,6 +285,7 @@ class MainActivity : LoadingActivity() {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/kosmowariat/KBlackbox")))
             }
             R.id.main_import -> importResult.launch(arrayOf("application/zip", "application/octet-stream"))
+            R.id.main_stop_all -> viewModel.stopAllApps(getString(R.string.all_spaces_stopped))
             R.id.main_setting -> SettingActivity.start(this)
             R.id.fake_location -> {
                 startActivity(Intent(this, FakeManagerActivity::class.java).putExtra("userID", 0))

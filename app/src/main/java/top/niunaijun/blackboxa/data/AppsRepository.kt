@@ -302,6 +302,19 @@ class AppsRepository {
         packages.filter { BlackBoxCore.isRunningApplication(it, userId) }.toSet()
     }
 
+    suspend fun stopAllEverywhere() = withContext(Dispatchers.IO) {
+        val core = BlackBoxCore.get()
+        core.users.forEach { user ->
+            core.getInstalledApplications(0, user.id).forEach { app ->
+                try {
+                    core.stopPackage(app.packageName, user.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error stopping ${app.packageName} in user ${user.id}", e)
+                }
+            }
+        }
+    }
+
     suspend fun stopAll(userId: Int, packages: List<String>) = withContext(Dispatchers.IO) {
         val core = BlackBoxCore.get()
         packages.forEach {

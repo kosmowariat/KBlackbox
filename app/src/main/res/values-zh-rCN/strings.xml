@@ -161,4 +161,6 @@
     <string name="fake_place_name">地点名称</string>
     <string name="fake_place_delete">从收藏中移除 %s？</string>
     <string name="fake_switch_space">切换空间</string>
+    <string name="stop_all_spaces">停止所有空间中的所有应用</string>
+    <string name="all_spaces_stopped">已停止所有空间中的所有应用</string>
 </resources>

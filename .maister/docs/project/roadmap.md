@@ -35,6 +35,7 @@
 - **Shipped (2026-10-01)**: app info and "Copy to another space" (with or without data) in the app menu; the app menu now opens on release after a long press, which ItemTouchHelper used to swallow.
 - **Shipped (2026-10-01)**: About dialog (version, upstream credits, source link) with shareable logcat export.
 - **Shipped (2026-10-01)**: fake location upgrade: space picker, coordinate entry, favourite places, and the "Preview" label dropped.
+- **Shipped (2026-10-01)**: "Stop all apps in all spaces" in the main menu. True freeze/auto-stop needs an engine setter for `hidden` and a background service, so it stays open.
 - **Platform**: `targetSdk` is 28 on purpose (the engine relies on legacy behaviors). Raising it is an engine-level decision, not a GUI one. Track Android 16+ hidden-API changes that may affect `Bcore`.
 
 ---
