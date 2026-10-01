@@ -160,4 +160,10 @@
     <string name="app_copy_already_there">%1$s is already in %2$s</string>
     <string name="app_copied">%1$s copied to %2$s</string>
     <string name="app_copy_failed">Could not copy %s</string>
+    <string name="about_title">About</string>
+    <string name="about_summary">Version, credits and logs</string>
+    <string name="about_message">%1$s %2$s\n\nAn independent fork of NewBlackbox by ALEX5402, released under the Apache License 2.0.</string>
+    <string name="about_share_logs">Share logs</string>
+    <string name="about_logs_failed">Could not collect the logs</string>
+    <string name="about_logs_subject">APKEnclave logs</string>
 </resources>

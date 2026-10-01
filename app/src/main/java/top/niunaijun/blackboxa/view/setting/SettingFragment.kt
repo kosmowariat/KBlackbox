@@ -1,16 +1,27 @@
 package top.niunaijun.blackboxa.view.setting
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
+import top.niunaijun.blackboxa.util.LogExport
 import top.niunaijun.blackboxa.util.closeApp
+import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.health.HealthActivity
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
 
@@ -26,6 +37,8 @@ class SettingFragment : PreferenceFragmentCompat() {
         initHealth()
 
         initGms()
+
+        initAbout()
 
         invalidHideState {
             val rootHidePreference: Preference = (findPreference("root_hide")!!)
@@ -80,6 +93,40 @@ class SettingFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun initAbout() {
+        findPreference<Preference>("about")!!.setOnPreferenceClickListener {
+            showAboutDialog()
+            true
+        }
+    }
+
+    private fun showAboutDialog() {
+        val context = requireContext()
+        val version = context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+        MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.about_title)
+                .setMessage(getString(R.string.about_message, getString(R.string.app_name), version))
+                .setPositiveButton(R.string.done, null)
+                .setNegativeButton(R.string.open_source_path) { _, _ ->
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_URL)))
+                }
+                .setNeutralButton(R.string.about_share_logs) { _, _ -> shareLogs() }
+                .show()
+    }
+
+    private fun shareLogs() {
+        val context = requireContext()
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val file = withContext(Dispatchers.IO) { LogExport.createLogFile(context) }
+                startActivity(LogExport.shareIntent(context, file))
+            } catch (e: IOException) {
+                Log.e(TAG, "Error collecting logs", e)
+                toast(R.string.about_logs_failed)
+            }
+        }
+    }
+
     private fun initGms() {
         val gmsManagerPreference: Preference = (findPreference("gms_manager")!!)
 
@@ -120,6 +167,8 @@ class SettingFragment : PreferenceFragmentCompat() {
     }
 
     private companion object {
+        const val TAG = "SettingFragment"
         const val SYSTEM_LANGUAGE = "system"
+        const val SOURCE_URL = "https://github.com/kosmowariat/KBlackbox"
     }
 }

@@ -145,4 +145,10 @@
     <string name="app_copy_already_there">%1$s 已在 %2$s 中</string>
     <string name="app_copied">已將 %1$s 複製到 %2$s</string>
     <string name="app_copy_failed">無法複製 %s</string>
+    <string name="about_title">關於</string>
+    <string name="about_summary">版本、致謝與日誌</string>
+    <string name="about_message">%1$s %2$s\n\nALEX5402 的 NewBlackbox 的獨立分支，採用 Apache 2.0 授權。</string>
+    <string name="about_share_logs">分享日誌</string>
+    <string name="about_logs_failed">無法收集日誌</string>
+    <string name="about_logs_subject">APKEnclave 日誌</string>
 </resources>

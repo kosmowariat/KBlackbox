@@ -149,4 +149,10 @@
     <string name="app_copy_already_there">%1$s jest już w %2$s</string>
     <string name="app_copied">Skopiowano %1$s do %2$s</string>
     <string name="app_copy_failed">Nie udało się skopiować %s</string>
+    <string name="about_title">O aplikacji</string>
+    <string name="about_summary">Wersja, autorzy i logi</string>
+    <string name="about_message">%1$s %2$s\n\nNiezależny fork NewBlackbox autorstwa ALEX5402, na licencji Apache 2.0.</string>
+    <string name="about_share_logs">Udostępnij logi</string>
+    <string name="about_logs_failed">Nie udało się zebrać logów</string>
+    <string name="about_logs_subject">Logi APKEnclave</string>
 </resources>

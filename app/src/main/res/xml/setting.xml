@@ -64,4 +64,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/about_title">
+
+        <Preference
+                app:icon="@drawable/ic_pref_info"
+                app:key="about"
+                app:summary="@string/about_summary"
+                app:title="@string/about_title" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
