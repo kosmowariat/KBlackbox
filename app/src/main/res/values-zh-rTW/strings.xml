@@ -127,4 +127,9 @@
     <string name="stop_all_apps">停止所有應用程式</string>
     <string name="all_apps_stopped">已停止所有應用程式</string>
     <string name="running_label">執行中</string>
+    <string name="export_space">匯出至備份檔</string>
+    <string name="import_space">從備份檔匯入</string>
+    <string name="backup_export_done">備份已儲存</string>
+    <string name="backup_export_failed">無法儲存備份</string>
+    <string name="backup_import_failed">無法還原備份</string>
 </resources>

@@ -142,4 +142,9 @@
     <string name="stop_all_apps">Stop all apps</string>
     <string name="all_apps_stopped">All apps stopped</string>
     <string name="running_label">Running</string>
+    <string name="export_space">Export to backup file</string>
+    <string name="import_space">Import from backup file</string>
+    <string name="backup_export_done">Backup saved</string>
+    <string name="backup_export_failed">Could not save the backup</string>
+    <string name="backup_import_failed">Could not restore the backup</string>
 </resources>

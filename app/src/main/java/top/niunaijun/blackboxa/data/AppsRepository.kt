@@ -19,8 +19,11 @@ import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.InstalledAppBean
 import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.bean.UserCreationResult
+import top.niunaijun.blackboxa.util.BackupApp
 import top.niunaijun.blackboxa.util.DataDirCopier
+import top.niunaijun.blackboxa.util.DataKind
 import top.niunaijun.blackboxa.util.MemoryManager
+import top.niunaijun.blackboxa.util.SpaceBackup
 import top.niunaijun.blackboxa.util.getString
 
 
@@ -437,6 +440,84 @@ class AppsRepository {
             } catch (e: Exception) {
                 Log.e(TAG, "Duplicate: copying ${source.path} failed", e)
             }
+        }
+    }
+
+    private fun dataDir(packageName: String, userId: Int, kind: DataKind): File = when (kind) {
+        DataKind.DATA -> BEnvironment.getDataDir(packageName, userId)
+        DataKind.DEVICE_PROTECTED -> BEnvironment.getDeDataDir(packageName, userId)
+        DataKind.EXTERNAL -> BEnvironment.getExternalDataDir(packageName, userId)
+    }
+
+    /** Writes the apps of a space and their data into [target]; returns an error message or null. */
+    suspend fun exportUser(userId: Int, target: Uri): String? = withContext(Dispatchers.IO) {
+        try {
+            val core = BlackBoxCore.get()
+            val apps = sortedInstalledApplications(userId).filterNot { GmsCore.isGoogleAppOrService(it.packageName) }
+            apps.forEach { core.stopPackage(it.packageName, userId) }
+            val backupApps = apps.map { app ->
+                BackupApp(
+                        app.packageName,
+                        File(app.sourceDir),
+                        DataKind.entries.associateWith { dataDir(app.packageName, userId, it) }
+                )
+            }
+            val appOrder = AppManager.mRemarkSharedPreferences.getString("AppList$userId", "").orEmpty()
+            val output = requireNotNull(BlackBoxCore.getContext().contentResolver.openOutputStream(target)) {
+                "Cannot open $target"
+            }
+            output.use { SpaceBackup.write(it, getUserName(userId), appOrder, backupApps) }
+            null
+        } catch (e: Exception) {
+            Log.e(TAG, "Error exporting user $userId", e)
+            getString(R.string.backup_export_failed)
+        }
+    }
+
+    /** Creates a new space from a backup file, installing its apps and restoring their data. */
+    suspend fun importUser(source: Uri): UserCreationResult = withContext(Dispatchers.IO) {
+        val backupFile = File(BEnvironment.getCacheDir(), "import-backup.zip")
+        try {
+            val input = requireNotNull(BlackBoxCore.getContext().contentResolver.openInputStream(source)) {
+                "Cannot open $source"
+            }
+            input.use { stream -> backupFile.outputStream().use { stream.copyTo(it) } }
+            SpaceBackup.Reader(backupFile).use { reader ->
+                val manifest = reader.manifest
+                val userId = createNamedUser(manifest.name)
+                val failedApps = manifest.packages.filterNot { restoreApp(reader, it, userId) }
+                if (manifest.appOrder.isNotEmpty()) {
+                    AppManager.mRemarkSharedPreferences.edit().putString("AppList$userId", manifest.appOrder).apply()
+                }
+                val error =
+                        if (failedApps.isEmpty()) null
+                        else getString(R.string.duplicate_failed_apps, failedApps.joinToString())
+                UserCreationResult(UserBean(userId, getUserName(userId), 0, emptyList()), error)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error importing backup", e)
+            UserCreationResult(null, getString(R.string.backup_import_failed))
+        } finally {
+            backupFile.delete()
+        }
+    }
+
+    private fun restoreApp(reader: SpaceBackup.Reader, packageName: String, userId: Int): Boolean {
+        val apk = File(BEnvironment.getCacheDir(), "import-$packageName.apk")
+        return try {
+            reader.extractApk(packageName, apk)
+            val result = BlackBoxCore.get().installPackageAsUser(apk, userId)
+            if (result.success) {
+                DataKind.entries.forEach { reader.extractData(packageName, it, dataDir(packageName, userId, it)) }
+            } else {
+                Log.w(TAG, "Import: install of $packageName failed: ${result.msg}")
+            }
+            result.success
+        } catch (e: Exception) {
+            Log.e(TAG, "Import: restoring $packageName failed", e)
+            false
+        } finally {
+            apk.delete()
         }
     }
 

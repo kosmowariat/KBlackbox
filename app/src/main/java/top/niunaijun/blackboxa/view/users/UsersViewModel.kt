@@ -1,5 +1,6 @@
 package top.niunaijun.blackboxa.view.users
 
+import android.net.Uri
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,14 @@ class UsersViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
     fun duplicateUser(sourceUserId: Int, name: String, copyDataFor: Set<String>) {
         launch { publish(repo.duplicateUser(sourceUserId, name, copyDataFor)) }
+    }
+
+    fun exportUser(userId: Int, target: Uri, successMessage: String) {
+        launch { _events.send(UsersEvent.Message(repo.exportUser(userId, target) ?: successMessage)) }
+    }
+
+    fun importUser(source: Uri) {
+        launch { publish(repo.importUser(source)) }
     }
 
     fun launchApp(packageName: String, userId: Int) {

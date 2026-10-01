@@ -131,4 +131,9 @@
     <string name="stop_all_apps">Zatrzymaj wszystkie aplikacje</string>
     <string name="all_apps_stopped">Zatrzymano wszystkie aplikacje</string>
     <string name="running_label">Działa</string>
+    <string name="export_space">Eksportuj do pliku kopii</string>
+    <string name="import_space">Importuj z pliku kopii</string>
+    <string name="backup_export_done">Zapisano kopię zapasową</string>
+    <string name="backup_export_failed">Nie udało się zapisać kopii zapasowej</string>
+    <string name="backup_import_failed">Nie udało się przywrócić kopii zapasowej</string>
 </resources>

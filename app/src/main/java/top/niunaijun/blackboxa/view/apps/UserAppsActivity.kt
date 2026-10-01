@@ -46,6 +46,14 @@ class UserAppsActivity : LoadingActivity() {
                 }
             }
 
+    private val exportResult =
+            registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
+                uri?.let {
+                    showLoading()
+                    viewModel.exportUser(userId, it, getString(R.string.backup_export_done))
+                }
+            }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
@@ -106,6 +114,7 @@ class UserAppsActivity : LoadingActivity() {
             }
             R.id.user_duplicate -> viewModel.requestDuplicate(user)
             R.id.user_delete -> userDialogs.showDeleteDialog(user)
+            R.id.user_export -> exportResult.launch("$userName.zip")
             R.id.user_stop_all -> appsFragment.stopAllApps()
             else -> return super.onOptionsItemSelected(item)
         }

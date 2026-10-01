@@ -66,6 +66,14 @@ class MainActivity : LoadingActivity() {
         }
     }
 
+    private val importResult =
+            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                uri?.let {
+                    showLoading()
+                    viewModel.importUser(it)
+                }
+            }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -276,6 +284,7 @@ class MainActivity : LoadingActivity() {
             R.id.main_git -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/kosmowariat/KBlackbox")))
             }
+            R.id.main_import -> importResult.launch(arrayOf("application/zip", "application/octet-stream"))
             R.id.main_setting -> SettingActivity.start(this)
             R.id.fake_location -> {
                 startActivity(Intent(this, FakeManagerActivity::class.java).putExtra("userID", 0))
