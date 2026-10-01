@@ -44,6 +44,7 @@ import top.niunaijun.blackbox.core.system.DaemonService;
 import top.niunaijun.blackbox.core.system.ServiceManager;
 import top.niunaijun.blackbox.core.system.user.BUserHandle;
 import top.niunaijun.blackbox.core.system.user.BUserInfo;
+import top.niunaijun.blackbox.entity.am.RunningAppProcessInfo;
 import top.niunaijun.blackbox.entity.pm.InstallOption;
 import top.niunaijun.blackbox.entity.pm.InstallResult;
 
@@ -1568,31 +1569,9 @@ public class BlackBoxCore extends ClientConfiguration {
 
     
     public static boolean isRunningApplication(String packageName, int userId) {
-        
         try {
-            
-            android.app.ActivityManager am = (android.app.ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-            if (am == null) return false;
-            
-            
-            
-            ServiceManager.get();
-            top.niunaijun.blackbox.core.system.am.ActivityStack stack =
-                (top.niunaijun.blackbox.core.system.am.ActivityStack) ServiceManager.getService(ServiceManager.ACTIVITY_MANAGER);
-            if (stack == null) return false;
-            java.util.Map<Integer, top.niunaijun.blackbox.core.system.am.TaskRecord> tasks =
-                    top.niunaijun.blackbox.utils.Reflector.with(stack).field("mTasks").get();
-            if (tasks == null) return false;
-            for (top.niunaijun.blackbox.core.system.am.TaskRecord task : tasks.values()) {
-                if (task.userId == userId && task.taskAffinity != null && task.taskAffinity.contains(packageName)) {
-                    
-                    for (top.niunaijun.blackbox.core.system.am.ActivityRecord activity : task.activities) {
-                        if (!activity.finished) {
-                            return true;
-                        }
-                    }
-                }
-            }
+            RunningAppProcessInfo info = getBActivityManager().getRunningAppProcesses(packageName, userId);
+            return info != null && !info.mAppProcessInfoList.isEmpty();
         } catch (Exception e) {
             Slog.w(TAG, "isRunningApplication failed: " + e.getMessage());
         }
