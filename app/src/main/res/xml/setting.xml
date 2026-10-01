@@ -54,6 +54,17 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/remote_panel_title">
+
+        <SwitchPreferenceCompat
+                android:persistent="false"
+                app:icon="@drawable/ic_pref_smartphone"
+                app:key="remote_panel"
+                app:summary="@string/remote_panel_summary"
+                app:title="@string/remote_panel_title" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/google_services">
 
         <Preference

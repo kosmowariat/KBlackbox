@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.io.IOException
@@ -20,7 +21,9 @@ import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
 import top.niunaijun.blackboxa.util.LogExport
+import top.niunaijun.blackboxa.remote.RemoteService
 import top.niunaijun.blackboxa.util.closeApp
+import top.niunaijun.blackboxa.util.collectStarted
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.health.HealthActivity
 import top.niunaijun.blackboxa.view.gms.GmsManagerActivity
@@ -37,6 +40,8 @@ class SettingFragment : PreferenceFragmentCompat() {
         initHealth()
 
         initGms()
+
+        initRemotePanel()
 
         initAbout()
 
@@ -90,6 +95,19 @@ class SettingFragment : PreferenceFragmentCompat() {
         findPreference<Preference>("health")!!.setOnPreferenceClickListener {
             HealthActivity.start(requireContext())
             true
+        }
+    }
+
+    private fun initRemotePanel() {
+        val panelPreference: SwitchPreferenceCompat = findPreference("remote_panel")!!
+        panelPreference.setOnPreferenceChangeListener { _, newValue ->
+            if (newValue == true) RemoteService.start(requireContext()) else RemoteService.stop(requireContext())
+            false
+        }
+        collectStarted(RemoteService.url) { url ->
+            panelPreference.isChecked = url != null
+            panelPreference.summary = url?.let { getString(R.string.remote_panel_running, it) }
+                    ?: getString(R.string.remote_panel_summary)
         }
     }
 

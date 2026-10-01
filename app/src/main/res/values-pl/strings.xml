@@ -110,6 +110,12 @@
     <string name="shortcut_removed">Aplikacja usunięta</string>
     <string name="health_title">Uprawnienia i stan</string>
     <string name="health_summary">Sprawdź, czego piaskownica potrzebuje do stabilnej pracy</string>
+    <string name="remote_panel_title">Panel webowy na PC</string>
+    <string name="remote_panel_summary">Zarządzaj przestrzeniami z przeglądarki na komputerze</string>
+    <string name="remote_panel_running">Otwórz na PC w tej samej sieci Wi-Fi: %1$s</string>
+    <string name="remote_panel_notification">Panel webowy działa</string>
+    <string name="remote_panel_no_network">Najpierw połącz się z Wi-Fi, panel potrzebuje sieci lokalnej</string>
+    <string name="remote_panel_start_failed">Nie udało się uruchomić panelu webowego</string>
     <string name="health_storage">Dostęp do wszystkich plików</string>
     <string name="health_battery">Optymalizacja baterii</string>
     <string name="health_notifications">Powiadomienia</string>

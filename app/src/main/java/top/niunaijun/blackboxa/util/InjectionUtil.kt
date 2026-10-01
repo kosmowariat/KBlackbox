@@ -14,7 +14,7 @@ import top.niunaijun.blackboxa.view.users.UsersFactory
 
 object InjectionUtil {
 
-    private val appsRepository = AppsRepository()
+    val appsRepository = AppsRepository()
 
 
 

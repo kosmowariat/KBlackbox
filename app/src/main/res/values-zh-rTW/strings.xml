@@ -106,6 +106,12 @@
     <string name="shortcut_removed">應用程式已移除</string>
     <string name="health_title">權限與狀態</string>
     <string name="health_summary">檢查沙盒穩定運作所需的條件</string>
+    <string name="remote_panel_title">電腦網頁面板</string>
+    <string name="remote_panel_summary">在電腦瀏覽器中管理空間</string>
+    <string name="remote_panel_running">在同一 Wi-Fi 下的電腦上開啟：%1$s</string>
+    <string name="remote_panel_notification">網頁面板正在執行</string>
+    <string name="remote_panel_no_network">請先連線 Wi-Fi，網頁面板需要區域網路</string>
+    <string name="remote_panel_start_failed">無法啟動網頁面板</string>
     <string name="health_storage">所有檔案存取權限</string>
     <string name="health_battery">電池最佳化</string>
     <string name="health_notifications">通知</string>

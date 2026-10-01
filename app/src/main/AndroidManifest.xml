@@ -56,7 +56,11 @@
             android:exported="true" />
         <activity android:name=".view.main.MainActivity"
             android:exported="false" />
-    
+
+        <service
+            android:name=".remote.RemoteService"
+            android:exported="false" />
+
         <service
                 android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
                 android:enabled="false"

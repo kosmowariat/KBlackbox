@@ -121,6 +121,12 @@
     <string name="shortcut_removed">App removed</string>
     <string name="health_title">Permissions &amp; health</string>
     <string name="health_summary">Check what the sandbox needs to run reliably</string>
+    <string name="remote_panel_title">PC web panel</string>
+    <string name="remote_panel_summary">Manage spaces from a browser on your PC</string>
+    <string name="remote_panel_running">Open on a PC in the same Wi-Fi: %1$s</string>
+    <string name="remote_panel_notification">Web panel is running</string>
+    <string name="remote_panel_no_network">Connect to Wi-Fi first, the web panel needs a local network</string>
+    <string name="remote_panel_start_failed">Could not start the web panel</string>
     <string name="health_storage">All files access</string>
     <string name="health_battery">Battery optimisation</string>
     <string name="health_notifications">Notifications</string>
