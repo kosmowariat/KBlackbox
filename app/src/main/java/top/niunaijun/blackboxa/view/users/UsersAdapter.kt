@@ -48,7 +48,7 @@ class UsersAdapter(
             UserVH(
                     binding.root, binding.avatar, binding.name, binding.appCount, binding.previews,
                     listOf(binding.preview1, binding.preview2, binding.preview3, binding.preview4, binding.preview5),
-                    binding.moreApps, binding.emptyHint, binding.rename, binding.duplicate, binding.delete
+                    binding.moreApps, null, binding.rename, binding.duplicate, binding.delete
             )
         }
     }
@@ -65,7 +65,7 @@ class UsersAdapter(
             private val previews: View,
             private val previewViews: List<ImageButton>,
             private val moreApps: TextView,
-            private val emptyHint: View,
+            private val emptyHint: View?,
             private val rename: View?,
             private val duplicate: View?,
             private val delete: View?
@@ -90,7 +90,7 @@ class UsersAdapter(
             moreApps.text = resources.getString(R.string.more_apps_count, user.appCount - shownApps.size)
             moreApps.setOnClickListener { onClick(user) }
             previews.visibility = if (user.previewApps.isEmpty()) View.GONE else View.VISIBLE
-            emptyHint.visibility = if (user.previewApps.isEmpty()) View.VISIBLE else View.GONE
+            emptyHint?.visibility = if (user.previewApps.isEmpty()) View.VISIBLE else View.GONE
 
             itemView.setOnClickListener { onClick(user) }
             rename?.setOnClickListener { onRename(user) }
