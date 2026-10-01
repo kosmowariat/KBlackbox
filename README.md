@@ -136,5 +136,5 @@ After creating the keystore (see below), run `.\scripts\configure-signing.ps1 -K
 Create the keystore once (the `.apkenclave` folder must exist) and keep a backup copy (password manager and an offline copy): if the key is lost, installed copies cannot be updated and have to be reinstalled.
 
 ```
-keytool -genkeypair -v -keystore %USERPROFILE%\.apkenclavepkenclave-release.jks -alias apkenclave -keyalg RSA -keysize 4096 -validity 10000
+keytool -genkeypair -v -keystore %USERPROFILE%\.apkenclave\apkenclave-release.jks -alias apkenclave -keyalg RSA -keysize 4096 -validity 10000
 ```
