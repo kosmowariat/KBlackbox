@@ -37,6 +37,9 @@ Languages: Java (engine and codegen), Kotlin 1.9.23 (UI), C/C++ via NDK and `ndk
 ### Architecture (`project/architecture.md`)
 The system diagram and patterns: layered MVVM in the host app (View → ViewModel → Repository → `BlackBoxCore` facade), and client/server virtualization in `Bcore` (virtual system services, `I*Proxy` binder hooks, manifest stub components, native Dobby/xDL hooks) driven by generated hidden-API accessors from `black-reflection`/`compiler`. Includes a package-by-package map of `app` and `Bcore`, the install-and-launch data flow, external integrations, configuration, and deployment (per-ABI APKs plus AAR/JAR artifacts). UI development notes: where new screens go (`view/<feature>/` with a Factory registered in `InjectionUtil`), UI reaches the engine only through repositories in `data/`, and where the theme and color resources live.
 
+### Monetization (`project/monetization.md`)
+Planned (not implemented) paid Pro subscription and self-hosted distribution: one app with a free tier and Pro, private repos, Cloudflare Pages/R2/Workers+D1 hosting, Polar as Merchant of Record (and why Lemon Squeezy was rejected), license-key verification through our own Worker with an offline grace period, the APK update channel (`latest.json`, sha256, PackageInstaller) and the same-signing-key requirement, plus the order of work. Dependency licenses and privacy policy are deliberately left for last.
+
 ---
 
 ## Technical Standards
