@@ -51,7 +51,7 @@ cd NewBlackbox
 
 ### Helper Scripts (Windows / PowerShell)
 
-The `scripts/` folder wraps the common build and device workflow. Run the scripts from the repository root.
+The `scripts/` folder wraps the common build and device workflow. Run the scripts from the repository root. If Windows refuses to run them ("running scripts is disabled"), start them as `powershell -ExecutionPolicy Bypass -File .\scripts\<name>.ps1 <arguments>`; this only affects that one run.
 
 ```powershell
 # Build the debug APKs (add -Release for release, -Clean to clean first)
@@ -131,7 +131,7 @@ Without any configuration the release build is signed with the debug key, which 
 
 Locally put them in `~/.gradle/gradle.properties` (user level, never committed) or in environment variables. In GitHub Actions they come from the repository secrets `APKENCLAVE_KEYSTORE_BASE64` (the keystore, base64), `APKENCLAVE_KEYSTORE_PASSWORD`, `APKENCLAVE_KEY_ALIAS` and `APKENCLAVE_KEY_PASSWORD`; when they are missing the build falls back to the debug key.
 
-After creating the keystore (see below), run `.\scripts\configure-signing.ps1 -Keystore <path to the .jks>`. It asks for the passwords, checks that the keystore opens and writes the four settings to `~/.gradle/gradle.properties`.
+After creating the keystore (see below), run `powershell -ExecutionPolicy Bypass -File .\scripts\configure-signing.ps1 -Keystore <path to the .jks>`. It asks for the passwords, checks that the keystore opens and writes the four settings to `~/.gradle/gradle.properties`.
 
 Create the keystore once (the `.apkenclave` folder must exist) and keep a backup copy (password manager and an offline copy): if the key is lost, installed copies cannot be updated and have to be reinstalled.
 
