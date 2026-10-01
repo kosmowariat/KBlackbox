@@ -26,7 +26,7 @@
 - [x] **CI quality gates.** CI runs `app` lint and unit tests before building; failing runs upload the reports.
 - [x] **Lint.** `app` lint runs clean of errors and gates CI (warnings remain); `Bcore` still sets `checkReleaseBuilds false`.
 - [ ] **Error handling in UI.** `MainActivity` wraps almost everything in `try/catch` + `Log.e`. Surface errors to users through a single consistent pattern.
-- [ ] **Release signing.** Release builds are still debug-signed. Decide on a proper signing config. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
+- [ ] **Release signing.** The build can sign with an own keystore (`APKENCLAVE_*`, see README); create the key and set the CI secrets. *The applicationId is now `com.kosmowariat.appenclave` (app name APKEnclave).*
 
 ## Future Considerations
 - **Feature ideas** (see `.maister/tasks/research/2026-09-30-feature-ideas/outputs/research-report.md`): space backup/export via SAF, per-app spoofing profiles in the UI, tablet/landscape layouts, app grid details sheet and clone-to-space, fake-location favourites and space picker, local diagnostics export, freeze/auto-stop idle apps. Biometric lock and shortcut hardening were deliberately dropped.

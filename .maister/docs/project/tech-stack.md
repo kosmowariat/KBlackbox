@@ -76,7 +76,7 @@ There is no SQL database. State lives in:
 - It runs no tests and no lint.
 
 ### Signing
-- Release builds are signed with the **debug** signing config (`app/build.gradle`).
+- Release builds are signed with a keystore given by `APKENCLAVE_*` Gradle properties or environment variables (`app/build.gradle`); without them they fall back to the **debug** signing config. The debug build type has the applicationId suffix `.debug` and is a separate app.
 
 ## Development Tools
 

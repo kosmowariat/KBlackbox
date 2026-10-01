@@ -73,6 +73,8 @@ To test on an emulator instead of a phone, set one up once (downloads the emulat
 
 The app ships ARM libraries only, so on an x86_64 PC the emulator runs fully emulated: it works, but the first boot takes minutes and it is slow.
 
+The debug build is a separate app, **APKEnclave Dev** (blue icon, `applicationId` ending in `.debug`), so it can sit next to the everyday app (lime icon) with its own data. `install.ps1` installs the debug app; add `-Release` for the everyday one.
+
 `install.ps1` finds `adb` through `sdk.dir` in `local.properties` (or `ANDROID_HOME`) and installs the APK matching the device ABI. Use `-Serial <id>` when more than one device is connected and `-Release` to install the release variant.
 
 ## Integration
@@ -115,3 +117,22 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+## Signing the release build
+
+Without any configuration the release build is signed with the debug key, which differs on every machine. To sign with your own key, create a keystore **outside the repository** and set four values:
+
+| Name | Meaning |
+|------|---------|
+| `APKENCLAVE_KEYSTORE` | Path to the `.jks` file |
+| `APKENCLAVE_KEYSTORE_PASSWORD` | Keystore password |
+| `APKENCLAVE_KEY_ALIAS` | Key alias |
+| `APKENCLAVE_KEY_PASSWORD` | Key password |
+
+Locally put them in `~/.gradle/gradle.properties` (user level, never committed) or in environment variables. In GitHub Actions they come from the repository secrets `APKENCLAVE_KEYSTORE_BASE64` (the keystore, base64), `APKENCLAVE_KEYSTORE_PASSWORD`, `APKENCLAVE_KEY_ALIAS` and `APKENCLAVE_KEY_PASSWORD`; when they are missing the build falls back to the debug key.
+
+Create the keystore once and keep a backup copy (password manager and an offline copy): if the key is lost, installed copies cannot be updated and have to be reinstalled.
+
+```
+keytool -genkeypair -v -keystore apkenclave-release.jks -alias apkenclave -keyalg RSA -keysize 4096 -validity 10000
+```

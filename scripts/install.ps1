@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
-    Updates the KBlackbox app on a phone connected over adb (keeps app data).
+    Updates APKEnclave on a phone connected over adb (keeps app data). The debug variant is a separate
+    app (APKEnclave Dev, applicationId ending in .debug); -Release updates the everyday app.
 .PARAMETER Build
     Build the APK first (scripts\build.ps1).
 .PARAMETER Release
@@ -24,9 +25,9 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
-$appId = 'com.kosmowariat.appenclave'
-$launcher = "$appId/top.niunaijun.blackboxa.view.main.WelcomeActivity"
 $variant = if ($Release) { 'release' } else { 'debug' }
+$appId = if ($Release) { 'com.kosmowariat.appenclave' } else { 'com.kosmowariat.appenclave.debug' }
+$launcher = "$appId/top.niunaijun.blackboxa.view.main.WelcomeActivity"
 
 function Get-Adb {
     $sdk = $null

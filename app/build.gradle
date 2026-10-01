@@ -28,9 +28,28 @@ android {
         }
     }
 
+    def signingProperty = { String name ->
+        providers.gradleProperty(name).orElse(providers.environmentVariable(name)).orNull
+    }
+    def releaseKeystore = signingProperty('APKENCLAVE_KEYSTORE')
+
+    signingConfigs {
+        if (releaseKeystore) {
+            release {
+                storeFile file(releaseKeystore)
+                storePassword signingProperty('APKENCLAVE_KEYSTORE_PASSWORD')
+                keyAlias signingProperty('APKENCLAVE_KEY_ALIAS')
+                keyPassword signingProperty('APKENCLAVE_KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.findByName('release') ?: signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

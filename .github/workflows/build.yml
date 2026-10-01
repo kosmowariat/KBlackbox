@@ -40,7 +40,20 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
+      - name: Prepare release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.APKENCLAVE_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            echo "APKENCLAVE_KEYSTORE=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+          fi
+
       - name: Build APKs and AARs
+        env:
+          APKENCLAVE_KEYSTORE_PASSWORD: ${{ secrets.APKENCLAVE_KEYSTORE_PASSWORD }}
+          APKENCLAVE_KEY_ALIAS: ${{ secrets.APKENCLAVE_KEY_ALIAS }}
+          APKENCLAVE_KEY_PASSWORD: ${{ secrets.APKENCLAVE_KEY_PASSWORD }}
         run: ./gradlew assembleDebug assembleRelease :Bcore:assembleDebug :Bcore:assembleRelease :black-reflection:assemble :compiler:assemble
 
       - name: Upload app debug APKs
