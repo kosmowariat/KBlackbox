@@ -41,7 +41,9 @@ Status: planned, nothing implemented yet (decisions of 2026-10-01). The app is s
 
 - `latest.json` on R2: `versionCode`, `versionName`, APK url, `sha256`, changelog, `minSupportedVersionCode`.
 - The app checks on start or daily via WorkManager, downloads with `DownloadManager`, verifies `sha256`, installs with `PackageInstaller` (`REQUEST_INSTALL_PACKAGES`).
-- Hard requirement: every release is signed with the same key. Release builds are currently debug-signed (tracked as tech debt in the roadmap); before the first public release create the real keystore and back it up.
+- Hard requirement: every release is signed with the same key. The release keystore exists (outside the repository, with `APKENCLAVE_*` settings, see README) and both the everyday app and the `.debug` app are signed with it; keep the offline backup of the keystore. The `.debug` app must never self-update.
+- Before installing, check that the downloaded APK is signed with our certificate (`PackageManager.getPackageArchiveInfo` with signing certificates), and that `versionCode` is higher than the installed one. Android refuses an update signed with another key anyway, but the explicit check gives a clear error and blocks downgrades.
+- `usesCleartextTraffic` is on for the whole app today. Restrict cleartext in `network_security_config.xml` and fetch `latest.json` and the APK only over HTTPS from the download domain.
 
 ## Order of work
 
@@ -49,3 +51,15 @@ Status: planned, nothing implemented yet (decisions of 2026-10-01). The app is s
 2. Site with downloads on Cloudflare Pages.
 3. License backend (Worker + D1) and the key screen in the app, once the Pro features are decided.
 4. Dependency licenses, privacy policy, terms.
+
+## Review notes (2026-10-01)
+
+Things to settle before any code is written, most important first.
+
+1. **Payment provider go/no-go.** The whole plan depends on Polar accepting the product. Read its acceptable-use policy and review requirements first and ask support in writing whether "an app that runs other apps in a sandbox" is acceptable. If not, the fallback is another Merchant of Record or Stripe with own VAT handling. Do this before the site, the Worker or the update channel. Also check with an accountant which business form is needed in Poland to sell a subscription.
+2. **Signed license tokens.** A plain `/verify` answer can be faked with a hosts-file entry or a proxy. Let the Worker return a signed token (for example Ed25519: license id, installation id, expiry) and verify it in the app with an embedded public key; cache the token for the offline grace period. Identify an installation with a random id created at first start, not with hardware identifiers, which also keeps the privacy policy short. Accept that a determined user can still patch the APK; do not spend effort on obfuscation.
+3. **Free versus Pro.** Keep everything that affects safety or data free (backup, restore, stop, health screen). Candidates that fit a paid tier: more than 2-3 spaces, the PC web panel, scheduled backups, favourite places in fake location. Decide this before the key screen, because it decides where the app needs a `isPro` check.
+4. **Dependency and content licenses.** Sandbox, hide-root and GMS features raise questions beyond the code licenses: Dobby, xdl, FreeReflection and the local AARs (`StateView`, `catloading`, `floatingview`, origin not documented) need a notices screen, and the upstream Apache 2.0 notice must ship with the app. Check how Google apps get into a space (bundled or downloaded) before selling. Cheap first step: a licenses list in the About dialog.
+5. **Name and domain.** "APKEnclave" was only checked as a package id. Check trademark and domain availability before building a site on it.
+6. **`targetSdk` 28 and self-distribution.** Android 14 already refuses to install apps with `targetSdk` below 23. The plan relies on 28 staying installable, so watch the minimum target level of new Android versions and keep this risk in the roadmap.
+7. **Cloudflare details.** Check current limits (Pages file size, R2 and Workers free tiers, D1 write limits) at the start; the numbers here are from memory.
