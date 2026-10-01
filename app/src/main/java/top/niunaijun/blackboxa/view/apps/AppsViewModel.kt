@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import top.niunaijun.blackboxa.bean.AppDetails
 import top.niunaijun.blackboxa.bean.AppInfo
+import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.data.AppsRepository
 import top.niunaijun.blackboxa.view.base.BaseViewModel
 
@@ -16,6 +18,8 @@ sealed interface AppsEvent {
     data class Message(val text: String) : AppsEvent
     data class Notice(val text: String) : AppsEvent
     data class LaunchResult(val launched: Boolean) : AppsEvent
+    data class Details(val details: AppDetails) : AppsEvent
+    data class CopyTargets(val app: AppInfo, val targets: List<UserBean>) : AppsEvent
 }
 
 class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
@@ -80,6 +84,18 @@ class AppsViewModel(private val repo: AppsRepository) : BaseViewModel() {
 
     fun launchApk(packageName: String, userID: Int) {
         launch { _events.send(AppsEvent.LaunchResult(repo.launchApk(packageName, userID))) }
+    }
+
+    fun showDetails(info: AppInfo, userId: Int) {
+        launch { _events.send(AppsEvent.Details(repo.getAppDetails(info, userId))) }
+    }
+
+    fun requestCopy(info: AppInfo, userId: Int) {
+        launch { _events.send(AppsEvent.CopyTargets(info, repo.getCopyTargets(userId))) }
+    }
+
+    fun copyApp(info: AppInfo, userId: Int, target: UserBean, withData: Boolean) {
+        launch { _events.send(AppsEvent.Notice(repo.copyApp(info, userId, target, withData))) }
     }
 
     fun updateApkOrder(userID: Int, dataList: List<AppInfo>) {

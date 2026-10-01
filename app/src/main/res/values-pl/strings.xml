@@ -136,4 +136,17 @@
     <string name="backup_export_done">Zapisano kopię zapasową</string>
     <string name="backup_export_failed">Nie udało się zapisać kopii zapasowej</string>
     <string name="backup_import_failed">Nie udało się przywrócić kopii zapasowej</string>
+    <string name="app_info">Informacje o aplikacji</string>
+    <string name="app_copy">Kopiuj do innej przestrzeni</string>
+    <string name="app_info_version">Wersja: %1$s (%2$d)</string>
+    <string name="app_info_package">Pakiet: %s</string>
+    <string name="app_info_data">Rozmiar danych: %s</string>
+    <string name="app_copy_title">Kopiuj %s do</string>
+    <string name="app_copy_no_spaces">Nie ma innej przestrzeni, do której można skopiować</string>
+    <string name="app_copy_data_question">Skopiować też dane aplikacji (zapisy, logowania)?</string>
+    <string name="app_copy_with_data">Z danymi</string>
+    <string name="app_copy_without_data">Bez danych</string>
+    <string name="app_copy_already_there">%1$s jest już w %2$s</string>
+    <string name="app_copied">Skopiowano %1$s do %2$s</string>
+    <string name="app_copy_failed">Nie udało się skopiować %s</string>
 </resources>

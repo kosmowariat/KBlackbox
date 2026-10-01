@@ -147,4 +147,17 @@
     <string name="backup_export_done">Backup saved</string>
     <string name="backup_export_failed">Could not save the backup</string>
     <string name="backup_import_failed">Could not restore the backup</string>
+    <string name="app_info">App info</string>
+    <string name="app_copy">Copy to another space</string>
+    <string name="app_info_version">Version: %1$s (%2$d)</string>
+    <string name="app_info_package">Package: %s</string>
+    <string name="app_info_data">Data size: %s</string>
+    <string name="app_copy_title">Copy %s to</string>
+    <string name="app_copy_no_spaces">There is no other space to copy to</string>
+    <string name="app_copy_data_question">Copy the data of the app (saves, logins) as well?</string>
+    <string name="app_copy_with_data">With data</string>
+    <string name="app_copy_without_data">Without data</string>
+    <string name="app_copy_already_there">%1$s is already in %2$s</string>
+    <string name="app_copied">%1$s copied to %2$s</string>
+    <string name="app_copy_failed">Could not copy %s</string>
 </resources>

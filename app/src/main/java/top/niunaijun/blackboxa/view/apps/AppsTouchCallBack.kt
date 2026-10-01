@@ -1,15 +1,27 @@
 package top.niunaijun.blackboxa.view.apps
 
+import android.graphics.Canvas
 import android.util.Log
+import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-class AppsTouchCallBack(private val onMoveBlock: (from: Int, to: Int) -> Unit) :
-    ItemTouchHelper.Callback() {
+/**
+ * Long-press starts a drag. When the finger is released without the app having been moved,
+ * [onLongPressRelease] is called so the screen can show the app's context menu instead.
+ */
+class AppsTouchCallBack(
+    private val onMoveBlock: (from: Int, to: Int) -> Unit,
+    private val onLongPressRelease: (view: View, position: Int) -> Unit
+) : ItemTouchHelper.Callback() {
+
+    private var reordered = false
+    private var travelled = 0f
 
     companion object {
         private const val TAG = "AppsTouchCallBack"
         private const val DRAG_ALPHA = 0.8f
+        private const val LONG_PRESS_SLOP_PX = 40f
     }
 
     override fun getMovementFlags(
@@ -37,6 +49,7 @@ class AppsTouchCallBack(private val onMoveBlock: (from: Int, to: Int) -> Unit) :
             return false
         }
         onMoveBlock(fromPosition, toPosition)
+        reordered = true
         return true
     }
 
@@ -50,9 +63,30 @@ class AppsTouchCallBack(private val onMoveBlock: (from: Int, to: Int) -> Unit) :
         }
     }
 
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        if (isCurrentlyActive && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            travelled = maxOf(travelled, kotlin.math.hypot(dX, dY))
+        }
+    }
+
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
         viewHolder.itemView.alpha = 1.0f
+        val position = viewHolder.bindingAdapterPosition
+        if (!reordered && travelled < LONG_PRESS_SLOP_PX && position != RecyclerView.NO_POSITION) {
+            onLongPressRelease(viewHolder.itemView, position)
+        }
+        reordered = false
+        travelled = 0f
     }
 
     override fun canDropOver(

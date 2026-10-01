@@ -32,6 +32,7 @@
 - **Feature ideas** (see `.maister/tasks/research/2026-09-30-feature-ideas/outputs/research-report.md`): space backup/export via SAF, per-app spoofing profiles in the UI, tablet/landscape layouts, app grid details sheet and clone-to-space, fake-location favourites and space picker, local diagnostics export, freeze/auto-stop idle apps. Biometric lock and shortcut hardening were deliberately dropped.
 - **Shipped from that list (2026-09-30)**: Polish locale with in-app language picker, launcher shortcuts (recent apps, fake location), permissions and health screen, running indicator with "Stop all apps".
 - **Shipped (2026-10-01)**: export and import of a space as a backup zip (apps, data, order; split APKs are not included).
+- **Shipped (2026-10-01)**: app info and "Copy to another space" (with or without data) in the app menu; the app menu now opens on release after a long press, which ItemTouchHelper used to swallow.
 - **Platform**: `targetSdk` is 28 on purpose (the engine relies on legacy behaviors). Raising it is an engine-level decision, not a GUI one. Track Android 16+ hidden-API changes that may affect `Bcore`.
 
 ---

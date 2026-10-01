@@ -133,4 +133,17 @@
     <string name="backup_export_done">备份已保存</string>
     <string name="backup_export_failed">无法保存备份</string>
     <string name="backup_import_failed">无法恢复备份</string>
+    <string name="app_info">应用信息</string>
+    <string name="app_copy">复制到其他空间</string>
+    <string name="app_info_version">版本：%1$s (%2$d)</string>
+    <string name="app_info_package">包名：%s</string>
+    <string name="app_info_data">数据大小：%s</string>
+    <string name="app_copy_title">将 %s 复制到</string>
+    <string name="app_copy_no_spaces">没有可复制到的其他空间</string>
+    <string name="app_copy_data_question">是否同时复制应用数据（存档、登录信息）？</string>
+    <string name="app_copy_with_data">包含数据</string>
+    <string name="app_copy_without_data">不含数据</string>
+    <string name="app_copy_already_there">%1$s 已在 %2$s 中</string>
+    <string name="app_copied">已将 %1$s 复制到 %2$s</string>
+    <string name="app_copy_failed">无法复制 %s</string>
 </resources>

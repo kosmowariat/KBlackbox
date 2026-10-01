@@ -2,6 +2,7 @@ package top.niunaijun.blackboxa.view.apps
 
 import android.graphics.Point
 import android.os.Bundle
+import android.text.format.Formatter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -14,9 +15,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackbox.BlackBoxCore
 import top.niunaijun.blackboxa.R
+import top.niunaijun.blackboxa.bean.AppDetails
 import top.niunaijun.blackboxa.bean.AppInfo
+import top.niunaijun.blackboxa.bean.UserBean
 import top.niunaijun.blackboxa.databinding.FragmentAppsBinding
 import top.niunaijun.blackboxa.databinding.ItemAppBinding
 import top.niunaijun.blackboxa.util.BindingAdapter
@@ -40,16 +44,12 @@ class AppsFragment : Fragment() {
 
     private val viewBinding: FragmentAppsBinding by inflate()
 
-    private var popupMenu: PopupMenu? = null
-
     private var running: Set<String> = emptySet()
 
     companion object {
         private const val TAG = "AppsFragment"
         private const val GRID_SPAN_COUNT = 4
-        private const val MOVE_THRESHOLD = 40
         private const val VERTICAL_SCROLL_THRESHOLD = 10
-        private const val TAP_MAX_DURATION_MS = 500
         private const val FAST_SCROLL_DY = 100
 
         fun newInstance(userID: Int): AppsFragment {
@@ -95,10 +95,13 @@ class AppsFragment : Fragment() {
             }
         })
 
-        val touchCallBack = AppsTouchCallBack { from, to ->
-            onItemMove(from, to)
-            viewModel.updateApkOrder(userID, mAdapter.getItems())
-        }
+        val touchCallBack = AppsTouchCallBack(
+            onMoveBlock = { from, to ->
+                onItemMove(from, to)
+                viewModel.updateApkOrder(userID, mAdapter.getItems())
+            },
+            onLongPressRelease = { view, position -> showAppMenu(view, mAdapter.getItems()[position]) }
+        )
         ItemTouchHelper(touchCallBack).attachToRecyclerView(viewBinding.recyclerView)
 
         mAdapter.onItemClick = { _, data, _ ->
@@ -108,7 +111,6 @@ class AppsFragment : Fragment() {
         }
 
         interceptTouch()
-        setOnLongClick()
         return viewBinding.root
     }
 
@@ -126,50 +128,22 @@ class AppsFragment : Fragment() {
         viewModel.getInstalledAppsWithRetry(userID)
     }
 
-    /**
-     * The context menu opens on release, so it doesn't fight with drag-to-reorder: a press that
-     * turns into a scroll or drag dismisses it instead.
-     */
     private fun interceptTouch() {
         val point = Point()
-        var isScrolling = false
-        var scrollStartTime = 0L
 
         viewBinding.recyclerView.setOnTouchListener { _, e ->
             when (e.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    isScrolling = false
-                    scrollStartTime = System.currentTimeMillis()
-                    point.set(0, 0)
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    val pressDuration = System.currentTimeMillis() - scrollStartTime
-                    if (!isScrolling && !isMove(point, e) && pressDuration < TAP_MAX_DURATION_MS) {
-                        popupMenu?.show()
-                    }
-                    popupMenu = null
-                    point.set(0, 0)
-                    isScrolling = false
-                }
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP -> point.set(0, 0)
 
                 MotionEvent.ACTION_MOVE -> {
                     if (point.x == 0 && point.y == 0) {
                         point.set(e.rawX.toInt(), e.rawY.toInt())
-                    }
-                    if (isMove(point, e)) {
-                        isScrolling = true
-                        popupMenu?.dismiss()
                     }
                     updateFloatButton(point, e)
                 }
             }
             false
         }
-    }
-
-    private fun isMove(point: Point, e: MotionEvent): Boolean {
-        return abs(point.x - e.rawX) > MOVE_THRESHOLD || abs(point.y - e.rawY) > MOVE_THRESHOLD
     }
 
     private fun updateFloatButton(point: Point, e: MotionEvent) {
@@ -188,24 +162,26 @@ class AppsFragment : Fragment() {
         mAdapter.moveItem(fromPosition, toPosition)
     }
 
-    private fun setOnLongClick() {
-        mAdapter.onItemLongClick = { view, data, _ ->
-            popupMenu = PopupMenu(requireContext(), view).also {
-                it.inflate(R.menu.app_menu)
-                it.setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.app_remove -> unInstallApk(data)
+    private fun showAppMenu(view: View, data: AppInfo) {
+        PopupMenu(requireContext(), view).also {
+            it.inflate(R.menu.app_menu)
+            it.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.app_remove -> unInstallApk(data)
 
-                        R.id.app_clear -> clearApk(data)
+                    R.id.app_clear -> clearApk(data)
 
-                        R.id.app_stop -> stopApk(data)
+                    R.id.app_stop -> stopApk(data)
 
-                        R.id.app_shortcut -> ShortcutUtil.createShortcut(requireContext(), userID, data)
-                    }
-                    true
+                    R.id.app_shortcut -> ShortcutUtil.createShortcut(requireContext(), userID, data)
+
+                    R.id.app_copy -> viewModel.requestCopy(data, userID)
+
+                    R.id.app_info -> viewModel.showDetails(data, userID)
                 }
-                it.show()
+                true
             }
+            it.show()
         }
     }
 
@@ -234,6 +210,8 @@ class AppsFragment : Fragment() {
             hideLoading()
             when (event) {
                 is AppsEvent.Notice -> requireContext().toast(event.text)
+                is AppsEvent.Details -> showDetails(event.details)
+                is AppsEvent.CopyTargets -> showCopyDialog(event.app, event.targets)
                 is AppsEvent.Message -> {
                     requireContext().toast(event.text)
                     viewModel.getInstalledApps(userID)
@@ -280,6 +258,46 @@ class AppsFragment : Fragment() {
             showLoading()
             viewModel.clearApkData(info.packageName, userID)
         }
+    }
+
+    private fun showDetails(details: AppDetails) {
+        val message = listOf(
+                getString(R.string.app_info_package, details.packageName),
+                getString(R.string.app_info_version, details.versionName, details.versionCode),
+                getString(R.string.app_info_data, Formatter.formatShortFileSize(requireContext(), details.dataBytes))
+        ).joinToString("\n")
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(details.name)
+                .setMessage(message)
+                .setPositiveButton(R.string.done, null)
+                .show()
+    }
+
+    private fun showCopyDialog(app: AppInfo, targets: List<UserBean>) {
+        if (targets.isEmpty()) {
+            toast(R.string.app_copy_no_spaces)
+            return
+        }
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.app_copy_title, app.name))
+                .setItems(targets.map { it.name }.toTypedArray()) { _, index -> askCopyData(app, targets[index]) }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+    }
+
+    private fun askCopyData(app: AppInfo, target: UserBean) {
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(app.name)
+                .setMessage(R.string.app_copy_data_question)
+                .setPositiveButton(R.string.app_copy_with_data) { _, _ -> copyApp(app, target, true) }
+                .setNegativeButton(R.string.app_copy_without_data) { _, _ -> copyApp(app, target, false) }
+                .setNeutralButton(R.string.cancel, null)
+                .show()
+    }
+
+    private fun copyApp(app: AppInfo, target: UserBean, withData: Boolean) {
+        showLoading()
+        viewModel.copyApp(app, userID, target, withData)
     }
 
     fun stopAllApps() {

@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.util.Log
 import android.webkit.URLUtil
+import androidx.core.content.pm.PackageInfoCompat
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,6 +15,7 @@ import top.niunaijun.blackbox.entity.pm.InstallResult
 import top.niunaijun.blackbox.utils.AbiUtils
 import top.niunaijun.blackboxa.R
 import top.niunaijun.blackboxa.app.AppManager
+import top.niunaijun.blackboxa.bean.AppDetails
 import top.niunaijun.blackboxa.bean.AppInfo
 import top.niunaijun.blackboxa.bean.DuplicateUserBean
 import top.niunaijun.blackboxa.bean.InstalledAppBean
@@ -448,6 +450,47 @@ class AppsRepository {
         DataKind.DEVICE_PROTECTED -> BEnvironment.getDeDataDir(packageName, userId)
         DataKind.EXTERNAL -> BEnvironment.getExternalDataDir(packageName, userId)
     }
+
+    suspend fun getAppDetails(info: AppInfo, userId: Int): AppDetails = withContext(Dispatchers.IO) {
+        val packageInfo = BlackBoxCore.getBPackageManager().getPackageInfo(info.packageName, 0, userId)
+        val dataBytes = DataKind.entries.sumOf { kind ->
+            dataDir(info.packageName, userId, kind).walkTopDown().filter { it.isFile }.sumOf { it.length() }
+        }
+        AppDetails(
+                info.name,
+                info.packageName,
+                packageInfo?.versionName.orEmpty(),
+                packageInfo?.let { PackageInfoCompat.getLongVersionCode(it) } ?: 0L,
+                dataBytes
+        )
+    }
+
+    suspend fun getCopyTargets(sourceUserId: Int): List<UserBean> = getUserList().filter { it.id != sourceUserId }
+
+    /** Installs [info] into another space, optionally with its data; returns the message to show. */
+    suspend fun copyApp(info: AppInfo, sourceUserId: Int, target: UserBean, withData: Boolean): String =
+            withContext(Dispatchers.IO) {
+                try {
+                    val core = BlackBoxCore.get()
+                    if (core.getInstalledApplications(0, target.id).any { it.packageName == info.packageName }) {
+                        return@withContext getString(R.string.app_copy_already_there, info.name, target.name)
+                    }
+                    val app = core.getInstalledApplications(0, sourceUserId).first { it.packageName == info.packageName }
+                    val result = installCopyForUser(app, target.id)
+                    if (!result.success) {
+                        Log.w(TAG, "Copy: install of ${info.packageName} failed: ${result.msg}")
+                        return@withContext getString(R.string.app_copy_failed, info.name)
+                    }
+                    if (withData) {
+                        copyAppData(info.packageName, sourceUserId, target.id)
+                    }
+                    updateAppSortList(target.id, info.packageName, true)
+                    getString(R.string.app_copied, info.name, target.name)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error copying ${info.packageName} to user ${target.id}", e)
+                    getString(R.string.app_copy_failed, info.name)
+                }
+            }
 
     /** Writes the apps of a space and their data into [target]; returns an error message or null. */
     suspend fun exportUser(userId: Int, target: Uri): String? = withContext(Dispatchers.IO) {

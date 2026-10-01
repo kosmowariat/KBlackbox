@@ -132,4 +132,17 @@
     <string name="backup_export_done">備份已儲存</string>
     <string name="backup_export_failed">無法儲存備份</string>
     <string name="backup_import_failed">無法還原備份</string>
+    <string name="app_info">應用程式資訊</string>
+    <string name="app_copy">複製到其他空間</string>
+    <string name="app_info_version">版本：%1$s (%2$d)</string>
+    <string name="app_info_package">套件名稱：%s</string>
+    <string name="app_info_data">資料大小：%s</string>
+    <string name="app_copy_title">將 %s 複製到</string>
+    <string name="app_copy_no_spaces">沒有可複製到的其他空間</string>
+    <string name="app_copy_data_question">是否同時複製應用程式資料（存檔、登入資訊）？</string>
+    <string name="app_copy_with_data">包含資料</string>
+    <string name="app_copy_without_data">不含資料</string>
+    <string name="app_copy_already_there">%1$s 已在 %2$s 中</string>
+    <string name="app_copied">已將 %1$s 複製到 %2$s</string>
+    <string name="app_copy_failed">無法複製 %s</string>
 </resources>

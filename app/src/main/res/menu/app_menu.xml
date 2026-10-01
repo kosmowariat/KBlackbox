@@ -7,4 +7,8 @@
 
     <item android:id="@+id/app_remove" android:title="@string/app_remove"/>
     <item android:id="@+id/app_shortcut" android:title="@string/app_shortcut"/>
+
+    <item android:id="@+id/app_copy" android:title="@string/app_copy"/>
+
+    <item android:id="@+id/app_info" android:title="@string/app_info"/>
 </menu>
