@@ -1,5 +1,68 @@
 # Release Notes - NewBlackbox
 
+## Version: Spaces and Tools (2026-10-01)
+
+---
+
+### New Features
+
+#### Backup and Restore of a Space
+Export a space (its apps, their data and the app order) to a zip file and create a new space from such a file.
+
+- **Location:** space menu → Export to backup file; main menu → Import from backup file
+- Uses the system file picker, so the file can live anywhere (Downloads, a cloud drive)
+- Google apps and services are not included; native libs and caches are skipped
+- Apps split into several APK files are not supported (only the base APK is saved)
+
+#### App Menu: Info and Copy to Another Space
+- **App info** shows the package, version and the size of the app data
+- **Copy to another space** installs the app into a chosen space, with or without its data
+- The app menu opens when you release a long press without moving; dragging an icon still reorders the grid
+
+#### Running Indicator and Stop All
+- A dot on an app icon shows that it is running
+- **Stop all apps** (space menu) and **Stop all apps in all spaces** (main menu)
+
+#### Permissions and Health Screen
+Settings → Sandbox → Permissions & health shows all-files access, battery optimization, notifications, launcher shortcuts support and the engine version, with buttons that open the right system screen. A Close app button applies engine settings that need a restart.
+
+#### Launcher Shortcuts
+Long-press the launcher icon for Fake location and the recently launched apps. Shortcuts of uninstalled apps are removed.
+
+#### Language
+Polish translation and an in-app language picker (Settings → Appearance → Language).
+
+#### Fake Location Upgrade
+Pick the space, type coordinates, and keep favourite places (long press removes one). Reachable from the space menu as well.
+
+#### About and Logs
+Settings → About shows the version and credits and can share the app log file.
+
+---
+
+### Bug Fixes
+
+#### Running apps were never detected
+**Problem:** `BlackBoxCore.isRunningApplication` always returned false on current devices.
+**Root Cause:** It read the private `mTasks` map of the activity stack by reflection.
+**Solution:** Ask the engine process service, which tracks the live processes of each user.
+**Files Changed:** `Bcore/src/main/java/top/niunaijun/blackbox/BlackBoxCore.java`
+
+#### App context menu never opened
+**Problem:** Long-pressing an app in the grid did nothing.
+**Root Cause:** `ItemTouchHelper` took over the long press for drag and the view long-click listener never fired.
+**Solution:** The menu is shown from the drag callback when the press ends without moving the icon.
+**Files Changed:** `app/src/main/java/top/niunaijun/blackboxa/view/apps/AppsTouchCallBack.kt`, `AppsFragment.kt`
+
+---
+
+### Known Issues
+
+- A sandboxed app that starts background work right after being stopped can crash on its first database access (`SQLiteGlobal.getDefaultSyncMode`, `ArrayIndexOutOfBoundsException`). Seen once with FreeCell, not reproduced.
+- Freezing apps and automatic stop of idle apps are not implemented; they need an engine setter for the hidden flag and a background service.
+
+---
+
 ## Version: GUI Refresh (2026-09-27)
 
 ---

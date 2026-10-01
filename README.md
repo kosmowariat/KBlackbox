@@ -18,6 +18,8 @@ This enhanced edition includes bug fixes, stability improvements, and Android 14
 *   **Multi-Architecture**: Support for 32-bit and 64-bit apps.
 *   **Device Spoofing**: Modify device information for virtual apps.
 *   **Fake Location**: Spoof GPS coordinates.
+*   **Spaces**: Several independent spaces, duplicated or copied between each other, with backup and restore to a zip file.
+*   **Material 3 UI**: Light and dark theme, Polish and Chinese translations, launcher shortcuts.
 
 ## Requirements
 
