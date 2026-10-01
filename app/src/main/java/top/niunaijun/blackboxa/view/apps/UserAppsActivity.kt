@@ -16,6 +16,7 @@ import top.niunaijun.blackboxa.util.Resolution
 import top.niunaijun.blackboxa.util.inflate
 import top.niunaijun.blackboxa.util.toast
 import top.niunaijun.blackboxa.view.base.LoadingActivity
+import top.niunaijun.blackboxa.view.fake.FakeManagerActivity
 import top.niunaijun.blackboxa.view.list.ListActivity
 import top.niunaijun.blackboxa.view.users.UserDialogs
 import top.niunaijun.blackboxa.view.users.UsersEvent
@@ -114,6 +115,9 @@ class UserAppsActivity : LoadingActivity() {
             }
             R.id.user_duplicate -> viewModel.requestDuplicate(user)
             R.id.user_delete -> userDialogs.showDeleteDialog(user)
+            R.id.user_fake_location -> startActivity(
+                    Intent(this, FakeManagerActivity::class.java).putExtra("userID", userId)
+            )
             R.id.user_export -> exportResult.launch("$userName.zip")
             R.id.user_stop_all -> appsFragment.stopAllApps()
             else -> return super.onOptionsItemSelected(item)

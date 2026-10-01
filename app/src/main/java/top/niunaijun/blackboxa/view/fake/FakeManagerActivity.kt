@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import top.niunaijun.blackbox.entity.location.BLocation
 import top.niunaijun.blackbox.fake.frameworks.BLocationManager
 import top.niunaijun.blackboxa.R
@@ -38,11 +40,14 @@ class FakeManagerActivity : BaseActivity() {
 
     private var query = ""
 
+    private var userId = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
 
+        userId = currentUserID()
         initToolbar(viewBinding.toolbarLayout.toolbar, R.string.fake_location, true)
 
         mAdapter = fakeLocationAdapter()
@@ -65,7 +70,7 @@ class FakeManagerActivity : BaseActivity() {
                 R.string.close_fake_location,
                 getString(R.string.close_app_fake_location, item.name)
         ) {
-            BLocationManager.disableFakeLocation(currentUserID(), item.packageName)
+            BLocationManager.disableFakeLocation(userId, item.packageName)
             toast(getString(R.string.close_fake_location_success, item.name))
             item.fakeLocationPattern = BLocationManager.CLOSE_MODE
             mAdapter.replaceAt(position, item)
@@ -77,6 +82,7 @@ class FakeManagerActivity : BaseActivity() {
             FakeLocationViewModel::class.java
         )
         loadAppList()
+        viewModel.loadSpaces()
         viewBinding.toolbarLayout.toolbar.setTitle(R.string.fake_location)
 
         collectStarted(viewModel.apps) { apps ->
@@ -94,7 +100,8 @@ class FakeManagerActivity : BaseActivity() {
 
     private fun loadAppList() {
         viewBinding.stateView.showLoading()
-        viewModel.getInstallAppList(currentUserID())
+        viewBinding.toolbarLayout.toolbar.subtitle = viewModel.spaceName(userId)
+        viewModel.getInstallAppList(userId)
     }
 
     private val locationResult =
@@ -106,8 +113,8 @@ class FakeManagerActivity : BaseActivity() {
                     val longitude = data.getDoubleExtra("longitude", 0.0)
                     val pkg = data.getStringExtra("pkg")
 
-                    viewModel.setPattern(currentUserID(), pkg.toString(), BLocationManager.OWN_MODE)
-                    viewModel.setLocation(currentUserID(), pkg.toString(), BLocation(latitude, longitude))
+                    viewModel.setPattern(userId, pkg.toString(), BLocationManager.OWN_MODE)
+                    viewModel.setLocation(userId, pkg.toString(), BLocation(latitude, longitude))
 
                     toast(getString(R.string.set_location,latitude.toString(), longitude.toString()))
 
@@ -137,7 +144,7 @@ class FakeManagerActivity : BaseActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_search, menu)
+        menuInflater.inflate(R.menu.menu_fake, menu)
         val searchView = menu!!.findItem(R.id.list_search).actionView as SearchView
         searchView.queryHint = getString(R.string.filter)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -149,6 +156,23 @@ class FakeManagerActivity : BaseActivity() {
 
             override fun onQueryTextSubmit(query: String?) = true
         })
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId != R.id.fake_switch_space) {
+            return super.onOptionsItemSelected(item)
+        }
+        val spaces = viewModel.spaces.value
+        MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.fake_switch_space)
+                .setSingleChoiceItems(spaces.map { it.second }.toTypedArray(), spaces.indexOfFirst { it.first == userId }) { dialog, index ->
+                    userId = spaces[index].first
+                    loadAppList()
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
         return true
     }
 

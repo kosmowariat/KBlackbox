@@ -7,7 +7,7 @@
     <string name="empty_empty">Empty</string>
     <string name="filter">Filter</string>
     <string name="open_source_path">Open Source</string>
-    <string name="fake_location">Fake Location(Preview)</string>
+    <string name="fake_location">Fake Location</string>
     <string name="real_location">Real Location</string>
     <string name="set_location">Set Fake Location Successfully:%s-%s</string>
     <string name="close_fake_location">Disable FakeLocation</string>
@@ -166,4 +166,13 @@
     <string name="about_share_logs">Share logs</string>
     <string name="about_logs_failed">Could not collect the logs</string>
     <string name="about_logs_subject">APKEnclave logs</string>
+    <string name="fake_coordinates">Coordinates</string>
+    <string name="fake_favourites">Favourites</string>
+    <string name="fake_coordinates_hint">Latitude, longitude</string>
+    <string name="fake_coordinates_invalid">Enter latitude and longitude, for example 52.2297, 21.0122</string>
+    <string name="fake_favourites_empty">No saved places yet. Pick a place on the map and save it here.</string>
+    <string name="fake_save_place">Save this place</string>
+    <string name="fake_place_name">Place name</string>
+    <string name="fake_place_delete">Remove %s from favourites?</string>
+    <string name="fake_switch_space">Switch space</string>
 </resources>

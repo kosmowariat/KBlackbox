@@ -9,7 +9,7 @@
     <string name="open_source_path">开源地址</string>
     <string name="setting">软件设置</string>
     <string name="permission_setting">权限设置</string>
-    <string name="fake_location">虚拟定位(预览版)</string>
+    <string name="fake_location">虚拟定位</string>
     <string name="real_location">真实位置</string>
     <string name="set_location">虚拟定位设置成功:%s-%s</string>
     <string name="close_fake_location">关闭虚拟定位</string>
@@ -152,4 +152,13 @@
     <string name="about_share_logs">分享日志</string>
     <string name="about_logs_failed">无法收集日志</string>
     <string name="about_logs_subject">APKEnclave 日志</string>
+    <string name="fake_coordinates">坐标</string>
+    <string name="fake_favourites">收藏</string>
+    <string name="fake_coordinates_hint">纬度, 经度</string>
+    <string name="fake_coordinates_invalid">请输入纬度和经度，例如 52.2297, 21.0122</string>
+    <string name="fake_favourites_empty">还没有保存的地点。在地图上选择地点后保存到这里。</string>
+    <string name="fake_save_place">保存此地点</string>
+    <string name="fake_place_name">地点名称</string>
+    <string name="fake_place_delete">从收藏中移除 %s？</string>
+    <string name="fake_switch_space">切换空间</string>
 </resources>

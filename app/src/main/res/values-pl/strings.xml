@@ -7,7 +7,7 @@
     <string name="empty_empty">Pusto</string>
     <string name="filter">Filtruj</string>
     <string name="open_source_path">Kod źródłowy</string>
-    <string name="fake_location">Fałszywa lokalizacja (podgląd)</string>
+    <string name="fake_location">Fałszywa lokalizacja</string>
     <string name="real_location">Prawdziwa lokalizacja</string>
     <string name="set_location">Ustawiono fałszywą lokalizację: %s-%s</string>
     <string name="close_fake_location">Wyłącz fałszywą lokalizację</string>
@@ -155,4 +155,13 @@
     <string name="about_share_logs">Udostępnij logi</string>
     <string name="about_logs_failed">Nie udało się zebrać logów</string>
     <string name="about_logs_subject">Logi APKEnclave</string>
+    <string name="fake_coordinates">Współrzędne</string>
+    <string name="fake_favourites">Ulubione</string>
+    <string name="fake_coordinates_hint">Szerokość, długość geograficzna</string>
+    <string name="fake_coordinates_invalid">Podaj szerokość i długość geograficzną, na przykład 52.2297, 21.0122</string>
+    <string name="fake_favourites_empty">Brak zapisanych miejsc. Wskaż miejsce na mapie i zapisz je tutaj.</string>
+    <string name="fake_save_place">Zapisz to miejsce</string>
+    <string name="fake_place_name">Nazwa miejsca</string>
+    <string name="fake_place_delete">Usunąć %s z ulubionych?</string>
+    <string name="fake_switch_space">Zmień przestrzeń</string>
 </resources>

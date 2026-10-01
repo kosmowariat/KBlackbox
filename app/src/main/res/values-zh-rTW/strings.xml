@@ -6,7 +6,7 @@
     <string name="empty_empty">空的</string>
     <string name="filter">篩檢</string>
     <string name="open_source_path">開源地址</string>
-    <string name="fake_location">虛擬定位（預覽）</string>
+    <string name="fake_location">虛擬定位</string>
     <string name="real_location">真實位置</string>
     <string name="set_location">成功設定虛擬定位：%s-%s</string>
     <string name="close_fake_location">禁用虛擬位置</string>
@@ -151,4 +151,13 @@
     <string name="about_share_logs">分享日誌</string>
     <string name="about_logs_failed">無法收集日誌</string>
     <string name="about_logs_subject">APKEnclave 日誌</string>
+    <string name="fake_coordinates">座標</string>
+    <string name="fake_favourites">收藏</string>
+    <string name="fake_coordinates_hint">緯度, 經度</string>
+    <string name="fake_coordinates_invalid">請輸入緯度和經度，例如 52.2297, 21.0122</string>
+    <string name="fake_favourites_empty">尚無儲存的地點。在地圖上選擇地點後儲存到這裡。</string>
+    <string name="fake_save_place">儲存此地點</string>
+    <string name="fake_place_name">地點名稱</string>
+    <string name="fake_place_delete">從收藏中移除 %s？</string>
+    <string name="fake_switch_space">切換空間</string>
 </resources>

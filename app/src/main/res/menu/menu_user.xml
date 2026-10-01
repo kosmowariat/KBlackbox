@@ -21,6 +21,11 @@
             app:showAsAction="always" />
 
     <item
+            android:id="@+id/user_fake_location"
+            android:title="@string/fake_location"
+            app:showAsAction="never" />
+
+    <item
             android:id="@+id/user_export"
             android:title="@string/export_space"
             app:showAsAction="never" />

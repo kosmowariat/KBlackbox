@@ -13,6 +13,14 @@ import top.niunaijun.blackboxa.bean.FakeLocationBean
 class FakeLocationRepository {
     val TAG: String = "FakeLocationRepository"
 
+    suspend fun getSpaces(): List<Pair<Int, String>> = withContext(Dispatchers.IO) {
+        val appsRepository = AppsRepository()
+        val ids = BlackBoxCore.get().users.map { it.id }.ifEmpty { listOf(AppsRepository.DEFAULT_USER_ID) }.sorted()
+        ids.map { it to appsRepository.getUserName(it) }
+    }
+
+    fun getSpaceName(userId: Int): String = AppsRepository().getUserName(userId)
+
     suspend fun setPattern(userId: Int, pkg: String, pattern: Int) = withContext(Dispatchers.IO) {
         BLocationManager.get().setPattern(userId, pkg, pattern)
     }
