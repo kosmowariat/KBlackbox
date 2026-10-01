@@ -38,6 +38,13 @@ Pick the space, type coordinates, and keep favourite places (long press removes 
 #### About and Logs
 Settings → About shows the version and credits and can share the app log file.
 
+#### PC Web Panel Hardening
+- The server listens only on the Wi-Fi address instead of every network interface
+- 16-character token; the API accepts it only in the `X-Token` header, never in the address
+- Ten wrong tokens lock the API for a minute; header lines, header count and total request time are limited
+- Responses carry `nosniff`, frame, referrer and content-security headers; the page keeps the token out of the address bar
+- Covered by unit tests that run a real server on the loopback interface
+
 #### Space Card Polish
 - In the grid view a space without apps shows a "No apps yet" hint with a plus instead of only its name
 - Long-pressing a card in the grid view shows only rename, duplicate and delete (it also listed items the card could not handle)

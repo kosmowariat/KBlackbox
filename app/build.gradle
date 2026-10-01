@@ -64,6 +64,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
     kotlinOptions {
         jvmTarget = '21'
     }
@@ -91,6 +94,7 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.core.ktx
     testImplementation libs.junit
+    testImplementation libs.json
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 

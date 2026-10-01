@@ -53,7 +53,13 @@
 </main>
 
 <script>
-  const token = new URLSearchParams(location.search).get('t') || '';
+  // The link carries the token once; keep it for this tab only and remove it from the address bar.
+  const fromLink = new URLSearchParams(location.search).get('t');
+  if (fromLink) {
+    sessionStorage.setItem('token', fromLink);
+    history.replaceState(null, '', location.pathname);
+  }
+  const token = sessionStorage.getItem('token') || '';
   const usersList = document.getElementById('users');
   const statusBox = document.getElementById('status');
   const nameInput = document.getElementById('name');

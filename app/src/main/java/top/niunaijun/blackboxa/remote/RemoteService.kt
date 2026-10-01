@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import java.io.IOException
 import java.net.Inet4Address
 import java.net.NetworkInterface
-import java.security.SecureRandom
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +39,14 @@ class RemoteService : Service() {
             return START_NOT_STICKY
         }
 
-        val token = newToken()
-        val remoteServer = RemoteServer(InjectionUtil.appsRepository, assets, token, PORT)
+        val token = RemoteToken.generate()
+        val remoteServer = RemoteServer(
+                RepositorySpaceDirectory(InjectionUtil.appsRepository),
+                { assets.open(PANEL_ASSET).use { it.readBytes() } },
+                token,
+                PORT,
+                address
+        )
         try {
             remoteServer.start()
         } catch (e: IOException) {
@@ -51,7 +56,7 @@ class RemoteService : Service() {
             return START_NOT_STICKY
         }
         server = remoteServer
-        mutableUrl.value = "http://$address:$PORT/?t=$token"
+        mutableUrl.value = "http://${address.hostAddress}:$PORT/?t=$token"
         return START_NOT_STICKY
     }
 
@@ -84,25 +89,19 @@ class RemoteService : Service() {
                 .build()
     }
 
-    private fun newToken(): String {
-        val random = SecureRandom()
-        return String(CharArray(TOKEN_LENGTH) { TOKEN_ALPHABET[random.nextInt(TOKEN_ALPHABET.length)] })
-    }
-
-    private fun localAddress(): String? =
+    private fun localAddress(): Inet4Address? =
             NetworkInterface.getNetworkInterfaces().toList()
                     .filter { it.isUp && !it.isLoopback }
                     .flatMap { it.inetAddresses.toList() }
-                    .firstOrNull { it is Inet4Address && it.isSiteLocalAddress }
-                    ?.hostAddress
+                    .filterIsInstance<Inet4Address>()
+                    .firstOrNull { it.isSiteLocalAddress }
 
     companion object {
         private const val TAG = "RemoteService"
         private const val PORT = 8765
         private const val NOTIFICATION_ID = 8765
         private const val CHANNEL_ID = "remote_panel"
-        private const val TOKEN_LENGTH = 10
-        private const val TOKEN_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789"
+        private const val PANEL_ASSET = "remote/index.html"
 
         private val mutableUrl = MutableStateFlow<String?>(null)
 
